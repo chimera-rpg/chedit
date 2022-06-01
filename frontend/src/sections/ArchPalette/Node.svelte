@@ -12,7 +12,7 @@
     if (node.Archetype === undefined) { 
       open = !open
     } else {
-      paletteStore.select(fullpath, [fullpath])
+      paletteStore.select(node.Archetype.Self, [node.Archetype.Self])
     }
   }
 </script>
@@ -48,7 +48,7 @@
     <ul>
       {#each Object.keys(node) as path2}
         <li>
-          <svelte:self path={path2} fullpath={path+'/'+path2} node={node[path2]}></svelte:self>
+          <svelte:self path={path2} fullpath={path?(path+'/'+path2):path2} node={node[path2]}></svelte:self>
         </li>
       {/each}
     </ul>

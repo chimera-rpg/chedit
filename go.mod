@@ -4,11 +4,13 @@ go 1.17
 
 require (
 	github.com/chimera-rpg/go-server v0.0.0-20220601083230-188495c509ea
-	github.com/wailsapp/wails/v2 v2.0.0-beta.36
+	github.com/sqweek/dialog v0.0.0-20220504154117-be45b268883a
+	github.com/wailsapp/wails/v2 v2.0.0-beta.37
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
+	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
 	github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b // indirect
 	github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -42,5 +44,3 @@ require (
 	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
-
-replace github.com/wailsapp/wails/v2 v2.0.0-beta.36 => /home/kts/go/pkg/mod/github.com/wailsapp/wails/v2@v2.0.0-beta.36

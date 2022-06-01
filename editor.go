@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	sdata "github.com/chimera-rpg/go-server/data"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gopkg.in/yaml.v2"
 )
 
@@ -325,15 +324,7 @@ type MapReference struct {
 }
 
 func (e *Editor) LoadMap() (*MapReference, error) {
-	p, err := runtime.OpenFileDialog(e.ctx, runtime.OpenDialogOptions{
-		DefaultDirectory: *e.Config.MapsRoot,
-		Title:            "Open a map",
-		Filters: []runtime.FileFilter{runtime.FileFilter{
-			DisplayName: "Map Files (*.map.yaml)",
-			Pattern:     "*.map.yaml;*.map.yml",
-		},
-		},
-	})
+	p, err := e.openMapDialog()
 	if p == "" {
 		return nil, nil
 	}

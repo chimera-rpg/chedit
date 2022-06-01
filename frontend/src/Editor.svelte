@@ -6,6 +6,8 @@
   import MainMenu from "./sections/MainMenu.svelte"
   import Views from "./sections/Views.svelte"
 
+  import SplitPane from "./components/SplitPane.svelte"
+
   import { animations as animationStore } from './stores/animations'
   import { archetypes as archetypesStore } from './stores/archetypes'
 
@@ -29,8 +31,10 @@
 <main>
   <MainMenu></MainMenu>
   <section>
-    <ArchPalette></ArchPalette>
-    <Views></Views>
+    <SplitPane type='horizontal' pos={15}>
+      <ArchPalette slot=a></ArchPalette>
+      <Views slot=b></Views>
+    </SplitPane>
   </section>
 </main>
 
@@ -44,7 +48,7 @@
   }
   section {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);;
+    grid-template-columns: minmax(0, 1fr);;
     grid-template-rows: minmax(0, 1fr);
   }
 </style>

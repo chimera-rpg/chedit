@@ -15,7 +15,7 @@
   div {
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
-    background: var(--menu);
+    background: var(--section);
     min-width: 10em;
     overflow: hidden;
   }

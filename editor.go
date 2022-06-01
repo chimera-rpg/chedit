@@ -11,10 +11,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type ArchetypeContainer struct {
+	Archetype *sdata.Archetype `json:"Archetype"`
+	Source    string           `json:"Source"`
+	Interface interface{}      `json:"Interface"`
+}
+
 // Editor is our editor, yo.
 type Editor struct {
 	ctx        context.Context
-	Archetypes map[string]*sdata.Archetype    `json:"Archetypes"`
+	Archetypes map[string]ArchetypeContainer  `json:"Archetypes"`
 	Animations map[string]*sdata.AnimationPre `json:"Animations"`
 	Config     Config                         `json:"Config"`
 }
@@ -22,7 +28,7 @@ type Editor struct {
 // NewEditor creates a new Editor application struct
 func NewEditor() *Editor {
 	return &Editor{
-		Archetypes: make(map[string]*sdata.Archetype),
+		Archetypes: make(map[string]ArchetypeContainer),
 		Animations: make(map[string]*sdata.AnimationPre),
 	}
 }
@@ -81,13 +87,18 @@ func (e *Editor) Initialize() (err error) {
 		return err
 	}
 
+	// Compile stuff.
+	if err := e.CompileArchetypes(); err != nil {
+		return err
+	}
+
 	// Print some info.
 	fmt.Printf("%d archetypes, %d animations\n", len(e.Archetypes), len(e.Animations))
 	return nil
 }
 
 func (e *Editor) LoadArchetypes() error {
-	e.Archetypes = make(map[string]*sdata.Archetype)
+	e.Archetypes = make(map[string]ArchetypeContainer)
 	err := filepath.Walk(*e.Config.ArchetypesRoot, func(p string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -108,7 +119,10 @@ func (e *Editor) LoadArchetypes() error {
 					if _, ok := e.Archetypes[k]; ok {
 						return fmt.Errorf("archetype '%s' exists", k)
 					}
-					e.Archetypes[k] = archetype
+					e.Archetypes[k] = ArchetypeContainer{
+						Archetype: archetype,
+						Source:    string(b),
+					}
 				}
 			}
 		}
@@ -152,10 +166,140 @@ func (e *Editor) LoadAnimations() error {
 		return err
 	}
 	return nil
-
 }
 
-func (e *Editor) GetArchetypes() map[string]*sdata.Archetype {
+func (e *Editor) CompileArchetypes() error {
+	for _, a := range e.Archetypes {
+		if err := e.resolveArchetype(a.Archetype); err != nil {
+			return err
+		}
+	}
+	for _, a := range e.Archetypes {
+		if err := e.compileArchetype(a.Archetype); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e *Editor) compileArchetype(a *sdata.Archetype) error {
+	if a.IsCompiled() || a.IsCompiling() {
+		return nil
+	}
+	a.SetCompiling(true)
+
+	if err := e.resolveArchetype(a); err != nil {
+		return err
+	}
+
+	if len(a.Archs) == 0 && a.Arch != "" {
+		a.Archs = append(a.Archs, a.Arch)
+	}
+	for _, dep := range a.Archs {
+		shouldMerge := true
+		if dep[0] == '+' {
+			dep = dep[1:]
+			shouldMerge = false
+		}
+		ac2, ok := e.Archetypes[dep]
+		if !ok {
+			return fmt.Errorf("missing dep %s", dep)
+		}
+		a2 := ac2.Archetype
+		if err := e.compileArchetype(a2); err != nil {
+			return err
+		}
+		if shouldMerge {
+			if err := a.Merge(a2); err != nil {
+				return err
+			}
+		} else {
+			if err := a.Add(a2); err != nil {
+				return err
+			}
+		}
+	}
+
+	for i := range a.Inventory {
+		if err := e.compileArchetype(&a.Inventory[i]); err != nil {
+			return err
+		}
+	}
+
+	// Ensure Events' archetypes are compiled.
+	compileEventResponses := func(er *sdata.EventResponses) {
+		if er == nil {
+			return
+		}
+		// FIXME: For now, do not compile events.
+		return
+		if er.Spawn != nil {
+			for _, a := range er.Spawn.Items {
+				e.compileArchetype(a.Archetype)
+			}
+		}
+		if er.Replace != nil {
+			for _, a := range *er.Replace {
+				e.compileArchetype(a.Archetype)
+			}
+		}
+	}
+	if a.Events != nil {
+		compileEventResponses(a.Events.Birth)
+		compileEventResponses(a.Events.Death)
+		compileEventResponses(a.Events.Advance)
+		compileEventResponses(a.Events.Hit)
+	}
+
+	a.SetCompiled(true)
+
+	return nil
+}
+
+func (e *Editor) resolveArchetype(archetype *sdata.Archetype) error {
+	resolved := make(map[string]struct{})
+	unresolved := make(map[string]struct{})
+
+	if err := e.dependencyResolveArchetype(archetype, resolved, unresolved); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Editor) dependencyResolveArchetype(archetype *sdata.Archetype, resolved, unresolved map[string]struct{}) error {
+	unresolved[archetype.Self] = struct{}{}
+	for _, dep := range archetype.Archs {
+		if dep[0] == '+' {
+			dep = dep[1:]
+		}
+		depArch := e.GetArchetype(dep)
+		if depArch == nil {
+			return fmt.Errorf("%s missing", dep)
+		}
+		if _, ok := resolved[dep]; !ok {
+			if _, ok := unresolved[dep]; ok {
+				return fmt.Errorf("circular dependency between %s and %s", archetype.Self, dep)
+			}
+			if err := e.dependencyResolveArchetype(depArch, resolved, unresolved); err != nil {
+				return err
+			}
+		}
+	}
+	resolved[archetype.Self] = struct{}{}
+	delete(unresolved, archetype.Self)
+
+	return nil
+}
+
+func (e *Editor) GetArchetype(n string) *sdata.Archetype {
+	ac, ok := e.Archetypes[n]
+	if !ok {
+		return nil
+	}
+	return ac.Archetype
+}
+
+func (e *Editor) GetArchetypes() map[string]ArchetypeContainer {
 	return e.Archetypes
 }
 
@@ -170,7 +314,6 @@ func (e *Editor) LoadMaps() error {
 
 func (e *Editor) GetBytes(p string) ([]byte, error) {
 	p = filepath.Join(*e.Config.ArchetypesRoot, p)
-	fmt.Println("okay, getting bytes from", p)
 	b, err := os.ReadFile(p)
 	if err != nil {
 		return nil, err

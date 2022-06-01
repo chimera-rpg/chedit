@@ -26,6 +26,7 @@ func main() {
 			editor,
 			&sdata.Archetype{},
 			&sdata.AnimationPre{},
+			&ArchetypeContainer{},
 		},
 	})
 

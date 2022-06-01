@@ -3,7 +3,7 @@ module changeme
 go 1.17
 
 require (
-	github.com/chimera-rpg/go-server v0.0.0-20220530064225-2c6d3973e920
+	github.com/chimera-rpg/go-server v0.0.0-20220601013221-99c35dc413d8
 	github.com/wailsapp/wails/v2 v2.0.0-beta.36
 	gopkg.in/yaml.v2 v2.4.0
 )

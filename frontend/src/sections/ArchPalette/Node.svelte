@@ -7,10 +7,8 @@
   export let node: data.Archetype | any
   export let open: boolean = false
 
-  console.log(node)
-
   function onClick(e: MouseEvent) {
-    if (node.Arch === undefined) { 
+    if (node.Archetype === undefined) { 
       open = !open
     } else {
       console.log('selected', fullpath)
@@ -20,7 +18,7 @@
 
 <main>
   <section on:click={onClick}>
-    {#if node.Arch === undefined}
+    {#if node.Archetype === undefined}
       <article class='opener'>
         {#if open}
         -
@@ -30,7 +28,7 @@
       </article>
     {:else}
       <article>
-        {#await animationsStore.getImage(node.Anim, node.Face)}
+        {#await animationsStore.getImage(node.Archetype.Anim, node.Archetype.Face)}
           ...
         {:then bytes}
           <img src="data:image/png;base64,{bytes}">
@@ -45,7 +43,7 @@
       <span>root</span>
     {/if}
   </section>
-  {#if node.Arch === undefined && open}
+  {#if node.Archetype === undefined && open}
     <ul>
       {#each Object.keys(node) as path2}
         <li>

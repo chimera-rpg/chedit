@@ -1,6 +1,7 @@
 <script lang="ts">
   import { group_outros } from 'svelte/internal';
   import { maps } from '../../stores/maps'
+  import View from './View.svelte'
 
   let dragging: boolean = false
 
@@ -49,7 +50,8 @@
           {/each}
         </nav>
       </header>
-      <article>MAP HERE</article>
+      <nav>map group menu here</nav>
+      <View map={group.Maps[group.SelectedMap]}></View>
     </section>
   {/each}
 </div>
@@ -70,8 +72,9 @@
     border: 1px solid var(--section-color);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
     background: var(--section);
+    overflow: hidden;
   }
   header {
     background: var(--subsection);

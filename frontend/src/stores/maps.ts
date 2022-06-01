@@ -29,6 +29,7 @@ export const maps: MapsStore = ((): MapsStore => {
       let ms = get({subscribe})
       ms.maps.push({
         ...mr,
+        SelectedMap: Object.keys(mr.Maps)[0],
         x: 64, y: 64, w: 320, h: 240,
       })
       set(ms)

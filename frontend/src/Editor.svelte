@@ -5,12 +5,9 @@
   import ArchPalette from "./sections/ArchPalette.svelte"
   import MainMenu from "./sections/MainMenu.svelte"
   import Views from "./sections/Views.svelte"
-  import type { data } from '../wailsjs/go/models'
 
-  import { animations as animationStore } from './stores/animations.ts'
-  import { archetypes as archetypesStore } from './stores/archetypes.ts'
-
-  let archetypes: {[key: string]: data.Archetype} = {}
+  import { animations as animationStore } from './stores/animations'
+  import { archetypes as archetypesStore } from './stores/archetypes'
 
   onMount(async () =>{
     await GoEditor.Initialize()

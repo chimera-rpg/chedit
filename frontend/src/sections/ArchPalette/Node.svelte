@@ -1,6 +1,7 @@
 <script lang='ts'>
   //import { data } from '../../../wailsjs/go/models'
   import { animations as animationsStore } from '../../stores/animations'
+  import { palette as paletteStore } from '../../stores/palette'
 
   export let path: string = ''
   export let fullpath: string = ''
@@ -11,13 +12,13 @@
     if (node.Archetype === undefined) { 
       open = !open
     } else {
-      console.log('selected', fullpath)
+      paletteStore.select(fullpath, [fullpath])
     }
   }
 </script>
 
 <main>
-  <section on:click={onClick}>
+  <section on:click={onClick} class:selected={$paletteStore.focused===fullpath}>
     {#if node.Archetype === undefined}
       <article class='opener'>
         {#if open}
@@ -68,6 +69,9 @@
     grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
     text-align: left;
+  }
+  section.selected {
+    background: rgba(128, 128, 128, 0.5)
   }
   ul, li {
     list-style: none;

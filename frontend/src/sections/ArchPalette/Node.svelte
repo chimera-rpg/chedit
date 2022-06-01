@@ -53,7 +53,7 @@
   {/if}
   {#if node.Archetype === undefined && open}
     <ul>
-      {#each Object.keys(node) as path2}
+      {#each Object.keys(node) as path2 (path2)}
         <li>
           <svelte:self path={path2} fullpath={path?(path+'/'+path2):path2} node={node[path2]} depth={depth+1}></svelte:self>
         </li>

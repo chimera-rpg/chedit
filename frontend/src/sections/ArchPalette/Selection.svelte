@@ -9,7 +9,7 @@
 <div>
   {#if arch && arch.Archetype}
     <ArchView anim={arch.Archetype.Anim} face={arch.Archetype.Face}></ArchView>
-    <span title={arch.Archetype.Anim+':'+arch.Archetype.Face}>{$palette.focused}</span>
+    <span title={arch.Archetype.Anim+':'+arch.Archetype.Face}>{arch.Archetype.Name}</span>
   {:else}
     <span></span>
     <span>{$palette.focused}</span>

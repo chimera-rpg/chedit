@@ -1,4 +1,6 @@
 <script lang='ts'>
+  import Arch from "./Arch.svelte"
+
   export let map: data.Map
   export let tile: any = {}
   export let y: number = 0
@@ -38,6 +40,9 @@
 </script>
 
 <div class='tile' style='left: {posX*zoom}px; top: {posY*zoom}px; z-index: {posZ};'>
+  {#each tile as arch}
+    <Arch arch={arch}></Arch>
+  {/each}
 </div>
 
 <style>

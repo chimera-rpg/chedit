@@ -24,6 +24,7 @@ type Editor struct {
 	Archetypes map[string]ArchetypeContainer  `json:"Archetypes"`
 	Animations map[string]*sdata.AnimationPre `json:"Animations"`
 	Config     Config                         `json:"Config"`
+	compiled   bool
 }
 
 // NewEditor creates a new Editor application struct
@@ -177,21 +178,22 @@ func (e *Editor) CompileArchetypes() error {
 		}
 	}
 	for _, a := range e.Archetypes {
-		if err := e.compileArchetype(a.Archetype); err != nil {
+		if _, err := e.CompileArchetype(a.Archetype); err != nil {
 			return err
 		}
 	}
+	e.compiled = true
 	return nil
 }
 
-func (e *Editor) compileArchetype(a *sdata.Archetype) error {
+func (e *Editor) CompileArchetype(a *sdata.Archetype) (*sdata.Archetype, error) {
 	if a.IsCompiled() || a.IsCompiling() {
-		return nil
+		return a, nil
 	}
 	a.SetCompiling(true)
 
 	if err := e.resolveArchetype(a); err != nil {
-		return err
+		return a, err
 	}
 
 	if len(a.Archs) == 0 && a.Arch != "" {
@@ -205,26 +207,28 @@ func (e *Editor) compileArchetype(a *sdata.Archetype) error {
 		}
 		ac2, ok := e.Archetypes[dep]
 		if !ok {
-			return fmt.Errorf("missing dep %s", dep)
+			return a, fmt.Errorf("missing dep %s", dep)
 		}
 		a2 := ac2.Archetype
-		if err := e.compileArchetype(a2); err != nil {
-			return err
+		if !e.compiled {
+			if _, err := e.CompileArchetype(a2); err != nil {
+				return a, err
+			}
 		}
 		if shouldMerge {
 			if err := a.Merge(a2); err != nil {
-				return err
+				return a, err
 			}
 		} else {
 			if err := a.Add(a2); err != nil {
-				return err
+				return a, err
 			}
 		}
 	}
 
 	for i := range a.Inventory {
-		if err := e.compileArchetype(&a.Inventory[i]); err != nil {
-			return err
+		if _, err := e.CompileArchetype(&a.Inventory[i]); err != nil {
+			return a, err
 		}
 	}
 
@@ -237,12 +241,12 @@ func (e *Editor) compileArchetype(a *sdata.Archetype) error {
 		return
 		if er.Spawn != nil {
 			for _, a := range er.Spawn.Items {
-				e.compileArchetype(a.Archetype)
+				e.CompileArchetype(a.Archetype)
 			}
 		}
 		if er.Replace != nil {
 			for _, a := range *er.Replace {
-				e.compileArchetype(a.Archetype)
+				e.CompileArchetype(a.Archetype)
 			}
 		}
 	}
@@ -255,7 +259,7 @@ func (e *Editor) compileArchetype(a *sdata.Archetype) error {
 
 	a.SetCompiled(true)
 
-	return nil
+	return a, nil
 }
 
 func (e *Editor) resolveArchetype(archetype *sdata.Archetype) error {

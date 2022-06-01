@@ -12,9 +12,9 @@
     <section>
       <article class='map__container'>
         <article class='map' style="width: {map.Width*8*zoom}px; height: {map.Height*8*zoom}px">
-          {#each map.Tiles as tileY, y}
-            {#each tileY as tileX, x}
-              {#each tileX as tileZ, z}
+          {#each map.Tiles as tileY, y (y)}
+            {#each tileY as tileX, x (x)}
+              {#each tileX as tileZ, z (z)}
                 <Tile y={y} x={x} z={z} tile={tileZ} map={map} zoom={zoom}></Tile>
               {/each}
             {/each}

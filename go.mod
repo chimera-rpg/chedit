@@ -3,13 +3,13 @@ module changeme
 go 1.17
 
 require (
-	github.com/chimera-rpg/go-server v0.0.0-20220601013221-99c35dc413d8
+	github.com/chimera-rpg/go-server v0.0.0-20220601083230-188495c509ea
 	github.com/wailsapp/wails/v2 v2.0.0-beta.36
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
-	github.com/chimera-rpg/go-common v0.0.0-20220414015514-90cf25831b62 // indirect
+	github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b // indirect
 	github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.1.2 // indirect

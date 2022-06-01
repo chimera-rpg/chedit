@@ -6,16 +6,24 @@
   import type { data } from "../../../wailsjs/go/models"
 
   export let arch: data.Archetype
+  let compiled: data.Archetype
+  let err: any
+  compile(arch).then(v => {
+    compiled = v
+    console.log('compiled')
+  }).catch(e => {
+    err = e
+  })
 </script>
 
 <div class='arch'>
-  {#await compile(arch)}
-    pending
-  {:then arch}
-    <ArchView anim={arch.Anim} face={arch.Face}></ArchView>
-  {:catch err}
-    crap
-  {/await}
+  {#if err}
+    {err}
+  {:else if !compiled}
+    ...
+  {:else}
+    <ArchView anim={compiled.Anim} face={compiled.Face}></ArchView>
+  {/if}
 </div>
 
 <style>

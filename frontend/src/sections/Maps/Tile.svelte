@@ -40,7 +40,7 @@
 </script>
 
 <div class='tile' style='left: {posX*zoom}px; top: {posY*zoom}px; z-index: {posZ};'>
-  {#each tile as arch}
+  {#each tile as arch, index (index)}
     <Arch arch={arch}></Arch>
   {/each}
 </div>

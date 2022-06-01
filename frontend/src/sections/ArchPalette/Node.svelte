@@ -8,6 +8,8 @@
   export let node: data.Archetype | any
   export let open: boolean = false
 
+  $: isArchetype = node.Archetype !== undefined
+
   function onClick(e: MouseEvent) {
     if (node.Archetype === undefined) { 
       open = !open
@@ -18,8 +20,8 @@
 </script>
 
 <main>
-  <section on:click={onClick} class:selected={$paletteStore.focused===fullpath}>
-    {#if node.Archetype === undefined}
+  <section class:archetype={isArchetype} on:click={onClick} class:selected={$paletteStore.focused===(isArchetype?node.Archetype.Self:'')}>
+    {#if !isArchetype}
       <article class='opener'>
         {#if open}
         -
@@ -72,6 +74,12 @@
   }
   section.selected {
     background: rgba(128, 128, 128, 0.5)
+  }
+  section {
+    cursor: pointer;
+  }
+  section.archetype {
+    cursor: crosshair;
   }
   ul, li {
     list-style: none;

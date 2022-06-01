@@ -16,6 +16,7 @@
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
     background: var(--section);
+    color: var(--section-color);
     min-width: 10em;
     overflow: hidden;
   }

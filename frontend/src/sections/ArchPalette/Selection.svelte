@@ -25,5 +25,7 @@
     align-items: flex-end;
     padding: .5em;
     box-sizing: content-box;
+    color: var(--subsection-color);
+    background: var(--subsection);
   }
 </style>

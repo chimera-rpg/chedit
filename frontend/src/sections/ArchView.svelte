@@ -17,4 +17,8 @@
 
 
 <style>
+  img {
+    zoom: 2;
+    image-rendering: pixelated;
+  }
 </style>

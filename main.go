@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 
-	sdata "github.com/chimera-rpg/go-server/data"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 )
@@ -24,9 +23,6 @@ func main() {
 		OnStartup: editor.startup,
 		Bind: []interface{}{
 			editor,
-			&sdata.Archetype{},
-			&sdata.AnimationPre{},
-			&ArchetypeContainer{},
 		},
 	})
 

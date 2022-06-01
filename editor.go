@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ArchetypeContainer contains an archetype and its source.
 type ArchetypeContainer struct {
 	Archetype *sdata.Archetype `json:"Archetype"`
 	Source    string           `json:"Source"`
@@ -40,6 +41,7 @@ func (e *Editor) startup(ctx context.Context) {
 	e.ctx = ctx
 }
 
+// Initialize initializes our editor, including creating user directories, loading configuration, and loading assets.
 func (e *Editor) Initialize() (err error) {
 	// Ensure our system directories are available.
 	configDir, err := os.UserConfigDir()
@@ -84,9 +86,6 @@ func (e *Editor) Initialize() (err error) {
 	if err := e.LoadAnimations(); err != nil {
 		return err
 	}
-	if err := e.LoadMaps(); err != nil {
-		return err
-	}
 
 	// Compile stuff.
 	if err := e.CompileArchetypes(); err != nil {
@@ -98,6 +97,7 @@ func (e *Editor) Initialize() (err error) {
 	return nil
 }
 
+// LoadArchetypes loads all archetypes in the archetypes root directory and stores them in our Archetypes field.
 func (e *Editor) LoadArchetypes() error {
 	e.Archetypes = make(map[string]ArchetypeContainer)
 	err := filepath.Walk(*e.Config.ArchetypesRoot, func(p string, info os.FileInfo, err error) error {
@@ -136,6 +136,7 @@ func (e *Editor) LoadArchetypes() error {
 	return nil
 }
 
+// LoadAnimations loads all animations in our archetypes directory and stores them in our Animations field.
 func (e *Editor) LoadAnimations() error {
 	e.Animations = make(map[string]*sdata.AnimationPre)
 	err := filepath.Walk(*e.Config.ArchetypesRoot, func(p string, info os.FileInfo, err error) error {
@@ -170,6 +171,7 @@ func (e *Editor) LoadAnimations() error {
 	return nil
 }
 
+// CompileArchetypes compiles all archetypes.
 func (e *Editor) CompileArchetypes() error {
 	for _, a := range e.Archetypes {
 		if err := e.resolveArchetype(a.Archetype); err != nil {
@@ -185,6 +187,7 @@ func (e *Editor) CompileArchetypes() error {
 	return nil
 }
 
+// CompileArchetype compiles a given archetype and returns itself. The return is used to automatically resend a changed Archetype back to Wails on completion.
 func (e *Editor) CompileArchetype(a *sdata.Archetype) (*sdata.Archetype, error) {
 	if a.IsCompiled() || a.IsCompiling() {
 		return a, nil
@@ -261,6 +264,7 @@ func (e *Editor) CompileArchetype(a *sdata.Archetype) (*sdata.Archetype, error) 
 	return a, nil
 }
 
+// resolveArchetype is used to ensure that circular dependencies do not exist.
 func (e *Editor) resolveArchetype(archetype *sdata.Archetype) error {
 	resolved := make(map[string]struct{})
 	unresolved := make(map[string]struct{})
@@ -271,6 +275,7 @@ func (e *Editor) resolveArchetype(archetype *sdata.Archetype) error {
 	return nil
 }
 
+// dependencyResolveArchetype is the deeper recursive companion to resolveArchetype.
 func (e *Editor) dependencyResolveArchetype(archetype *sdata.Archetype, resolved, unresolved map[string]struct{}) error {
 	unresolved[archetype.Self] = struct{}{}
 	for _, dep := range archetype.Archs {
@@ -296,6 +301,7 @@ func (e *Editor) dependencyResolveArchetype(archetype *sdata.Archetype, resolved
 	return nil
 }
 
+// GetArchetype returns the archetype entry corresponding to the given name.
 func (e *Editor) GetArchetype(n string) *sdata.Archetype {
 	ac, ok := e.Archetypes[n]
 	if !ok {
@@ -304,25 +310,24 @@ func (e *Editor) GetArchetype(n string) *sdata.Archetype {
 	return ac.Archetype
 }
 
+// GetArchetypes returns the archetypes field.
 func (e *Editor) GetArchetypes() map[string]ArchetypeContainer {
 	return e.Archetypes
 }
 
+// GetAnimations returns the animations field.
 func (e *Editor) GetAnimations() map[string]*sdata.AnimationPre {
 	return e.Animations
 }
 
-func (e *Editor) LoadMaps() error {
-	fmt.Println("TODO: somehow load maps")
-	return nil
-}
-
+// MapReference is a container for a map that contains the current selected map as well as the source path. Most of its fields are intended for Wails use.
 type MapReference struct {
 	Path        string               `json:"Path"`
 	Maps        map[string]sdata.Map `json:"Maps"`
 	SelectedMap string               `json:"SelectedMap"`
 }
 
+// LoadMap opens a file dialog and attempts to load a map from the selected file.
 func (e *Editor) LoadMap() (*MapReference, error) {
 	p, err := e.openMapDialog()
 	if p == "" {
@@ -348,6 +353,7 @@ func (e *Editor) LoadMap() (*MapReference, error) {
 	}, nil
 }
 
+// GetBytes gets bytes from a file relative to the archetypes root directory.
 func (e *Editor) GetBytes(p string) ([]byte, error) {
 	p = filepath.Join(*e.Config.ArchetypesRoot, p)
 	b, err := os.ReadFile(p)

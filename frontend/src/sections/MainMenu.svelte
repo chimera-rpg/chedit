@@ -3,9 +3,12 @@
   import MenuBar from "../components/Menus/MenuBar.svelte"
   import MenuList from "../components/Menus/MenuList.svelte"
   import MenuItem from "../components/Menus/MenuItem.svelte"
+  import { LoadMap } from "../../wailsjs/go/main/Editor"
+  import { maps as mapsStore } from '../stores/maps'
 
-  function openMap() {
-    console.log('TODO: Show open map dialog')
+  async function openMap() {
+    let m = await LoadMap()
+    mapsStore.open(m)
   }
 </script>
 

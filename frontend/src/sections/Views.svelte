@@ -1,12 +1,18 @@
 <script lang='ts'>
+  import List from "./Maps/List.svelte"
+  import Windows from "./Maps/Windows.svelte"
+
 </script>
 
-<main>
-  Map views, perhaps floating windows?
-</main>
+<div>
+  <List></List>
+  <Windows></Windows>
+</div>
 
 <style>
-  main {
+  div {
+    position: relative;
     background: var(--content);
+    overflow: hidden;
   }
 </style>

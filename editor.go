@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	sdata "github.com/chimera-rpg/go-server/data"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gopkg.in/yaml.v2"
 )
 
@@ -311,6 +312,45 @@ func (e *Editor) GetAnimations() map[string]*sdata.AnimationPre {
 func (e *Editor) LoadMaps() error {
 	fmt.Println("TODO: somehow load maps")
 	return nil
+}
+
+type MapReference struct {
+	Path        string               `json:"Path"`
+	Maps        map[string]sdata.Map `json:"Maps"`
+	SelectedMap string               `json:"SelectedMap"`
+}
+
+func (e *Editor) LoadMap() (*MapReference, error) {
+	p, err := runtime.OpenFileDialog(e.ctx, runtime.OpenDialogOptions{
+		DefaultDirectory: *e.Config.MapsRoot,
+		Title:            "Open a map",
+		Filters: []runtime.FileFilter{runtime.FileFilter{
+			DisplayName: "Map Files (*.map.yaml)",
+			Pattern:     "*.map.yaml;*.map.yml",
+		},
+		},
+	})
+	if p == "" {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := os.ReadFile(p)
+	if err != nil {
+		return nil, err
+	}
+
+	m := make(map[string]sdata.Map)
+	if err := yaml.Unmarshal(b, &m); err != nil {
+		return nil, err
+	}
+
+	return &MapReference{
+		Path: p,
+		Maps: m,
+	}, nil
 }
 
 func (e *Editor) GetBytes(p string) ([]byte, error) {

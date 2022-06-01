@@ -20,7 +20,6 @@ export const animations: Writable<AnimationsStore> = ((): Writable<AnimationsSto
     subscribe,
     set,
     getImage: async (anim: string, face: string): Promise<number[]|undefined> => {
-      console.log('getImage', anim, face)
       if (face === "") {
         face = "default"
       }

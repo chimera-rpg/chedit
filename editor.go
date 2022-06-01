@@ -119,6 +119,7 @@ func (e *Editor) LoadArchetypes() error {
 					if _, ok := e.Archetypes[k]; ok {
 						return fmt.Errorf("archetype '%s' exists", k)
 					}
+					archetype.Self = k
 					e.Archetypes[k] = ArchetypeContainer{
 						Archetype: archetype,
 						Source:    string(b),

@@ -7,6 +7,7 @@
   export let fullpath: string = ''
   export let node: data.Archetype | any
   export let open: boolean = false
+  export let depth: number = 0
 
   $: isArchetype = node.Archetype !== undefined
 
@@ -20,7 +21,7 @@
 </script>
 
 <main>
-  <section class:archetype={isArchetype} on:click={onClick} class:selected={$paletteStore.focused===(isArchetype?node.Archetype.Self:'')}>
+  <section style='padding-left: {depth/2}em' class:archetype={isArchetype} on:click={onClick} class:selected={$paletteStore.focused===(isArchetype?node.Archetype.Self:'')}>
     {#if !isArchetype}
       <article class='opener'>
         {#if open}
@@ -50,7 +51,7 @@
     <ul>
       {#each Object.keys(node) as path2}
         <li>
-          <svelte:self path={path2} fullpath={path?(path+'/'+path2):path2} node={node[path2]}></svelte:self>
+          <svelte:self path={path2} fullpath={path?(path+'/'+path2):path2} node={node[path2]} depth={depth+1}></svelte:self>
         </li>
       {/each}
     </ul>
@@ -85,6 +86,5 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    padding-left: .5em;
   }
 </style>

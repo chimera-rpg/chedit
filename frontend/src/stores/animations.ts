@@ -5,7 +5,7 @@ import { GetBytes } from '../../wailsjs/go/main/Editor'
 interface AnimationsStore {
   animations: {[key:string]: data.AnimationPre}
   images: {[key:string]: {[key:string]:number[]|undefined}}
-  getImage(p: string): Promise<number[]|undefined>
+  getImage(anim: string, face: string): Promise<number[]|undefined>
   tree: any
 }
  

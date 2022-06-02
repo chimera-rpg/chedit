@@ -4,18 +4,34 @@
 
   export let map: data.Map
   let zoom: number = 2
+  let cursorY: number = 0
+  let cursorX: number = 0
+  let cursorZ: number = 0
 
+  function handleTileMousedown(e: MouseEvent, y: number, x: number, z: number) {
+    cursorX = x
+    cursorZ = z
+  }
+  function handleMapMousewheel(e: WheelEvent) {
+    if (e.altKey) {
+      e.preventDefault()
+      e.stopPropagation()
+      cursorY += e.deltaY > 0 ? -1 : 1
+      if (cursorY < 0) cursorY = 0
+      if (cursorY > map.Height) cursorY = map.Height
+    }
+  }
 </script>
 
 <div>
   {#if map}
     <section>
       <article class='map__container'>
-        <article class='map' style="width: {map.Width*8*zoom}px; height: {map.Height*8*zoom}px">
+        <article class='map' style="width: {map.Width*8*zoom}px; height: {map.Height*8*zoom}px" on:wheel={handleMapMousewheel}>
           {#each map.Tiles as tileY, y (y)}
             {#each tileY as tileX, x (x)}
               {#each tileX as tileZ, z (z)}
-                <Tile y={y} x={x} z={z} tile={tileZ} map={map} zoom={zoom}></Tile>
+                <Tile y={y} x={x} z={z} tile={tileZ} map={map} zoom={zoom} disabled={cursorY!==y} focused={cursorX===x&&cursorY===y&&cursorZ===z} on:mousedown={e=>handleTileMousedown(e, y, x, z)}></Tile>
               {/each}
             {/each}
           {/each}

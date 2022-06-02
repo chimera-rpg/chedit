@@ -11,7 +11,12 @@
   let x: number = 0
   let y: number = 0
 
-  compiled = compileInJS(arch)
+  try {
+    compiled = compileInJS(arch)
+  } catch(err: any) {
+    console.log(err)
+    compiled = arch
+  }
   /*compile(arch).then(v => {
     compiled = v
   }).catch(e => {

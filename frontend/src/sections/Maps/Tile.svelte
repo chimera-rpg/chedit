@@ -9,7 +9,6 @@
   export let x: number = 0
   export let z: number = 0
   export let zoom: number = 1
-  export let disabled: boolean = false
   export let focused: boolean = false
 
   let tileWidth = animationsConfig.TileWidth
@@ -43,29 +42,26 @@
   let [posX, posY, posZ] = getPos(y, x, z)
 </script>
 
-<div class:disabled class='tile' style='left: {posX*zoom}px; top: {posY*zoom}px; min-width: {tileWidth*zoom}px; min-height: {tileHeight*zoom}px; z-index: {posZ};' on:mousedown|preventDefault|stopPropagation>
+<div class='tile' style='left: {posX*zoom}px; top: {posY*zoom}px; width: {tileWidth*zoom}px; height: {tileHeight*zoom}px;'>
   {#each tile as arch, index (index)}
-    <Arch arch={arch} zoom={zoom}></Arch>
+    <Arch arch={arch} zoom={zoom} zIndex={posZ}></Arch>
   {/each}
-  {#if focused}
-    <div class:focused style='width: {tileWidth*zoom}px; height: {tileHeight*zoom}px'></div>
-  {/if}
+  <div class='cursor' class:focused style='width: {tileWidth*zoom}px; height: {tileHeight*zoom}px'></div>
 </div>
 
 <style>
   .tile {
     position: absolute;
   }
-  .tile.disabled {
-    pointer-events: none;
-  }
-  .focused {
+  .cursor {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
-    background: rgba(200, 100, 100, 0.5);
-    border: 1px solid rgba(200, 100, 100, 0.75);
     z-index: 999999999;
+    box-sizing: border-box;
+  }
+  .focused {
+    background: rgba(200, 100, 100, 0.5);
   }
 </style>

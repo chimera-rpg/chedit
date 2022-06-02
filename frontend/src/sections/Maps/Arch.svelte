@@ -6,10 +6,9 @@
 
   export let zoom: number = 1
   export let arch: data.Archetype
+  export let zIndex: number = 0
   let compiled: data.Archetype
   let err: any
-  let x: number = 0
-  let y: number = 0
 
   try {
     compiled = compileInJS(arch)
@@ -24,7 +23,7 @@
   })*/
 </script>
 
-<div class='arch'>
+<div class='arch' style='z-index: {zIndex}'>
   {#if err}
     {err}
   {:else if !compiled}
@@ -36,5 +35,6 @@
 
 <style>
   .arch {
+    position: relative;
   }
 </style>

@@ -3,7 +3,7 @@ import type { data } from '../../wailsjs/go/models'
 import type { main } from '../../wailsjs/go/models'
 import * as ftt from '@kettek/filepaths-to-tree'
 
-interface ArchetypesStore {
+export interface ArchetypesStore {
   archetypes: {[key:string]: main.ArchetypeContainer}
   tree: any
 }

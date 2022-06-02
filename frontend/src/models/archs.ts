@@ -1,5 +1,5 @@
 import { get } from "svelte/store"
-import { archetypes } from "../stores/archetypes"
+import { archetypes, ArchetypesStore } from "../stores/archetypes"
 import { data } from "../../wailsjs/go/models"
 import merge from 'ts-deepmerge'
 import { CompileArchetype } from "../../wailsjs/go/main/Editor"
@@ -99,8 +99,14 @@ export function compileInJS(arch: data.Archetype): data.Archetype {
   return arch
 }
 
+let localArchetypes: ArchetypesStore = {archetypes: {}, tree: {}}
+
+archetypes.subscribe((value: ArchetypesStore) => {
+  localArchetypes = value
+})
+
 function getArchetype(name: string): data.Archetype {
-  let r = get(archetypes).archetypes[name]
+  let r = localArchetypes.archetypes[name]
   if (r) {
     return r.Archetype
   }

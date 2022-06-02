@@ -3,6 +3,7 @@ module changeme
 go 1.17
 
 require (
+	github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b
 	github.com/chimera-rpg/go-server v0.0.0-20220601083230-188495c509ea
 	github.com/sqweek/dialog v0.0.0-20220504154117-be45b268883a
 	github.com/wailsapp/wails/v2 v2.0.0-beta.37
@@ -11,7 +12,6 @@ require (
 
 require (
 	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
-	github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b // indirect
 	github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.1.2 // indirect

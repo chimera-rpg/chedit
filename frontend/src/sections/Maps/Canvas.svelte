@@ -14,9 +14,13 @@
   export let zoom: number = 1
   export let map: data.Map
 
-  $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X) + (animationsConfig.TileWidth*4)
-  $: canvasHeight = (map.Height * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y) + (animationsConfig.TileHeight*4)
-  $: (zoom || map) ? render() : null
+  $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
+  $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
+
+  $: onChange(zoom, map)
+  function onChange(...args: any) {
+    render()
+  }
 
   interface DrawListItem {
     arch: data.Archetype
@@ -115,9 +119,10 @@
   let drawlist: DrawListItem[]
   function render() {
     if (!canvas) return
+    console.log('render')
     ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
     renderDrawList(drawlist)
   }
 

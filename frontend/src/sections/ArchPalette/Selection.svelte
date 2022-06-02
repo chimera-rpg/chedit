@@ -8,7 +8,7 @@
 
 <div>
   {#if arch && arch.Archetype}
-    <ArchView anim={arch.Archetype.Anim} face={arch.Archetype.Face}></ArchView>
+    <ArchView arch={arch.Archetype} anim={arch.Archetype.Anim} face={arch.Archetype.Face} zoom={2}></ArchView>
     <span title={arch.Archetype.Anim+':'+arch.Archetype.Face}>{arch.Archetype.Name}</span>
   {:else}
     <span></span>
@@ -18,6 +18,7 @@
 
 <style>
   div {
+    position: relative;
     height: 3em;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);

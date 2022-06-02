@@ -5,10 +5,17 @@
   import MenuItem from "../components/Menus/MenuItem.svelte"
   import { LoadMap } from "../../wailsjs/go/main/Editor"
   import { maps as mapsStore } from '../stores/maps'
+  import { parse } from 'yaml'
 
   async function openMap() {
-    let m = await LoadMap()
-    mapsStore.open(m)
+    if (true) { // This unmarshals the maps in go, then sends those here.
+      let m = await LoadMap(true)
+      mapsStore.open(m)
+    } else { // This only reads the bytes in go, then sends them here to unmarshal.
+      let m = await LoadMap(false)
+      m.Maps = parse(m.Source)
+      mapsStore.open(m)
+    }
   }
 </script>
 

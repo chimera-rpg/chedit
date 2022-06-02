@@ -348,12 +348,13 @@ func (e *Editor) GetAnimations() map[string]*sdata.AnimationPre {
 // MapReference is a container for a map that contains the current selected map as well as the source path. Most of its fields are intended for Wails use.
 type MapReference struct {
 	Path        string               `json:"Path"`
+	Source      string               `json:"Source"`
 	Maps        map[string]sdata.Map `json:"Maps"`
 	SelectedMap string               `json:"SelectedMap"`
 }
 
 // LoadMap opens a file dialog and attempts to load a map from the selected file.
-func (e *Editor) LoadMap() (*MapReference, error) {
+func (e *Editor) LoadMap(unmarshal bool) (*MapReference, error) {
 	p, err := e.openMapDialog()
 	if p == "" {
 		return nil, nil
@@ -367,15 +368,21 @@ func (e *Editor) LoadMap() (*MapReference, error) {
 		return nil, err
 	}
 
-	m := make(map[string]sdata.Map)
-	if err := yaml.Unmarshal(b, &m); err != nil {
-		return nil, err
+	mr := &MapReference{
+		Path: p,
 	}
 
-	return &MapReference{
-		Path: p,
-		Maps: m,
-	}, nil
+	if unmarshal {
+		m := make(map[string]sdata.Map)
+		if err := yaml.Unmarshal(b, &m); err != nil {
+			return nil, err
+		}
+		mr.Maps = m
+	} else {
+		mr.Source = string(b)
+	}
+
+	return mr, nil
 }
 
 // GetBytes gets bytes from a file relative to the archetypes root directory.

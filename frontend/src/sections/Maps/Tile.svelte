@@ -43,7 +43,7 @@
   let [posX, posY, posZ] = getPos(y, x, z)
 </script>
 
-<div class:disabled class='tile' style='left: {posX*zoom}px; top: {posY*zoom}px; z-index: {posZ};' on:mousedown|preventDefault|stopPropagation>
+<div class:disabled class='tile' style='left: {posX*zoom}px; top: {posY*zoom}px; min-width: {tileWidth*zoom}px; min-height: {tileHeight*zoom}px; z-index: {posZ};' on:mousedown|preventDefault|stopPropagation>
   {#each tile as arch, index (index)}
     <Arch arch={arch} zoom={zoom}></Arch>
   {/each}

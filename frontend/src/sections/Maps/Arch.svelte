@@ -1,7 +1,6 @@
 <script lang="ts">
   import ArchView from '../ArchView.svelte'
-  //import { CompileArchetype } from "../../../wailsjs/go/main/Editor"
-  import { compile } from '../../models/archs'
+  import { compile, compileInJS } from '../../models/archs'
 
   import type { data } from "../../../wailsjs/go/models"
 
@@ -11,11 +10,13 @@
   let err: any
   let x: number = 0
   let y: number = 0
-  compile(arch).then(v => {
+
+  compiled = compileInJS(arch)
+  /*compile(arch).then(v => {
     compiled = v
   }).catch(e => {
     err = e
-  })
+  })*/
 </script>
 
 <div class='arch'>

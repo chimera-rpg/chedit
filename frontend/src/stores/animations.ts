@@ -8,6 +8,9 @@ interface AnimationsStore {
   getImage(anim: string, face: string): Promise<number[]|undefined>
   tree: any
 }
+
+let pending: {[key:string]: {[key:string]: ({resolve: (result: number[]) => void, reject: (err: any) => void})[]}} = {}
+let images: {[key:string]: {[key:string]:number[]|undefined}} = {}
  
 export const animations: Writable<AnimationsStore> = ((): Writable<AnimationsStore> => {
   const { subscribe, set, update } = writable({
@@ -19,37 +22,67 @@ export const animations: Writable<AnimationsStore> = ((): Writable<AnimationsSto
   return {
     subscribe,
     set,
-    getImage: async (anim: string, face: string): Promise<number[]|undefined> => {
+    getImage: (anim: string, face: string): Promise<number[]|undefined> => {
+      let resolve: (v: number[]|undefined) => void
+      let reject: (e: any) => void
+      let p = new Promise((res: (v: number[]|undefined) => void, rej: (e: any) => void) => {
+        resolve = res
+        reject = rej
+      })
       if (face === "") {
         face = "default"
       }
       let a = get({subscribe})
-      let i = a.images[anim]
+      let i = images[anim]
       if (i) {
         if (i[face]) {
-          return i[face]
+          resolve(i[face])
+          return p
         }
       } else {
-        a.images[anim] = {}
+        images[anim] = {}
       }
 
       let animation = a.animations[anim]
       if (!animation) {
-        return undefined
+        resolve(undefined)
+        return p
       }
       let f = animation.Faces[face]
       if (!f) {
-        return undefined
+        resolve(undefined)
+        return p
       }
       let img = f[0].Image
       if (!img) {
-        return undefined
+        resolve(undefined)
+        return p
       }
 
-      let bytes = await GetBytes(img)
-      a.images[anim][face] = bytes
-      set(a)
-      return a.images[anim][face]
+      if (!pending[anim]) {
+        pending[anim] = {}
+      }
+      if (!pending[anim][face]) {
+        pending[anim][face] = []
+      }
+      if (pending[anim][face].length > 0) {
+        pending[anim][face].push({resolve, reject})
+      } else {
+        pending[anim][face].push({resolve, reject})
+        GetBytes(img).then((v: number[]) => {
+          images[anim][face] = v
+          for (let p of pending[anim][face]) {
+            p.resolve(v)
+          }
+          pending[anim][face] = []
+        }).catch((err: any) => {
+          for (let p of pending[anim][face]) {
+            p.reject(err)
+          }
+          pending[anim][face] = []
+        })
+      }
+      return p
     },
     update,
   }

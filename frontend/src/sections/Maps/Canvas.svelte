@@ -46,11 +46,15 @@
             let zIndex = (z * map.Height * map.Width) + (map.Depth * y) - x
             let di: DrawListItem = {
               arch: map.Tiles[y][x][z][i],
-              compiled: compileInJS(map.Tiles[y][x][z][i]),
               x: x3,
               y: y3,
               zIndex: zIndex,
               frame: null,
+            }
+            try {
+              di.compiled = compileInJS(di.arch)
+            } catch(err) {
+              di.compiled = di.arch
             }
             di.frame = anims[di.compiled.Anim]?.Faces[di.compiled.Face][0]
             dl.push(di)

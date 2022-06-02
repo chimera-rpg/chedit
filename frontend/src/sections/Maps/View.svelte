@@ -19,6 +19,11 @@
       cursorY += e.deltaY > 0 ? -1 : 1
       if (cursorY < 0) cursorY = 0
       if (cursorY > map.Height) cursorY = map.Height
+    } else if (e.ctrlKey) {
+      e.preventDefault()
+      e.stopPropagation()
+      zoom += e.deltaY > 0 ? -1 : 1
+      if (zoom < 1) zoom = 1
     }
   }
 </script>

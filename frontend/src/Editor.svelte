@@ -11,6 +11,8 @@
   import { animations as animationStore } from './stores/animations'
   import { archetypes as archetypesStore } from './stores/archetypes'
 
+  import { setAnimationsConfig } from './models/config'
+
   onMount(async () =>{
     await GoEditor.Initialize()
     try {
@@ -20,6 +22,10 @@
       console.error('archetypes', err)
     }
     try {
+      // Get our animations config since we're storing that in our animation store.
+      let animationConfig = await GoEditor.GetAnimationsConfig()
+      setAnimationsConfig(animationConfig)
+
       let animations = await GoEditor.GetAnimations()
       animationStore.set({animations, tree: {}, images: {}})
     } catch(err: any) {

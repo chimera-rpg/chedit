@@ -3,7 +3,7 @@
   import Tile from './Tile.svelte'
 
   export let map: data.Map
-  let zoom: number = 4
+  let zoom: number = 2
 
 </script>
 

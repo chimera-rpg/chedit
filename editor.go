@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	cdata "github.com/chimera-rpg/go-common/data"
 	sdata "github.com/chimera-rpg/go-server/data"
 	"gopkg.in/yaml.v2"
 )
@@ -20,11 +21,12 @@ type ArchetypeContainer struct {
 
 // Editor is our editor, yo.
 type Editor struct {
-	ctx        context.Context
-	Archetypes map[string]ArchetypeContainer  `json:"Archetypes"`
-	Animations map[string]*sdata.AnimationPre `json:"Animations"`
-	Config     Config                         `json:"Config"`
-	compiled   bool
+	ctx              context.Context
+	Archetypes       map[string]ArchetypeContainer  `json:"Archetypes"`
+	Animations       map[string]*sdata.AnimationPre `json:"Animations"`
+	AnimationsConfig cdata.AnimationsConfig         `json:"AnimationsConfig"`
+	Config           Config                         `json:"Config"`
+	compiled         bool
 }
 
 // NewEditor creates a new Editor application struct
@@ -79,6 +81,11 @@ func (e *Editor) Initialize() (err error) {
 
 	fmt.Println(e.Config.String())
 
+	// Load our animation config.
+	if err := e.LoadAnimationsConfig(); err != nil {
+		return err
+	}
+
 	// Load our assets.
 	if err := e.LoadArchetypes(); err != nil {
 		return err
@@ -94,6 +101,19 @@ func (e *Editor) Initialize() (err error) {
 
 	// Print some info.
 	fmt.Printf("%d archetypes, %d animations\n", len(e.Archetypes), len(e.Animations))
+	return nil
+}
+
+// LoadAnimationsConfig loads the animations config file.
+func (e *Editor) LoadAnimationsConfig() error {
+	p := filepath.Join(*e.Config.ArchetypesRoot, "config.yaml")
+	b, err := os.ReadFile(p)
+	if err != nil {
+		return err
+	}
+	if err := yaml.Unmarshal(b, &e.AnimationsConfig); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -299,6 +319,11 @@ func (e *Editor) dependencyResolveArchetype(archetype *sdata.Archetype, resolved
 	delete(unresolved, archetype.Self)
 
 	return nil
+}
+
+// GetAnimationsConfig returns the animations config.
+func (e *Editor) GetAnimationsConfig() cdata.AnimationsConfig {
+	return e.AnimationsConfig
 }
 
 // GetArchetype returns the archetype entry corresponding to the given name.

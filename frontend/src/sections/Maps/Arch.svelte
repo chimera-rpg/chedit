@@ -5,12 +5,14 @@
 
   import type { data } from "../../../wailsjs/go/models"
 
+  export let zoom: number = 1
   export let arch: data.Archetype
   let compiled: data.Archetype
   let err: any
+  let x: number = 0
+  let y: number = 0
   compile(arch).then(v => {
     compiled = v
-    console.log('compiled')
   }).catch(e => {
     err = e
   })
@@ -22,9 +24,11 @@
   {:else if !compiled}
     ...
   {:else}
-    <ArchView anim={compiled.Anim} face={compiled.Face}></ArchView>
+    <ArchView arch={compiled} zoom={zoom}></ArchView>
   {/if}
 </div>
 
 <style>
+  .arch {
+  }
 </style>

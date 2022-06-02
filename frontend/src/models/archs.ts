@@ -6,7 +6,7 @@ type Entry = [number, data.Archetype, (value: data.Archetype|PromiseLike<data.Ar
 let queue: Entry[] = []
 let index: number = 0
 let pending: number = 0
-let limit: number = 500
+let limit: number = 200
 
 async function go() {
   if (pending > limit) return

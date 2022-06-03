@@ -15,15 +15,20 @@
   export let zoom: number = 1
   export let map: data.Map
 
-  export let cursor: [number, number, number] = [0, 0, 0]
-  export let hover: [number, number, number] = [0, 0, 0]
+  export let cursorY = 0
+  export let cursorX = 0
+  export let cursorZ = 0
+  export let hoverY = 0
+  export let hoverX = 0
+  export let hoverZ = 0
 
   $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
   $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
 
-  $: onChange(zoom, map, cursor)
+  $: onChange(zoom, map, cursorY, cursorX, cursorZ, hoverY, hoverX, hoverZ)
   function onChange(...args: any) {
-    pendingRender()
+    //pendingRender()
+    render()
   }
 
   interface DrawListItem {
@@ -162,14 +167,14 @@
     ctx.translate(.5, .5)
     // Draw active cursor.
     {
-      let [x, y, zIndex] = getCoordinatePosition(cursor[0], cursor[1], cursor[2])
+      let [x, y, zIndex] = getCoordinatePosition(cursorY, cursorX, cursorZ)
       ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.cursorBorder
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     // Draw hover cursor
     {
-      let [x, y, zIndex] = getCoordinatePosition(hover[0], hover[1], hover[2])
+      let [x, y, zIndex] = getCoordinatePosition(hoverY, hoverX, hoverZ)
       ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.hoverBorder
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)

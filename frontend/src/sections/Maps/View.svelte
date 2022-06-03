@@ -69,7 +69,7 @@
     <section>
       <SplitPane type='horizontal' pos={80}>
         <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown}>
-          <Canvas cursor={[cursorY, cursorX, cursorZ]} hover={[hoverY, hoverX, hoverZ]} map={map} zoom={zoom}></Canvas>
+          <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
         </article>
         <aside slot=b>
           tiles

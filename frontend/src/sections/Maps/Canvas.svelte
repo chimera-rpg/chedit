@@ -14,10 +14,12 @@
   export let zoom: number = 1
   export let map: data.Map
 
+  export let cursor: [number, number, number] = [0, 0, 0]
+
   $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
   $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
 
-  $: onChange(zoom, map)
+  $: onChange(zoom, map, cursor)
   function onChange(...args: any) {
     pendingRender()
   }
@@ -102,6 +104,18 @@
     }
   }
 
+  function getCoordinatePosition(y: number, x: number, z: number): [number, number, number] {
+    let x1 = 0
+    let y1 = map.Height * -animationsConfig.YStep.Y
+    let x2 = x1 + y * animationsConfig.YStep.X
+    let y2 = y1 + y * animationsConfig.YStep.Y
+    let x3 = x2 + x * animationsConfig.TileWidth
+    let y3 = y2 + z * animationsConfig.TileHeight
+    let zIndex = (z * map.Height * map.Width) + (map.Depth * y) - x
+
+    return [x3, y3, zIndex]
+  }
+
   function renderDrawList(dl: DrawListItem[]) {
     // Sort it first.
     dl.sort((a: DrawListItem, b: DrawListItem): number => {
@@ -142,6 +156,17 @@
     }
   }
 
+  function renderCursors() {
+    let [x, y, zIndex] = getCoordinatePosition(cursor[0], cursor[1], cursor[2])
+
+    ctx.translate(.5, .5)
+    ctx.lineWidth = 1
+    ctx.strokeStyle = '#fff'
+    ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+  }
+
   let drawlist: DrawListItem[]
   function render() {
     if (!canvas) return
@@ -150,6 +175,7 @@
     ctx.imageSmoothingEnabled = false
     ctx.clearRect(0, 0, canvasWidth, canvasHeight)
     renderDrawList(drawlist)
+    renderCursors()
   }
 
   onMount(() => {

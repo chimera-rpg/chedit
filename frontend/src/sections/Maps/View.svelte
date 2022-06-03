@@ -14,10 +14,6 @@
   let hoverX: number = 0
   let hoverY: number = 0
 
-  function handleTileMousedown(e: MouseEvent, y: number, x: number, z: number) {
-    cursorX = x
-    cursorZ = z
-  }
   function handleMapMousewheel(e: WheelEvent) {
     if (e.altKey) {
       e.preventDefault()
@@ -41,18 +37,26 @@
 
     let r = mapEl.getBoundingClientRect()
 
-    let hitX = (e.clientX + mapEl.scrollLeft - r.left) / zoom
-    let hitY = (e.clientY + mapEl.scrollTop - r.top) / zoom
+    let hitX = (e.clientX - r.left + mapEl.scrollLeft) / zoom
+    let hitY = (e.clientY - r.top + mapEl.scrollTop) / zoom
 
     let xOffset = cursorY * -animationsConfig.YStep.X
     let yOffset = cursorY * animationsConfig.YStep.Y + (map.Height * -animationsConfig.YStep.Y)
 
-    let nearestX = Math.round((hitX + xOffset) / animationsConfig.TileWidth - 1)
-    let nearestY = Math.round((hitY - yOffset) / animationsConfig.TileHeight)
+    let nearestX = Math.floor((hitX + xOffset) / animationsConfig.TileWidth)
+    let nearestZ = Math.floor((hitY - yOffset) / animationsConfig.TileHeight)
 
-    let [hX, hY] = getPos(cursorY, nearestX, nearestY)
-    hoverY = hY
-    hoverX = hX
+    if (nearestX < 0) nearestX = 0
+    if (nearestZ < 0) nearestZ = 0
+    if (nearestX > map.Width) nearestX = map.Width
+    if (nearestZ > map.Depth) nearestZ = map.Depth
+
+    cursorX = nearestX
+    cursorZ = nearestZ
+
+    /*let [hX, hY] = getPos(cursorY, nearestX, nearestZ)
+    hoverY = hY - (mapEl.scrollTop / zoom)
+    hoverX = hX*/
   }
 
   function getPos(y: number, x: number, z: number): [number, number, number] {
@@ -86,9 +90,8 @@
   {#if map}
     <section>
       <SplitPane type='horizontal' pos={80}>
-        <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove}  on:wheel={handleMapMousewheel}>
-          <Canvas map={map} zoom={zoom}></Canvas>
-          <div class='cursor' style="left: {hoverX*zoom}px; top: {hoverY*zoom}px; width: {animationsConfig.TileWidth*zoom}px; height: {animationsConfig.TileHeight*zoom}px"></div>
+        <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel}>
+          <Canvas cursor={[cursorY, cursorX, cursorZ]} map={map} zoom={zoom}></Canvas>
         </article>
         <aside slot=b>
           tiles
@@ -133,6 +136,7 @@
     position: absolute;
     border: 1px solid white;
     z-index: 9999999;
+    pointer-events: none;
   }
   article {
     background: black;

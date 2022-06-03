@@ -2,6 +2,7 @@
 	import { getContext } from 'svelte';
 	import { WINDOWS } from './Windows.svelte'
   import type { WindowI } from './Windows'
+  import { scale } from 'svelte/transition'
 
 	const win: WindowI = {
     x: 32,
@@ -57,7 +58,7 @@
 
 </script>
 
-<section class:window class:selected={$selectedWindow === win} on:click={_=>selectWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
+<section transition:scale class:window class:selected={$selectedWindow === win} on:click={_=>selectWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
   <header use:drag={updatePosition}>
     <slot name="header"></slot>
   </header>

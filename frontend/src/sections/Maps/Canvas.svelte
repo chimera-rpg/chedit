@@ -19,7 +19,7 @@
 
   $: onChange(zoom, map)
   function onChange(...args: any) {
-    render()
+    pendingRender()
   }
 
   interface DrawListItem {
@@ -32,6 +32,7 @@
     frame: data.AnimationFramePre
     image?: HTMLImageElement
     imageSrc?: string
+    imageErr?: any
   }
 
   function buildDrawList(): DrawListItem[] {
@@ -69,16 +70,34 @@
     return dl
   }
 
+  let pendingRenderId: NodeJS.Timeout
+
+  function pendingRender() {
+    if (pendingRenderId) {
+      clearTimeout(pendingRenderId)
+      pendingRenderId = null
+    } else {
+      pendingRenderId = setTimeout(() => {
+        render()
+      }, 0)
+    }
+  }
+
   function collectDrawListImages() {
     for (let di of drawlist) {
       animations.getImage(di.compiled.Anim, di.compiled.Face).then((bytes: string) => {
         di.image = new Image()
-        di.image.onload = _ => {
-          render()
+        di.image.onload = (ev: Event) => {
+          pendingRender()
+        }
+        di.image.onerror = (err: any) => {
+          di.imageErr = err
+          pendingRender()
         }
         di.image.src = "data:image/png;base64,"+bytes
       }).catch((err: any) => {
-        console.log(err)
+        di.imageErr = err
+        pendingRender()
       })
     }
   }
@@ -88,9 +107,9 @@
     dl.sort((a: DrawListItem, b: DrawListItem): number => {
       return a.zIndex - b.zIndex
     })
-    ctx.strokeStyle = '#f00'
     for (let item of dl) {
-      if (item.image && item.image.complete) {
+      ctx.strokeStyle = '#f00'
+      if (item.image && item.image.complete && !item.imageErr) {
         // Get adjustments.
         let x = 0
         let y = 0
@@ -109,8 +128,15 @@
           yOffset = -(item.image.naturalHeight - animationsConfig.TileHeight)
         }
 
-        ctx.drawImage(item.image, (x+item.x)*zoom, (y+item.y+yOffset)*zoom, item.image.naturalWidth*zoom, item.image.naturalHeight*zoom)
+        try {
+          ctx.drawImage(item.image, (x+item.x)*zoom, (y+item.y+yOffset)*zoom, item.image.naturalWidth*zoom, item.image.naturalHeight*zoom)
+        } catch(err) {
+          ctx.strokeText("!", item.x*zoom, item.y * zoom)
+        }
+      } else if (item.imageErr) {
+        ctx.strokeText("!", item.x*zoom, item.y * zoom)
       } else {
+        ctx.strokeStyle = '#fff'
         ctx.strokeText("?", item.x*zoom, item.y * zoom)
       }
     }
@@ -127,9 +153,10 @@
   }
 
   onMount(() => {
+    console.log('mount')
     drawlist = buildDrawList()
     collectDrawListImages()
-    render()
+    pendingRender()
   })
 </script>
 

@@ -23,7 +23,7 @@
 
 <main>
   {#if fullpath !== ""}
-    <section style='padding-left: {depth/2}em' class:archetype={isArchetype} on:click={onClick} class:selected={$paletteStore.focused===(isArchetype?node.Archetype.Self:'')}>
+    <section style='padding-left: {depth/2}em' class:archetype={isArchetype} class:folder={!isArchetype} on:click={onClick} class:selected={$paletteStore.focused===(isArchetype?node.Archetype.Self:'')}>
       {#if !isArchetype}
         <article class='opener'>
           {#if open}
@@ -103,8 +103,11 @@
     text-align: left;
     align-items: flex-end;
   }
+  section.folder {
+    background: rgba(64, 64, 64, 0.5);
+  }
   section.selected {
-    background: rgba(128, 128, 128, 0.5)
+    background: rgba(128, 196, 128, 0.5);
   }
   section {
     cursor: pointer;

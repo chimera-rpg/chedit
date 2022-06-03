@@ -182,7 +182,7 @@
     console.log('render')
     ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
     renderDrawList(drawlist)
     renderCursors()
   }
@@ -195,7 +195,7 @@
   })
 </script>
 
-<canvas bind:this={canvas} on:mousemove={render} width={canvasWidth * zoom} height={canvasHeight * zoom}>
+<canvas bind:this={canvas} on:mousemove={render} width={canvasWidth * zoom} height={canvasHeight * zoom + 1}>
 </canvas>
 
 <style>

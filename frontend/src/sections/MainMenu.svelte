@@ -3,7 +3,7 @@
   import MenuBar from "../components/Menus/MenuBar.svelte"
   import MenuList from "../components/Menus/MenuList.svelte"
   import MenuItem from "../components/Menus/MenuItem.svelte"
-  import { LoadMap, GetArchetypes, GetAnimations, GetAnimationsConfig, LoadArchetypes, LoadAnimations, LoadAnimationsConfig } from "../../wailsjs/go/main/Editor"
+  import { LoadMap, GetArchetypes, GetAnimations, GetAnimationsConfig, LoadArchetypes, LoadAnimations, LoadAnimationsConfig, CompileArchetypes } from "../../wailsjs/go/main/Editor"
   import { maps as mapsStore } from '../stores/maps'
   import { animations as animationStore } from '../stores/animations'
   import { archetypes as archetypesStore } from '../stores/archetypes'
@@ -24,6 +24,7 @@
   async function refreshAssets() {
     try {
       await LoadArchetypes()
+      await CompileArchetypes()
       let archetypes = await GetArchetypes()
       archetypesStore.set({archetypes, tree: {}})
     } catch(err: any) {

@@ -2,7 +2,6 @@
   import { animationsConfig } from '../../models/config'
 
   import type { main, data } from '../../../wailsjs/go/models'
-  import Tile from './Tile.svelte'
   import Canvas from './Canvas.svelte'
   import SplitPane from '../../components/SplitPane.svelte'
 
@@ -89,15 +88,6 @@
       <SplitPane type='horizontal' pos={80}>
         <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove}  on:wheel={handleMapMousewheel}>
           <Canvas map={map} zoom={zoom}></Canvas>
-          <!--<article class='map' style="width: {map.Width*8*zoom}px; height: {map.Height*8*zoom}px">
-            {#each map.Tiles as tileY, y (y)}
-              {#each tileY as tileX, x (x)}
-                {#each tileX as tileZ, z (z)}
-                  <Tile y={y} x={x} z={z} tile={tileZ} map={map} zoom={zoom} focused={cursorX===x&&cursorY===y&&cursorZ===z}></Tile>
-                {/each}
-              {/each}
-            {/each}
-          </article>-->
           <div class='cursor' style="left: {hoverX*zoom}px; top: {hoverY*zoom}px; width: {animationsConfig.TileWidth*zoom}px; height: {animationsConfig.TileHeight*zoom}px"></div>
         </article>
         <aside slot=b>

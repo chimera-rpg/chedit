@@ -7,14 +7,19 @@
   export let path: string = ''
   export let fullpath: string = ''
   export let node: data.Archetype | any
-  export let open: boolean = false
   export let depth: number = 0
 
   $: isArchetype = node.Archetype !== undefined
 
+  $: open = path ? $paletteStore.folders[path]: true
+
   function onClick(e: MouseEvent) {
     if (node.Archetype === undefined) { 
-      open = !open
+      if (open) {
+        paletteStore.close(path)
+      } else {
+        paletteStore.open(path)
+      }
     } else {
       paletteStore.select(node.Archetype.Self, [node.Archetype.Self])
     }

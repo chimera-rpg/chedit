@@ -7,7 +7,7 @@
 <div>
   <header>Archetypes</header>
   <nav>
-    <Node node={$archetypesStore.tree} open={true}></Node>
+    <Node node={$archetypesStore.tree}></Node>
   </nav>
   <Selection></Selection>
 </div>

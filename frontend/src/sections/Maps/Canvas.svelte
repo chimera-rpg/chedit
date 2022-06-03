@@ -1,7 +1,8 @@
 <script lang="ts">
   import { animationsConfig } from "../../models/config"
   import { compileInJS } from "../../models/archs"
-  import { animations } from "../..//stores/animations"
+  import { animations } from "../../stores/animations"
+  import { styles } from '../../stores/styles'
 
   import { onMount } from "svelte"
 
@@ -163,14 +164,14 @@
     {
       let [x, y, zIndex] = getCoordinatePosition(cursor[0], cursor[1], cursor[2])
       ctx.lineWidth = 1
-      ctx.strokeStyle = '#f00'
+      ctx.strokeStyle = $styles.colors.cursorBorder
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     // Draw hover cursor
     {
       let [x, y, zIndex] = getCoordinatePosition(hover[0], hover[1], hover[2])
       ctx.lineWidth = 1
-      ctx.strokeStyle = '#fff'
+      ctx.strokeStyle = $styles.colors.hoverBorder
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0)

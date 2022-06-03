@@ -26,9 +26,9 @@
       {#if !isArchetype}
         <article class='opener'>
           {#if open}
-          -
+          📂
           {:else}
-          +
+          📁
           {/if}
         </article>
       {:else}
@@ -45,7 +45,7 @@
         </article>
       {/if}
       {#if path}
-        <span>{path}</span>
+        <span>{isArchetype?path.substring(0,path.length-'__arch'.length):path}</span>
       {:else}
         <span>root</span>
       {/if}
@@ -69,7 +69,17 @@
     grid-template-rows: auto minmax(0, 1fr);
   }
   article {
-    min-width: 1em;
+    min-height: 1em;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+  }
+  .opener {
+    border: 1px solid transparent;
+    align-items: center;
+    justify-content: center;
+    box-sizing: content-box;
+    margin: 1px;
   }
   .image {
     min-width: 1.5em;

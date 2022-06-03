@@ -17,8 +17,28 @@ export const archetypes: Writable<ArchetypesStore> = ((): Writable<ArchetypesSto
   return {
     subscribe,
     set: (value: ArchetypesStore) => {
+      value.tree = ftt.Make(Object.keys(value.archetypes).map(v=>v+'__arch'), p => value.archetypes[p.substring(0, p.length-'__arch'.length)])
+      let sortNode = (node: any): any => {
+        console.log('arhg', node)
+        return Object.keys(node).sort((a: string, b: string) => {
+          if (a.endsWith('__arch') && !b.endsWith('__arch')) {
+            return 1
+          } else if (!a.endsWith('__arch') && b.endsWith('__arch')) {
+            return -1
+          }
+          return 0
+        }).reduce((obj: any, key: any) => {
+          if (node[key].Archetype) {
+            obj[key] = node[key]
+          } else {
+            obj[key] = sortNode(node[key])
+          }
+          return obj
+        }, {})
+      }
+      value.tree = sortNode(value.tree)
+      console.log('ohh', value.tree)
       set(value)
-      value.tree = ftt.Make(Object.keys(value.archetypes), p => value.archetypes[p])
     },
     update,
   }

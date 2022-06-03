@@ -50,7 +50,6 @@
   span {
   }
   img {
-    position: absolute;
     image-rendering: pixelated;
   }
 </style>

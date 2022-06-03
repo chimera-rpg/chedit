@@ -26,6 +26,19 @@
     startY = event.clientY
   }
 
+  function updateSize(event: MouseEvent) {
+    win.width += event.clientX - startX
+    win.height += event.clientY - startY
+    startX = event.clientX
+    startY = event.clientY
+    if (win.width < 100) {
+      win.width = 100
+    }
+    if (win.height < 100) {
+      win.height = 100
+    }
+  }
+
   function drag(node: HTMLElement, callback: any) {
 		const onmousedown = (event: MouseEvent) => {
 			if (event.which !== 1) return;
@@ -63,6 +76,7 @@
     <slot name="header"></slot>
   </header>
   <slot></slot>
+  <aside use:drag={updateSize}></aside>
 </section>
 
 <style>
@@ -72,16 +86,26 @@
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     overflow: hidden;
+    background: var(--window);
   }
 	.selected {
 		border-bottom: 2px solid teal;
 		color: #333;
 	}
   header {
-    border: 1px solid red;
+    background: var(--window-header);
+    color: var(--window-color);
   }
   article {
     overflow: hidden;
+  }
+  aside {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    width: 1em;
+    height: 1em;
   }
 </style>
 

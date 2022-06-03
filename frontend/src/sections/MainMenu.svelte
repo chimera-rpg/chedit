@@ -3,8 +3,11 @@
   import MenuBar from "../components/Menus/MenuBar.svelte"
   import MenuList from "../components/Menus/MenuList.svelte"
   import MenuItem from "../components/Menus/MenuItem.svelte"
-  import { LoadMap } from "../../wailsjs/go/main/Editor"
+  import { LoadMap, GetArchetypes, GetAnimations, GetAnimationsConfig } from "../../wailsjs/go/main/Editor"
   import { maps as mapsStore } from '../stores/maps'
+  import { animations as animationStore } from '../stores/animations'
+  import { archetypes as archetypesStore } from '../stores/archetypes'
+  import { setAnimationsConfig } from '../models/config'
   import { parse } from 'yaml'
 
   async function openMap() {
@@ -17,6 +20,24 @@
       mapsStore.open(m)
     }
   }
+
+  async function refreshAssets() {
+    try {
+      let archetypes = await GetArchetypes()
+      archetypesStore.set({archetypes, tree: {}})
+    } catch(err: any) {
+      console.error('archetypes', err)
+    }
+    try {
+      let animationConfig = await GetAnimationsConfig()
+      setAnimationsConfig(animationConfig)
+
+      let animations = await GetAnimations()
+      animationStore.set({animations, tree: {}, images: {}})
+    } catch(err: any) {
+      console.error('animations', err)
+    }
+  }
 </script>
 
 <nav>
@@ -27,6 +48,14 @@
         <MenuList popup='map-menu'>
           <MenuItem on:click={openMap}>
             Open...
+          </MenuItem>
+        </MenuList>
+      </MenuItem>
+      <MenuItem popup='tool-menu'>
+        Tools
+        <MenuList popup='tool-menu'>
+          <MenuItem on:click={refreshAssets}>
+            Refresh Assets
           </MenuItem>
         </MenuList>
       </MenuItem>

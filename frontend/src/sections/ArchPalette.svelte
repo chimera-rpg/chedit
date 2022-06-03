@@ -19,8 +19,10 @@
     color: var(--section-color);
     min-width: 10em;
     overflow: hidden;
+    user-select: none;
   }
   nav {
     overflow: auto;
+    font-size: 75%;
   }
 </style>

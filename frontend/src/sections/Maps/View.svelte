@@ -1,5 +1,6 @@
 <script lang='ts'>
   import { animationsConfig } from '../../models/config'
+  import { styles } from '../../stores/styles'
 
   import type { main, data } from '../../../wailsjs/go/models'
   import Canvas from './Canvas.svelte'
@@ -63,7 +64,7 @@
   }
 </script>
 
-<div>
+<div style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
   {#if map}
     <section>
       <SplitPane type='horizontal' pos={80}>
@@ -76,7 +77,24 @@
       </SplitPane>
     </section>
     <footer>
-      {map.X}x{map.Y}x{map.Width}x{map.Height}
+      <div class='map__dimensions'>
+        <span>{map.Width}</span>
+        <span>{map.Height}</span>
+      </div>
+      <div class='map__cursor'>
+        <span>
+          <span class='cursor__text'>{cursorY}</span>
+          <span class='hover__text'>({hoverY})</span>
+        </span>
+        <span>
+          <span class='cursor__text'>{cursorX}</span>
+          <span class='hover__text'>({hoverX})</span>
+        </span>
+        <span>
+          <span class='cursor__text'>{cursorZ}</span>
+          <span class='hover__text'>({hoverZ})</span>
+        </span>
+      </div>
     </footer>
   {:else}
     select a map
@@ -98,6 +116,7 @@
   .map__container {
     overflow: scroll;
     text-align: left;
+    cursor: crosshair;
   }
   .map {
     position: relative;
@@ -120,5 +139,28 @@
   }
   aside {
     min-width: 4em;
+  }
+  footer {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: flex-start;
+    background: var(--subsection);
+    color: var(--subsection-color);
+  }
+  .map__dimensions {
+    display: grid;
+    grid-template-columns: 2em 2em;
+  }
+  .map__cursor {
+    display: grid;
+    grid-template-columns: 4em 4em 4em 4em;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .cursor__text {
+    color: var(--cursorBorder);
+  }
+  .hover__text {
+    color: var(--hoverBorder);
   }
 </style>

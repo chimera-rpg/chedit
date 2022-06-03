@@ -5,6 +5,7 @@
 </script>
 
 <div>
+  <header>Archetypes</header>
   <nav>
     <Node node={$archetypesStore.tree} open={true}></Node>
   </nav>
@@ -14,12 +15,16 @@
 <style>
   div {
     display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     background: var(--section);
     color: var(--section-color);
     min-width: 10em;
     overflow: hidden;
     user-select: none;
+  }
+  header {
+    font-weight: bold;
+    background: var(--section-header);
   }
   nav {
     overflow: auto;

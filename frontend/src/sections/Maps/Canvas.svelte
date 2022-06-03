@@ -15,6 +15,7 @@
   export let map: data.Map
 
   export let cursor: [number, number, number] = [0, 0, 0]
+  export let hover: [number, number, number] = [0, 0, 0]
 
   $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
   $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
@@ -157,13 +158,21 @@
   }
 
   function renderCursors() {
-    let [x, y, zIndex] = getCoordinatePosition(cursor[0], cursor[1], cursor[2])
-
     ctx.translate(.5, .5)
-    ctx.lineWidth = 1
-    ctx.strokeStyle = '#fff'
-    ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
-
+    // Draw active cursor.
+    {
+      let [x, y, zIndex] = getCoordinatePosition(cursor[0], cursor[1], cursor[2])
+      ctx.lineWidth = 1
+      ctx.strokeStyle = '#f00'
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+    }
+    // Draw hover cursor
+    {
+      let [x, y, zIndex] = getCoordinatePosition(hover[0], hover[1], hover[2])
+      ctx.lineWidth = 1
+      ctx.strokeStyle = '#fff'
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+    }
     ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
 

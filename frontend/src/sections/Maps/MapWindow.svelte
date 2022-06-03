@@ -7,7 +7,7 @@
   export let map: main.MapReference
 </script>
 
-<Window>
+<Window on:close>
   <svelte:fragment slot="header">
     <span>{map.Path.split('/').reverse()[0]}</span>
   </svelte:fragment>

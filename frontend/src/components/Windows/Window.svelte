@@ -3,6 +3,7 @@
 	import { WINDOWS } from './Windows.svelte'
   import type { WindowI } from './Windows'
   import { scale } from 'svelte/transition'
+  import { createEventDispatcher } from 'svelte'
 
 	const win: WindowI = {
     x: 32,
@@ -69,11 +70,22 @@
 		};
   }
 
+  const dispatch = createEventDispatcher()
+
+  function closeWindow() {
+    dispatch('close')
+  }
+
 </script>
 
 <section transition:scale class:window class:selected={$selectedWindow === win} on:click={_=>selectWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
   <header use:drag={updatePosition}>
-    <slot name="header"></slot>
+    <nav class='header'>
+      <slot name="header"></slot>
+    </nav>
+    <nav class='buttons'>
+      <button on:click={closeWindow}>✖</button>
+    </nav>
   </header>
   <slot></slot>
   <aside use:drag={updateSize}></aside>
@@ -91,10 +103,17 @@
 	.selected {
 		border-bottom: 2px solid teal;
 		color: #333;
+    z-index: 99;
 	}
   header {
     background: var(--window-header);
     color: var(--window-color);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .buttons {
+    display: flex;
+    align-items: flex-end;
   }
   article {
     overflow: hidden;

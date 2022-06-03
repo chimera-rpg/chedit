@@ -2,12 +2,17 @@
   import { maps } from '../../stores/maps'
   import MapWindow from './MapWindow.svelte'
   import Windows from '../../components/Windows/Windows.svelte'
+  import type { main } from '../../../wailsjs/go/models'
+
+  function closeMap(map: main.MapReference) {
+    maps.close(map)
+  }
 </script>
 
 <div>
   <Windows>
-    {#each $maps.maps as group (group.id)}
-      <MapWindow bind:map={group}></MapWindow>
+    {#each $maps.maps as group}
+      <MapWindow bind:map={group} on:close={_=>closeMap(group)}></MapWindow>
     {/each}
   </Windows>
 </div>

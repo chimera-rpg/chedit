@@ -129,6 +129,7 @@
     background: rgba(0, 0, 0, 0.5);
     width: 1em;
     height: 1em;
+    cursor: nwse-resize
   }
 </style>
 

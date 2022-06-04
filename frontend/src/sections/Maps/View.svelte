@@ -33,6 +33,7 @@
 
   let mapEl: HTMLElement = null
   function handleMapMousemove(e: MouseEvent) {
+    if (scrolling) return
     e.stopImmediatePropagation()
     e.stopPropagation()
     e.preventDefault()
@@ -58,17 +59,60 @@
   }
 
   function handleMapMousedown(e: MouseEvent) {
+    if (e.which !== 1) return
     cursorY = hoverY
     cursorX = hoverX
     cursorZ = hoverZ
   }
+
+  let scrolling: boolean = false
+  let scrollX = 0
+  let scrollY = 0
+  function dragScroll(node: HTMLElement, callback: any) {
+		const onmousedown = (event: MouseEvent) => {
+			if (event.which !== 2) return;
+      event.stopPropagation()
+			event.preventDefault();
+      scrollX = event.clientX
+      scrollY = event.clientY
+			scrolling = true;
+
+      mapEl.requestPointerLock()
+
+			const onmouseup = () => {
+        document.exitPointerLock()
+				scrolling = false;
+
+				window.removeEventListener('mousemove', callback, false);
+				window.removeEventListener('mouseup', onmouseup, false);
+			};
+
+			window.addEventListener('mousemove', callback, false);
+			window.addEventListener('mouseup', onmouseup, false);
+		}
+
+		node.addEventListener('mousedown', onmousedown, false);
+
+		return {
+			destroy() {
+				node.removeEventListener('mousedown', onmousedown, false);
+			}
+		};
+  }
+  function updateScroll(event: MouseEvent) {
+    mapEl.scrollLeft -= event.clientX - scrollX
+    mapEl.scrollTop -= event.clientY - scrollY
+    scrollX = event.clientX
+    scrollY = event.clientY
+  }
+
 </script>
 
 <div style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
   {#if map}
     <section>
       <SplitPane type='horizontal' pos={80}>
-        <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown}>
+        <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} use:dragScroll={updateScroll}>
           <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
         </article>
         <aside slot=b>
@@ -117,22 +161,6 @@
     overflow: scroll;
     text-align: left;
     cursor: crosshair;
-  }
-  .map {
-    position: relative;
-    pointer-events: none;
-  }
-  .yLayer {
-    position: relative;
-  }
-  .yLayer.disabled {
-    pointer-events: none;
-  }
-  .cursor {
-    position: absolute;
-    border: 1px solid white;
-    z-index: 9999999;
-    pointer-events: none;
   }
   article {
     background: black;

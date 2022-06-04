@@ -201,7 +201,7 @@
   })
 </script>
 
-<canvas bind:this={canvas} on:mousemove={render} width={canvasWidth * zoom} height={canvasHeight * zoom + 1}>
+<canvas bind:this={canvas} width={canvasWidth * zoom} height={canvasHeight * zoom + 1}>
 </canvas>
 
 <style>

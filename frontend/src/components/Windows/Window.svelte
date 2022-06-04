@@ -78,7 +78,7 @@
 
 </script>
 
-<section transition:scale class:window class:selected={$selectedWindow === win} on:click={_=>selectWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
+<section transition:scale class:dragging={dragging} class:window class:selected={$selectedWindow === win} on:click={_=>selectWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
   <header use:drag={updatePosition}>
     <nav class='header'>
       <slot name="header"></slot>
@@ -110,6 +110,10 @@
     color: var(--window-color);
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+    cursor: grab;
+  }
+  section.window.dragging header {
+    cursor: grabbing;
   }
   .buttons {
     display: flex;

@@ -61,6 +61,26 @@ function addArch(to: data.Archetype, from: data.Archetype) {
   return to
 }
 
+export function cloneObject(object: any) {
+  let cloned: any
+  if (typeof object === 'number') {
+    cloned = Number(object)
+  } else if (typeof object === 'boolean') {
+    cloned = Boolean(object)
+  } else if (typeof object === 'string') {
+    cloned = String(object)
+  } else if (object == null) {
+    cloned = object
+  } else {
+    cloned = (object instanceof Array) ? [] : {};
+    for (let k in object) {
+      let v = object[k]
+      cloned[k] = (v instanceof Object) ? cloneObject(v) : v
+    }
+  }
+  return cloned
+}
+
 // compileInJS is used _only_ for compiling in-map archetypes.
 export function compileInJS(arch: data.Archetype): data.Archetype {
   let err = resolveArchetype(arch)

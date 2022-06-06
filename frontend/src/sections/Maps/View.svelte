@@ -5,6 +5,7 @@
   import type { main, data } from '../../../wailsjs/go/models'
   import Canvas from './Canvas.svelte'
   import SplitPane from '../../components/SplitPane.svelte'
+  import TilesList from './TilesList.svelte'
 
   export let map: data.Map
   let zoom: number = 2
@@ -116,7 +117,7 @@
           <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
         </article>
         <aside slot=b>
-          tiles
+          <TilesList y={cursorY} x={cursorX} z={cursorZ} map={map}></TilesList>
         </aside>
       </SplitPane>
     </section>

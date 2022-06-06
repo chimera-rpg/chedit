@@ -38,7 +38,145 @@ export interface Archetype {
   Skills?: {[key: SkillType]: Skill}
   CompetencyTypes?: CompetencyType[]
   Competencies?: {[key: CompetencyType]: Competency}
+  Resistances?: AttackTypes
+  AttackTypes?: AttackTypes
+
+  Reach?: number
+  Attackable?: boolean
+
+  Damage?: Damage
+
+  Armor?: number
+
+  Dodge?: number
+  ChannelTime?: number
+  RecoveryTime?: number
+
+  Level?: number
+  Advancement?: number
+  Efficiency?: number
+
+  Attributes?: AttributeSets
+
+  // Statuses?: // ???
+
+  Attitudes?: Attitudes
+  Genera?: string
+  Species?: string
+  Factions?: string[]
+  Legacy?: string
+  Events?: Events
 }
+
+export interface Events {
+  Birth?: EventResponses
+  Death?: EventResponses
+  Hit?: EventResponses
+  Attacking?: EventResponses
+  Attacked?: EventResponses
+  Attack?: EventResponses
+  Advance?: EventResponses
+  Exit?: EventResponses
+}
+
+export interface EventResponses {
+  Spawn?: SpawnEventResponse
+  Replace?: SpawnArchetype[]
+  Trigger?: TriggerEventResponse
+  Script?: ScriptEventResponse
+}
+
+type SpawnEventType = string
+
+export interface IntRange {
+  Min?: number
+  Max?: number
+  Not?: number[]
+}
+
+interface SpawnConditions {
+  Matter?: MatterType
+  Blocking?: MatterType
+}
+
+type MatterType = string
+
+interface SpawnPlacement {
+  Overlap?: boolean
+  Surface?: SpawnConditions
+  Air?: SpawnConditions
+  X?: IntRange
+  Y?: IntRange
+  Z?: IntRange
+}
+
+interface SpawnArchetype {
+  Chance?: number
+  Archetype?: Archetype
+  Count?: IntRange
+  Retry?: number
+  Placement?: SpawnPlacement
+}
+
+interface XYZOffset {
+  X?: IntRange
+  Y?: IntRange
+  Z?: IntRange
+}
+
+interface SpawnEventResponse {
+  Type?: SpawnEventType
+  Items?: SpawnArchetype[]
+}
+
+interface TriggerEventResponse {
+  Event?: string
+}
+
+type ScriptEventResponse = string
+
+type EventType = number
+
+export interface Attitudes {
+  Genera?: {[key: string]: GeneraAttitudes}
+  Factions?: {[key: string]: Attitude}
+  Legacies?: {[key: string]: Attitude}
+}
+
+export interface GeneraAttitudes {
+  Attitude?: Attitude
+  Species?: {[key: string]: Attitude}
+}
+
+type Attitude = string
+
+export interface AttributeSets {
+  Physical?: Attributes
+  Arcane?: Attributes
+  Spirit?: Attributes
+}
+export interface Attributes  {
+  Might?: number
+  Prowess?: number
+  Focus?: number
+  Sense?: number
+  Haste?: number
+  Reaction?: number
+}
+
+type AttackType = string
+type AttackTypes = {[key: AttackType]: AttackStyles}
+type AttackStyle = string
+type AttackStyles = {[key: AttackStyle]: number}
+
+export interface Damage {
+  Value?: number
+  AttributeBonus?: DamageAttributeBonuses
+}
+type DamageAttributeBonuses = {[key: AttackType]: AttributeTypes}
+
+type AttributeType = string
+type AttributeTypes = {[key: AttributeType]: number}
 
 type SkillType = string
 

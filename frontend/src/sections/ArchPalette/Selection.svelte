@@ -7,9 +7,9 @@
 </script>
 
 <div>
-  {#if arch && arch.Archetype}
-    <ArchView arch={arch.Archetype} anim={arch.Archetype.Anim} face={arch.Archetype.Face} zoom={2}></ArchView>
-    <span title={arch.Archetype.Anim+':'+arch.Archetype.Face}>{arch.Archetype.Name}</span>
+  {#if arch && arch.Compiled}
+    <ArchView arch={arch.Compiled} anim={arch.Compiled.Anim} face={arch.Compiled.Face} zoom={2}></ArchView>
+    <span title={arch.Compiled.Anim+':'+arch.Compiled.Face}>{arch.Compiled.Name}</span>
   {:else}
     <span></span>
     <span>{$palette.focused}</span>

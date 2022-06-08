@@ -163,19 +163,84 @@
     ctx.translate(.5, .5)
     // Draw active cursor.
     {
-      let [x, y, zIndex] = getCoordinatePosition(cursorY, cursorX, cursorZ)
       ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.cursorBorder
+      drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
+
+      let [x, y] = getCoordinatePosition(cursorY, cursorX, cursorZ)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ;[x, y] = getCoordinatePosition(cursorY-1, cursorX, cursorZ)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
+    ctx.globalAlpha = 0.5
+    renderPositionLines(cursorY, cursorX, cursorZ)
+    ctx.globalAlpha = 1
     // Draw hover cursor
     {
       let [x, y, zIndex] = getCoordinatePosition(hoverY, hoverX, hoverZ)
       ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.hoverBorder
+
+      drawVerticalBoxLines(hoverY, hoverX, hoverZ, hoverY-1)
+
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ;[x, y] = getCoordinatePosition(hoverY-1, hoverX, hoverZ)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
+    ctx.globalAlpha = 0.5
+    renderPositionLines(hoverY, hoverX, hoverZ)
+    ctx.globalAlpha = 1
     ctx.setTransform(1, 0, 0, 1, 0, 0)
+  }
+
+  function getOpenPositionBelow(y: number, x: number, z: number): number {
+    let i = y-1
+    for (; i > 0; i--) {
+      if (!map.Tiles[i]) continue
+      if (!map.Tiles[i][x]) continue
+      if (!map.Tiles[i][x][z]) continue
+      let blocks = false
+      for (let a of map.Tiles[i][x][z]) {
+        if (!a.Compiled.Blocking) continue
+        if (a.Compiled.Blocking.includes('Solid') && a.Compiled.Blocking.includes('Physical')) {
+          blocks = true
+          break
+        }
+      }
+      if (blocks) {
+        break
+      }
+    }
+    return i
+  }
+
+  function drawVerticalBoxLines(y: number, x: number, z: number, y_: number) {
+    let [x1, y1] = getCoordinatePosition(y, x, z)
+    let [x2, y2] = getCoordinatePosition(y_, x, z)
+    // draw box lines
+    ctx.beginPath()
+    ctx.moveTo(x1*zoom, y1*zoom)
+    ctx.lineTo(x2*zoom, y2*zoom)
+
+    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, y1*zoom)
+    ctx.lineTo((x2+animationsConfig.TileWidth)*zoom, y2*zoom)
+
+    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
+    ctx.lineTo((x2+animationsConfig.TileWidth)*zoom, (y2+animationsConfig.TileHeight)*zoom)
+
+    ctx.moveTo(x1*zoom, (y1+animationsConfig.TileHeight)*zoom)
+    ctx.lineTo(x2*zoom, (y2+animationsConfig.TileHeight)*zoom)
+
+    ctx.stroke()
+  }
+
+  function renderPositionLines(y: number, x: number, z: number) {
+    let i = getOpenPositionBelow(y, x, z)
+    if (i >= 0) {
+      drawVerticalBoxLines(y, x, z, i)
+    }
   }
 
   let drawlist: DrawListItem[]

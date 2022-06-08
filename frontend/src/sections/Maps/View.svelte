@@ -6,9 +6,9 @@
   import Canvas from './Canvas.svelte'
   import SplitPane from '../../components/SplitPane.svelte'
   import TilesList from './TilesList.svelte'
-  import type { MapsContainer } from '../../interfaces/Map'
+  import type { MapsContainer, ContainerMap } from '../../interfaces/Map'
 
-  export let map: MapsContainer
+  export let map: ContainerMap
   let zoom: number = 2
   let cursorY: number = 0
   let cursorX: number = 0
@@ -118,7 +118,7 @@
           <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
         </article>
         <aside slot=b>
-          <TilesList y={cursorY} x={cursorX} z={cursorZ} map={map}></TilesList>
+          <TilesList bind:y={cursorY} x={cursorX} z={cursorZ} map={map}></TilesList>
         </aside>
       </SplitPane>
     </section>

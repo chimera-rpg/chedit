@@ -44,7 +44,7 @@
   </header>
   <ol class='tiles'>
     {#each tiles as tile, tileY}
-      <li class='tile' class:selected={y===tileY}>
+      <li class='tile' class:selected={y===tileY} on:click={_=>y=tileY}>
         <span>{tileY}</span>
         <ol class='archs'>
           {#each tile as arch}

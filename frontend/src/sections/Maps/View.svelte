@@ -18,16 +18,21 @@
   let hoverX: number = 0
   let hoverZ: number = 0
 
+  let lastWheelTimestamp = 0
   function handleMapMousewheel(e: WheelEvent) {
-    if (e.altKey) {
+    // Limit the frequency of scrolling allowed to once per ms.
+    if (e.altKey || e.ctrlKey) {
       e.preventDefault()
       e.stopPropagation()
+      if (e.timeStamp - lastWheelTimestamp <= 1) return
+      lastWheelTimestamp = e.timeStamp
+    }
+
+    if (e.altKey) {
       hoverY += e.deltaY > 0 ? -1 : 1
       if (hoverY < 0) hoverY = 0
       if (hoverY > map.Height) hoverY = map.Height
     } else if (e.ctrlKey) {
-      e.preventDefault()
-      e.stopPropagation()
       zoom += e.deltaY > 0 ? -1 : 1
       if (zoom < 1) zoom = 1
     }

@@ -276,7 +276,6 @@
   let drawlist: DrawListItem[]
   function render() {
     if (!canvas) return
-    console.log('render')
     ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -285,7 +284,6 @@
   }
 
   onMount(() => {
-    console.log('mount')
     drawlist = buildDrawList()
     collectDrawListImages()
     pendingRender()

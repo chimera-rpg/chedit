@@ -50,7 +50,7 @@
           {#each tile as arch}
             <li class='arch'>
               <ArchView arch={arch.Compiled}></ArchView>
-              {arch.Compiled.Self}
+              {arch.Compiled.Name||arch.Compiled.Self}
             </li>
           {/each}
         </ol>

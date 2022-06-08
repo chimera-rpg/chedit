@@ -33,7 +33,6 @@
       for (let arch of archs) {
         s.push(arch)
       }
-      console.log(s)
       tiles.push(s)
     }
   }

@@ -1,34 +1,34 @@
 <script lang='ts'>
-  //import { data } from '../../../wailsjs/go/models'
   import { animations as animationsStore } from '../../stores/animations'
   import { palette as paletteStore } from '../../stores/palette'
   import { slide } from 'svelte/transition'
+  import type { Archetype } from '../../interfaces/Archetype'
 
   export let path: string = ''
   export let fullpath: string = ''
-  export let node: data.Archetype | any
+  export let node: Archetype | any
   export let depth: number = 0
 
-  $: isArchetype = node.Archetype !== undefined
+  $: isArchetype = node.Compiled !== undefined
 
   $: open = path ? $paletteStore.folders[path]: true
 
   function onClick(e: MouseEvent) {
-    if (node.Archetype === undefined) { 
+    if (node.Compiled === undefined) { 
       if (open) {
         paletteStore.close(path)
       } else {
         paletteStore.open(path)
       }
     } else {
-      paletteStore.select(node.Archetype.Self, [node.Archetype.Self])
+      paletteStore.select(node.Compiled.Self, [node.Compiled.Self])
     }
   }
 </script>
 
 <main>
   {#if fullpath !== ""}
-    <section style='padding-left: {depth/2}em' class:archetype={isArchetype} class:folder={!isArchetype} on:click={onClick} class:selected={isArchetype?$paletteStore.focused===node.Archetype.Self:false}>
+    <section style='padding-left: {depth/2}em' class:archetype={isArchetype} class:folder={!isArchetype} on:click={onClick} class:selected={isArchetype?$paletteStore.focused===node.Compiled.Self:false}>
       {#if !isArchetype}
         <article class='opener'>
           {#if open}
@@ -39,7 +39,7 @@
         </article>
       {:else}
         <article class='image'>
-          {#await animationsStore.getImage(node.Archetype.Anim, node.Archetype.Face)}
+          {#await animationsStore.getImage(node.Compiled.Anim, node.Compiled.Face)}
             ...
           {:then bytes}
             {#if bytes}

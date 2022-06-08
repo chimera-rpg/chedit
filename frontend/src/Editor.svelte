@@ -1,6 +1,7 @@
 <script lang='ts'>
   import { onMount } from "svelte"
   import * as GoEditor from '../wailsjs/go/main/Editor'
+  import { collectArchetypes, compileArchetypes, getArchetypes } from "./models/archs"
 
   import ArchPalette from "./sections/ArchPalette.svelte"
   import MainMenu from "./sections/MainMenu.svelte"
@@ -16,8 +17,10 @@
   onMount(async () =>{
     await GoEditor.Initialize()
     try {
-      let archetypes = await GoEditor.GetArchetypes()
-      archetypesStore.set({archetypes, tree: {}})
+      await collectArchetypes()
+      compileArchetypes()
+      let archetypes = getArchetypes()
+      archetypesStore.set(archetypes)
     } catch(err: any) {
       console.error('archetypes', err)
     }

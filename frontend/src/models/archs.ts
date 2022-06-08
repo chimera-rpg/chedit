@@ -1,10 +1,11 @@
 import { get } from "svelte/store"
 import { archetypes, ArchetypesStore } from "../stores/archetypes"
-import { data } from "../../wailsjs/go/models"
+import type { Archetype, ArchetypeContainer } from '../interfaces/Archetype'
 import merge from 'ts-deepmerge'
-import { CompileArchetype } from "../../wailsjs/go/main/Editor"
+import { CollectArchetypes, GetArchetypes } from "../../wailsjs/go/main/Editor"
+import { parse } from "yaml"
 
-type Entry = [number, data.Archetype, (value: data.Archetype|PromiseLike<data.Archetype>) => void, (reason: any) => void]
+type Entry = [number, Archetype, (value: Archetype|PromiseLike<Archetype>) => void, (reason: any) => void]
 
 let queue: Entry[] = []
 let index: number = 0
@@ -17,9 +18,9 @@ async function go() {
   if (top) {
     pending++
     try {
-      let r = await CompileArchetype(top[1])
+      let r = compileInJS(top[1], true)
       pending--
-      top[2](r as unknown as data.Archetype)
+      top[2](r as unknown as Archetype)
     } catch(err: any) {
       pending--
       top[3](err as unknown as any)
@@ -31,7 +32,7 @@ async function go() {
   }
 }
 
-export function compile(arch: any): Promise<data.Archetype> {
+export function compile(arch: any): Promise<Archetype> {
   let entry: Entry = [
     index++,
     arch,
@@ -39,7 +40,7 @@ export function compile(arch: any): Promise<data.Archetype> {
     undefined,
   ]
 
-  let p = new Promise<data.Archetype>((resolve, reject) => {
+  let p = new Promise<Archetype>((resolve, reject) => {
     entry[2] = resolve
     entry[3] = reject
   })
@@ -51,12 +52,12 @@ export function compile(arch: any): Promise<data.Archetype> {
   return p
 }
 
-function mergeArch(to: data.Archetype, from: data.Archetype): data.Archetype {
-  to = merge(to, from)
+function mergeArch(to: Archetype, from: Archetype): Archetype {
+  to = merge(from, to)
   return to
 }
 
-function addArch(to: data.Archetype, from: data.Archetype) {
+function addArch(to: Archetype, from: Archetype) {
   console.log('TODO: addArch!')
   return to
 }
@@ -82,12 +83,20 @@ export function cloneObject(object: any) {
 }
 
 // compileInJS is used _only_ for compiling in-map archetypes.
-export function compileInJS(arch: data.Archetype): data.Archetype {
+export function compileInJS(arch: Archetype, compile?: boolean): Archetype {
+  if (!compile || arch.Compile) {
+    return arch
+  }
+  arch.Compile = 'compiling'
+
   let err = resolveArchetype(arch)
   if (err) {
     throw err
   }
-  if (arch.Archs.length === 0 && arch.Arch !== "") {
+  if (!arch.Archs) {
+    arch.Archs = []
+  }
+  if (arch.Archs.length === 0 && arch.Arch) {
     arch.Archs.push(arch.Arch)
   }
   for (let dep of arch.Archs) {
@@ -100,6 +109,9 @@ export function compileInJS(arch: data.Archetype): data.Archetype {
     if (!arch2) {
       throw new Error(`missing dep ${dep}`)
     }
+
+    compileInJS(arch2, compile)
+
     if (shouldMerge) {
       arch = mergeArch(arch, arch2)
     } else {
@@ -108,55 +120,85 @@ export function compileInJS(arch: data.Archetype): data.Archetype {
   }
 
   if (arch.Inventory) {
-    for (let inv of arch.Inventory) {
-      let err = compileInJS(inv)
-      if (err) {
-        return err
-      }
+    for (let i = 0; i < arch.Inventory.length; i++) {
+      arch.Inventory[i] = compileInJS(arch.Inventory[i], compile)
     }
   }
+  
+  arch.Compile = 'compiled'
 
   return arch
 }
 
-let localArchetypes: ArchetypesStore = {archetypes: {}, tree: {}}
+export let localArchetypes: ArchetypesStore = {archetypes: {}, tree: {}}
 
 archetypes.subscribe((value: ArchetypesStore) => {
   localArchetypes = value
 })
 
-function getArchetype(name: string): data.Archetype {
+function getArchetype(name: string): Archetype {
   let r = localArchetypes.archetypes[name]
   if (r) {
-    return r.Archetype
+    return r.Compiled
   }
   return undefined
 }
 
-function resolveArchetype(archetype: data.Archetype): Error {
+export async function collectArchetypes() {
+  localArchetypes = {archetypes: {}, tree: {}}
+  await CollectArchetypes()
+  let archSources = await GetArchetypes()
+  for (let s of Object.values(archSources)) {
+    let archs = parse(s)
+    for (let [name, arch] of Object.entries(archs)) {
+      arch.Self = name
+      localArchetypes.archetypes[name] = {
+        Original: arch,
+        Compiled: cloneObject(arch),
+      }
+    }
+  }
+}
+
+export function compileArchetypes() {
+  for (let a of Object.values(localArchetypes.archetypes)) {
+    a.Compiled = compileInJS(a.Compiled, true)
+  }
+}
+
+export function getArchetypes(): ArchetypesStore {
+  return localArchetypes
+}
+
+function resolveArchetype(archetype: Archetype): Error {
   let resolved: {[key: string]: boolean} = {}
   let unresolved: {[key: string]: boolean} = {}
 
   return dependencyResolveArchetype(archetype, resolved, unresolved)
 }
 
-function dependencyResolveArchetype(archetype: data.Archetype, resolved: {[key: string]: boolean}, unresolved: {[key: string]: boolean}): Error {
+function dependencyResolveArchetype(archetype: Archetype, resolved: {[key: string]: boolean}, unresolved: {[key: string]: boolean}): Error {
   unresolved[archetype.Self] = true
-  for (let dep of archetype.Archs) {
-    if (dep[0] === '+') {
-      dep = dep.substring(1)
-    }
-    let depArch = getArchetype(dep)
-    if (!depArch) {
-      return new Error(`${dep} missing`)
-    }
-    if (resolved[dep]) {
-      if (unresolved[dep]) {
-        return new Error(`circular dependency between ${archetype.Self} and ${dep}`)
+  if (!archetype.Archs && archetype.Arch) {
+    archetype.Archs = [archetype.Arch]
+  }
+  if (archetype.Archs) {
+    for (let dep of archetype.Archs) {
+      if (dep[0] === '+') {
+        dep = dep.substring(1)
       }
-      let depErr = dependencyResolveArchetype(depArch, resolved, unresolved)
-      if (depErr) {
-        return depErr
+      let depArch = getArchetype(dep)
+      if (!depArch) {
+        return new Error(`${dep} missing`)
+      }
+      if (resolved[dep]) {
+        if (unresolved[dep]) {
+          return new Error(`circular dependency between ${archetype.Self} and ${dep}`)
+        }
+        let depErr = dependencyResolveArchetype(depArch, resolved, unresolved)
+        if (depErr) {
+          return depErr
+        }
       }
     }
   }

@@ -22,7 +22,7 @@ type ArchetypeContainer struct {
 // Editor is our editor, yo.
 type Editor struct {
 	ctx              context.Context
-	Archetypes       map[string]ArchetypeContainer  `json:"Archetypes"`
+	Archetypes       map[string]string              `json:"Archetypes"`
 	Animations       map[string]*sdata.AnimationPre `json:"Animations"`
 	AnimationsConfig cdata.AnimationsConfig         `json:"AnimationsConfig"`
 	Config           Config                         `json:"Config"`
@@ -32,7 +32,7 @@ type Editor struct {
 // NewEditor creates a new Editor application struct
 func NewEditor() *Editor {
 	return &Editor{
-		Archetypes: make(map[string]ArchetypeContainer),
+		Archetypes: make(map[string]string),
 		Animations: make(map[string]*sdata.AnimationPre),
 	}
 }
@@ -87,15 +87,10 @@ func (e *Editor) Initialize() (err error) {
 	}
 
 	// Load our assets.
-	if err := e.LoadArchetypes(); err != nil {
+	if err := e.CollectArchetypes(); err != nil {
 		return err
 	}
 	if err := e.LoadAnimations(); err != nil {
-		return err
-	}
-
-	// Compile stuff.
-	if err := e.CompileArchetypes(); err != nil {
 		return err
 	}
 
@@ -117,9 +112,9 @@ func (e *Editor) LoadAnimationsConfig() error {
 	return nil
 }
 
-// LoadArchetypes loads all archetypes in the archetypes root directory and stores them in our Archetypes field.
-func (e *Editor) LoadArchetypes() error {
-	e.Archetypes = make(map[string]ArchetypeContainer)
+// CollectArchetypes loads all archetypes in the archetypes root directory and stores them in our Archetypes field.
+func (e *Editor) CollectArchetypes() error {
+	e.Archetypes = make(map[string]string)
 	err := filepath.Walk(*e.Config.ArchetypesRoot, func(p string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -131,21 +126,7 @@ func (e *Editor) LoadArchetypes() error {
 					return err
 				}
 
-				archetypesMap := make(map[string]*sdata.Archetype)
-
-				if err := yaml.Unmarshal(b, &archetypesMap); err != nil {
-					return err
-				}
-				for k, archetype := range archetypesMap {
-					if _, ok := e.Archetypes[k]; ok {
-						return fmt.Errorf("archetype '%s' exists", k)
-					}
-					archetype.Self = k
-					e.Archetypes[k] = ArchetypeContainer{
-						Archetype: archetype,
-						Source:    string(b),
-					}
-				}
+				e.Archetypes[p] = string(b)
 			}
 		}
 		return nil
@@ -191,152 +172,13 @@ func (e *Editor) LoadAnimations() error {
 	return nil
 }
 
-// CompileArchetypes compiles all archetypes.
-func (e *Editor) CompileArchetypes() error {
-	for _, a := range e.Archetypes {
-		if err := e.resolveArchetype(a.Archetype); err != nil {
-			return err
-		}
-	}
-	for _, a := range e.Archetypes {
-		if _, err := e.CompileArchetype(a.Archetype); err != nil {
-			return err
-		}
-	}
-	e.compiled = true
-	return nil
-}
-
-// CompileArchetype compiles a given archetype and returns itself. The return is used to automatically resend a changed Archetype back to Wails on completion.
-func (e *Editor) CompileArchetype(a *sdata.Archetype) (*sdata.Archetype, error) {
-	if a.IsCompiled() || a.IsCompiling() {
-		return a, nil
-	}
-	a.SetCompiling(true)
-
-	if err := e.resolveArchetype(a); err != nil {
-		return a, err
-	}
-
-	if len(a.Archs) == 0 && a.Arch != "" {
-		a.Archs = append(a.Archs, a.Arch)
-	}
-	for _, dep := range a.Archs {
-		shouldMerge := true
-		if dep[0] == '+' {
-			dep = dep[1:]
-			shouldMerge = false
-		}
-		ac2, ok := e.Archetypes[dep]
-		if !ok {
-			return a, fmt.Errorf("missing dep %s", dep)
-		}
-		a2 := ac2.Archetype
-		if !e.compiled {
-			if _, err := e.CompileArchetype(a2); err != nil {
-				return a, err
-			}
-		}
-		if shouldMerge {
-			if err := a.Merge(a2); err != nil {
-				return a, err
-			}
-		} else {
-			if err := a.Add(a2); err != nil {
-				return a, err
-			}
-		}
-	}
-
-	for i := range a.Inventory {
-		if _, err := e.CompileArchetype(&a.Inventory[i]); err != nil {
-			return a, err
-		}
-	}
-
-	// Ensure Events' archetypes are compiled.
-	compileEventResponses := func(er *sdata.EventResponses) {
-		if er == nil {
-			return
-		}
-		// FIXME: For now, do not compile events.
-		return
-		if er.Spawn != nil {
-			for _, a := range er.Spawn.Items {
-				e.CompileArchetype(a.Archetype)
-			}
-		}
-		if er.Replace != nil {
-			for _, a := range *er.Replace {
-				e.CompileArchetype(a.Archetype)
-			}
-		}
-	}
-	if a.Events != nil {
-		compileEventResponses(a.Events.Birth)
-		compileEventResponses(a.Events.Death)
-		compileEventResponses(a.Events.Advance)
-		compileEventResponses(a.Events.Hit)
-	}
-
-	a.SetCompiled(true)
-
-	return a, nil
-}
-
-// resolveArchetype is used to ensure that circular dependencies do not exist.
-func (e *Editor) resolveArchetype(archetype *sdata.Archetype) error {
-	resolved := make(map[string]struct{})
-	unresolved := make(map[string]struct{})
-
-	if err := e.dependencyResolveArchetype(archetype, resolved, unresolved); err != nil {
-		return err
-	}
-	return nil
-}
-
-// dependencyResolveArchetype is the deeper recursive companion to resolveArchetype.
-func (e *Editor) dependencyResolveArchetype(archetype *sdata.Archetype, resolved, unresolved map[string]struct{}) error {
-	unresolved[archetype.Self] = struct{}{}
-	for _, dep := range archetype.Archs {
-		if dep[0] == '+' {
-			dep = dep[1:]
-		}
-		depArch := e.GetArchetype(dep)
-		if depArch == nil {
-			return fmt.Errorf("%s missing", dep)
-		}
-		if _, ok := resolved[dep]; !ok {
-			if _, ok := unresolved[dep]; ok {
-				return fmt.Errorf("circular dependency between %s and %s", archetype.Self, dep)
-			}
-			if err := e.dependencyResolveArchetype(depArch, resolved, unresolved); err != nil {
-				return err
-			}
-		}
-	}
-	resolved[archetype.Self] = struct{}{}
-	delete(unresolved, archetype.Self)
-
-	return nil
-}
-
 // GetAnimationsConfig returns the animations config.
 func (e *Editor) GetAnimationsConfig() cdata.AnimationsConfig {
 	return e.AnimationsConfig
 }
 
-// GetArchetype returns the archetype entry corresponding to the given name.
-func (e *Editor) GetArchetype(n string) *sdata.Archetype {
-	ac, ok := e.Archetypes[n]
-	if !ok {
-		return nil
-	}
-	return ac.Archetype
-}
-
 // GetArchetypes returns the archetypes field.
-func (e *Editor) GetArchetypes() map[string]ArchetypeContainer {
+func (e *Editor) GetArchetypes() map[string]string {
 	return e.Archetypes
 }
 

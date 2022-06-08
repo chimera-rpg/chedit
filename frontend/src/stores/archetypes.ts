@@ -1,10 +1,11 @@
 import { writable, get, Subscriber, Writable } from 'svelte/store'
 import type { data } from '../../wailsjs/go/models'
 import type { main } from '../../wailsjs/go/models'
+import type { ArchetypeContainer } from '../interfaces/Archetype'
 import * as ftt from '@kettek/filepaths-to-tree'
 
 export interface ArchetypesStore {
-  archetypes: {[key:string]: main.ArchetypeContainer}
+  archetypes: {[key:string]: ArchetypeContainer}
   tree: any
 }
  
@@ -27,7 +28,7 @@ export const archetypes: Writable<ArchetypesStore> = ((): Writable<ArchetypesSto
           }
           return 0
         }).reduce((obj: any, key: any) => {
-          if (node[key].Archetype) {
+          if (node[key].Compiled) {
             obj[key] = node[key]
           } else {
             obj[key] = sortNode(node[key])

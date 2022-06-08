@@ -1,7 +1,13 @@
 // It pains me to reimplement Archetypes here, as I was hoping wails would be enough, but given that server/data.Archetype converts archetypes into more optimized/machine-readable formats during unmarshalling, it quickly turns into a lot of extra work for no real reason.
 
+export interface ArchetypeContainer {
+  Compiled: Archetype
+  Original: Archetype
+}
+
 export interface Archetype {
-  Self: string
+  Self?: string
+  Compile?: ''|'compiled'|'compiling'
 
   Arch?: string
   Archs?: string[]

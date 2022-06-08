@@ -24,6 +24,9 @@
   export let hoverX = 0
   export let hoverZ = 0
 
+  export let fadeAbove: boolean = true
+  export let fadeBelow: boolean = false
+
   $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
   $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
 
@@ -35,9 +38,13 @@
 
   interface DrawListItem {
     arch: ArchetypeContainer
+    left: number
+    top: number
+    zIndex: number
+    //
     x: number
     y: number
-    zIndex: number
+    z: number
     //
     frame: data.AnimationFramePre
     image?: HTMLImageElement
@@ -61,8 +68,11 @@
             let zIndex = (z * map.Height * map.Width) + (map.Depth * y) - x
             let di: DrawListItem = {
               arch: map.Tiles[y][x][z][i],
-              x: x3,
-              y: y3,
+              left: x3,
+              top: y3,
+              y: y,
+              x: x,
+              z: z,
               zIndex: zIndex,
               frame: null,
             }
@@ -125,6 +135,14 @@
       return a.zIndex - b.zIndex
     })
     for (let item of dl) {
+      if (fadeAbove && item.y > hoverY) {
+        ctx.globalAlpha = 0.2
+      } else if (fadeBelow && item.y < hoverY) {
+        ctx.globalAlpha = 0.2
+      } else {
+        ctx.globalAlpha = 1
+      }
+
       ctx.strokeStyle = '#f00'
       if (item.image && item.image.complete && !item.imageErr) {
         // Get adjustments.
@@ -146,15 +164,15 @@
         }
 
         try {
-          ctx.drawImage(item.image, (x+item.x)*zoom, (y+item.y+yOffset)*zoom, item.image.naturalWidth*zoom, item.image.naturalHeight*zoom)
+          ctx.drawImage(item.image, (x+item.left)*zoom, (y+item.top+yOffset)*zoom, item.image.naturalWidth*zoom, item.image.naturalHeight*zoom)
         } catch(err) {
-          ctx.strokeText("!", item.x*zoom, item.y * zoom)
+          ctx.strokeText("!", item.left*zoom, item.top * zoom)
         }
       } else if (item.imageErr) {
-        ctx.strokeText("!", item.x*zoom, item.y * zoom)
+        ctx.strokeText("!", item.left*zoom, item.top * zoom)
       } else {
         ctx.strokeStyle = '#fff'
-        ctx.strokeText("?", item.x*zoom, item.y * zoom)
+        ctx.strokeText("?", item.left*zoom, item.top * zoom)
       }
     }
   }
@@ -173,7 +191,7 @@
       ;[x, y] = getCoordinatePosition(cursorY-1, cursorX, cursorZ)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
-    ctx.globalAlpha = 0.5
+    ctx.globalAlpha = 0.7
     renderPositionLines(cursorY, cursorX, cursorZ)
     ctx.globalAlpha = 1
     // Draw hover cursor
@@ -189,7 +207,7 @@
       ;[x, y] = getCoordinatePosition(hoverY-1, hoverX, hoverZ)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
-    ctx.globalAlpha = 0.5
+    ctx.globalAlpha = 0.7
     renderPositionLines(hoverY, hoverX, hoverZ)
     ctx.globalAlpha = 1
     ctx.setTransform(1, 0, 0, 1, 0, 0)

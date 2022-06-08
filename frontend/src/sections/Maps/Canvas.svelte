@@ -26,6 +26,10 @@
 
   export let fadeAbove: boolean = true
   export let fadeBelow: boolean = false
+  export let fadeFront: boolean = false
+  export let fadeBehind: boolean = false
+  export let fadeLeft: boolean = false
+  export let fadeRight: boolean = false
 
   $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
   $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
@@ -138,6 +142,14 @@
       if (fadeAbove && item.y > hoverY) {
         ctx.globalAlpha = 0.2
       } else if (fadeBelow && item.y < hoverY) {
+        ctx.globalAlpha = 0.2
+      } else if (fadeLeft && item.x < hoverX) {
+        ctx.globalAlpha = 0.2
+      } else if (fadeRight && item.x > hoverX) {
+        ctx.globalAlpha = 0.2
+      } else if (fadeBehind && item.z < hoverZ) {
+        ctx.globalAlpha = 0.2
+      } else if (fadeFront && item.z > hoverZ) {
         ctx.globalAlpha = 0.2
       } else {
         ctx.globalAlpha = 1

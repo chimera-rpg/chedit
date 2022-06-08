@@ -1,13 +1,14 @@
 import { writable, get, Subscriber, Writable } from 'svelte/store'
 import type { main } from '../../wailsjs/go/models'
+import type { MapsContainer } from '../interfaces/Map'
 
 interface MapsStoreData {
-  maps: main.MapReference[]
+  maps: MapsContainer[]
 }
 
 interface MapsStore extends Writable<MapsStoreData> {
-  open(maps: main.MapReference): void
-  close(maps: main.MapReference): void
+  open(maps: MapsContainer): void
+  close(maps: MapsContainer): void
 }
 
 export const maps: MapsStore = ((): MapsStore => {
@@ -19,7 +20,7 @@ export const maps: MapsStore = ((): MapsStore => {
     subscribe,
     set,
     update,
-    open: (mr: main.MapReference): void => {
+    open: (mr: MapsContainer): void => {
       let ms = get({subscribe})
       ms.maps.push({
         ...mr,
@@ -27,7 +28,7 @@ export const maps: MapsStore = ((): MapsStore => {
       })
       set(ms)
     },
-    close: (mr: main.MapReference): void => {
+    close: (mr: MapsContainer): void => {
       let ms = get({subscribe})
       ms.maps = ms.maps.filter(v=>v!==mr)
       set(ms)

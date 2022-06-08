@@ -1,6 +1,6 @@
-import type { Archetype } from "./Archetype"
+import type { ArchetypeContainer, Archetype } from "./Archetype"
 
-export interface Map {
+export interface BaseMap {
   DataName?: string
   Name?: string
   Description?: string
@@ -13,8 +13,23 @@ export interface Map {
   Y?: number
   X?: number
   Z?: number
-  Tiles?: Archetype[][][][]
   Script?: string
 }
 
+export interface ContainerMap extends BaseMap {
+  Tiles?: ArchetypeContainer[][][][]
+}
+
+export interface Map extends BaseMap {
+  Tiles?: Archetype[][][][]
+}
+
+export interface MapsContainer {
+  Path: string
+  Maps?: ContainerMaps
+  SelectedMap: string
+}
+
 export type Maps = {[key: string]: Map}
+export type BaseMaps = {[key: string]: BaseMap}
+export type ContainerMaps = {[key: string]: ContainerMap}

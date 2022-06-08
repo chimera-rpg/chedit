@@ -10,15 +10,21 @@
   import { archetypes as archetypesStore } from '../stores/archetypes'
   import { setAnimationsConfig } from '../models/config'
   import { parse } from 'yaml'
+  import type { main } from '../../wailsjs/go/models'
+  import { loadMapsFromYAML } from '../models/maps'
 
   async function openMap() {
-    if (true) { // This unmarshals the maps in go, then sends those here.
-      let m = await LoadMap(true)
+    if (false) { // This unmarshals the maps in go, then sends those here.
+      let m = await LoadMap(true) as main.MapReference
       mapsStore.open(m)
     } else { // This only reads the bytes in go, then sends them here to unmarshal.
-      let m = await LoadMap(false)
-      m.Maps = parse(m.Source)
-      mapsStore.open(m)
+      let mr = await LoadMap(false) as main.MapReference
+      let m = loadMapsFromYAML(mr.Source)
+      mapsStore.open({
+        Path: mr.Path,
+        SelectedMap: "",
+        Maps: m,
+      })
     }
   }
 

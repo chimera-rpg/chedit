@@ -1,20 +1,17 @@
 <script lang="ts">
   import { compileInJS, cloneObject } from '../../models/archs'
 
+  import type { ContainerMap } from '../../interfaces/Map'
   import type { data } from '../../../wailsjs/go/models'
   import ArchView from '../ArchView.svelte'
+  import type { ArchetypeContainer } from '../../interfaces/Archetype'
 
-  export let map: data.Map
+  export let map: ContainerMap
   export let y = 0
   export let x = 0
   export let z = 0
 
-  interface ArchetypeWrapper {
-    original: data.Archetype
-    compiled: data.Archetype
-  }
-
-  let tiles: ArchetypeWrapper[][] = []
+  let tiles: ArchetypeContainer[][] = []
 
   $: onChange(map, y, x, z)
   function onChange(...args: any) {
@@ -29,15 +26,12 @@
       if (!p) return
       ctiles.push(p)
     }
-    // Kind of excessive to recompile each change, but whatever.
+
     tiles = []
     for (let archs of ctiles) {
       let s = []
       for (let arch of archs) {
-        s.push({
-          original: arch,
-          compiled: compileInJS(cloneObject(arch)),
-        })
+        s.push(arch)
       }
       console.log(s)
       tiles.push(s)
@@ -56,8 +50,8 @@
         <ol class='archs'>
           {#each tile as arch}
             <li class='arch'>
-              <ArchView arch={arch.compiled}></ArchView>
-              {arch.compiled.Self}
+              <ArchView arch={arch.Compiled}></ArchView>
+              {arch.Compiled.Self}
             </li>
           {/each}
         </ol>

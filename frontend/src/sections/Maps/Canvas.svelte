@@ -7,13 +7,15 @@
   import { onMount } from "svelte"
 
   import type { data } from "../../../wailsjs/go/models"
+  import type { ContainerMap } from '../../interfaces/Map'
+  import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import { get } from "svelte/store"
 
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
 
   export let zoom: number = 1
-  export let map: data.Map
+  export let map: ContainerMap
 
   export let cursorY = 0
   export let cursorX = 0
@@ -32,8 +34,7 @@
   }
 
   interface DrawListItem {
-    arch: data.Archetype
-    compiled?: data.Archetype
+    arch: ArchetypeContainer
     x: number
     y: number
     zIndex: number
@@ -65,12 +66,7 @@
               zIndex: zIndex,
               frame: null,
             }
-            try {
-              di.compiled = compileInJS(di.arch)
-            } catch(err) {
-              di.compiled = di.arch
-            }
-            di.frame = anims[di.compiled.Anim]?.Faces[di.compiled.Face][0]
+            di.frame = anims[di.arch.Compiled.Anim]?.Faces[di.arch.Compiled.Face][0]
             dl.push(di)
           }
         }
@@ -94,7 +90,7 @@
 
   function collectDrawListImages() {
     for (let di of drawlist) {
-      animations.getImage(di.compiled.Anim, di.compiled.Face).then((bytes: string) => {
+      animations.getImage(di.arch.Compiled.Anim, di.arch.Compiled.Face).then((bytes: string) => {
         di.image = new Image()
         di.image.onload = (ev: Event) => {
           pendingRender()
@@ -134,7 +130,7 @@
         // Get adjustments.
         let x = 0
         let y = 0
-        let adjustment = animationsConfig.Adjustments[item.compiled.Type]
+        let adjustment = animationsConfig.Adjustments[item.arch.Compiled.Type]
         if (adjustment) {
           x = adjustment.X
           y = adjustment.Y
@@ -145,7 +141,7 @@
         }
         // Get local offsets.
         let yOffset = 0
-        if ((item.compiled.Height > 1 || item.compiled.Depth > 1) && item.image.naturalHeight > animationsConfig.TileHeight) {
+        if ((item.arch.Compiled.Height > 1 || item.arch.Compiled.Depth > 1) && item.image.naturalHeight > animationsConfig.TileHeight) {
           yOffset = -(item.image.naturalHeight - animationsConfig.TileHeight)
         }
 

@@ -6,8 +6,9 @@
   import Canvas from './Canvas.svelte'
   import SplitPane from '../../components/SplitPane.svelte'
   import TilesList from './TilesList.svelte'
+  import type { MapsContainer } from '../../interfaces/Map'
 
-  export let map: data.Map
+  export let map: MapsContainer
   let zoom: number = 2
   let cursorY: number = 0
   let cursorX: number = 0

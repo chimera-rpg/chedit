@@ -1,10 +1,9 @@
 <script lang='ts'>
-  import Windows from '../../components/Windows/Windows.svelte'
   import Window from '../../components/Windows/Window.svelte'
-  import type { main } from '../../../wailsjs/go/models'
+  import type { MapsContainer } from '../../interfaces/Map'
   import View from './View.svelte'
 
-  export let map: main.MapReference
+  export let map: MapsContainer
 </script>
 
 <Window on:close>

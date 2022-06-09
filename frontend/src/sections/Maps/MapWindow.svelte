@@ -4,6 +4,7 @@
   import View from './View.svelte'
 
   export let map: MapsContainer
+  export let mapIndex: number
 </script>
 
 <Window on:close>
@@ -16,7 +17,7 @@
         <li>{key}</li>
       {/each}
     </nav>
-    <View map={map.Maps[map.SelectedMap]}></View>
+    <View map={map.Maps[map.SelectedMap]} mapsContainer={map} mapIndex={mapIndex}></View>
   </section>
 </Window>
 

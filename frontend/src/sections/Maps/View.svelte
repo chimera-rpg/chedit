@@ -2,13 +2,19 @@
   import { animationsConfig } from '../../models/config'
   import { styles } from '../../stores/styles'
 
-  import type { main, data } from '../../../wailsjs/go/models'
+  import { main, data } from '../../../wailsjs/go/models'
   import Canvas from './Canvas.svelte'
   import SplitPane from '../../components/SplitPane.svelte'
   import TilesList from './TilesList.svelte'
-  import type { MapsContainer, ContainerMap } from '../../interfaces/Map'
+  import type { MapsContainer, ContainerMap, ContainerMaps } from '../../interfaces/Map'
+  import { palette } from '../../stores/palette'
+  import type { ArchetypeContainer } from '../../interfaces/Archetype'
+  import { compileInJS } from '../../models/archs'
+  import { maps as mapsStore, MapsStoreData } from '../../stores/maps'
 
+  export let mapsContainer: MapsContainer
   export let map: ContainerMap
+  export let mapIndex: number
   let zoom: number = 2
   let cursorY: number = 0
   let cursorX: number = 0
@@ -65,11 +71,60 @@
     hoverZ = nearestZ
   }
 
+  function getNearestFromMouse(e: MouseEvent): [number, number, number] {
+    let r = mapEl.getBoundingClientRect()
+
+    let hitX = (e.clientX - r.left + mapEl.scrollLeft) / zoom
+    let hitY = (e.clientY - r.top + mapEl.scrollTop) / zoom
+
+    let xOffset = hoverY * -animationsConfig.YStep.X
+    let yOffset = hoverY * animationsConfig.YStep.Y + (map.Height * -animationsConfig.YStep.Y)
+
+    let nearestX = Math.floor((hitX + xOffset) / animationsConfig.TileWidth)
+    let nearestZ = Math.floor((hitY - yOffset) / animationsConfig.TileHeight)
+
+    if (nearestX < 0) nearestX = 0
+    if (nearestZ < 0) nearestZ = 0
+    if (nearestX > map.Width) nearestX = map.Width
+    if (nearestZ > map.Depth) nearestZ = map.Depth
+
+    return [hoverY, nearestX, nearestZ]
+  }
+
   function handleMapMousedown(e: MouseEvent) {
-    if (e.which !== 1) return
-    cursorY = hoverY
-    cursorX = hoverX
-    cursorZ = hoverZ
+    if (e.button === 0) {
+      cursorY = hoverY
+      cursorX = hoverX
+      cursorZ = hoverZ
+    } else if (e.button === 2) {
+      e.preventDefault()
+      e.stopPropagation()
+      let [y, x, z] = getNearestFromMouse(e)
+      insertArchetype($palette.focused, y, x, z, -1)
+    }
+  }
+
+  // FIXME: Make this undoable!
+  function insertArchetype(arch: string, y: number, x: number, z: number, p: number) {
+    if (y < 0 || x < 0 || z < 0) return
+    if (y >= map.Height || x >= map.Width || z >= map.Depth) return
+    mapsStore.update(((v: MapsStoreData) => {
+      let mc = v.maps.find(v=>v===mapsContainer)
+      if (mc) {
+        let m = mc.Maps[mapsContainer.SelectedMap]
+        if (m) {
+          let archetype: ArchetypeContainer = {
+            Original: { Archs: [arch] },
+            Compiled: compileInJS({Archs: [arch]}, true),
+          }
+          if (p === -1) {
+            p = m.Tiles[y][x][z].length
+          }
+          m.Tiles[y][x][z].splice(p, 0, archetype)
+        }
+      }
+      return v
+    }))
   }
 
   let scrolling: boolean = false
@@ -119,7 +174,7 @@
   {#if map}
     <section>
       <SplitPane type='horizontal' pos={80}>
-        <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} use:dragScroll={updateScroll}>
+        <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
           <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
         </article>
         <aside slot=b>

@@ -2,7 +2,7 @@ import { writable, get, Subscriber, Writable } from 'svelte/store'
 import type { main } from '../../wailsjs/go/models'
 import type { MapsContainer } from '../interfaces/Map'
 
-interface MapsStoreData {
+export interface MapsStoreData {
   maps: MapsContainer[]
 }
 
@@ -32,6 +32,6 @@ export const maps: MapsStore = ((): MapsStore => {
       let ms = get({subscribe})
       ms.maps = ms.maps.filter(v=>v!==mr)
       set(ms)
-    },
+    }
   }
 })()

@@ -10,6 +10,7 @@
   import type { ContainerMap } from '../../interfaces/Map'
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import { get } from "svelte/store"
+  import { maps, MapsStoreData } from "../../stores/maps"
 
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
@@ -102,9 +103,19 @@
     }
   }
 
+  // TODO: allow image invalidation.
+  let imageStore: {[key: string]: {[key: string]: HTMLImageElement}} = {}
+
   function collectDrawListImages() {
     for (let di of drawlist) {
+      if (imageStore[di.arch.Compiled.Anim]?.[di.arch.Compiled.Face]) {
+        di.image = imageStore[di.arch.Compiled.Anim][di.arch.Compiled.Face]
+        continue
+      }
       animations.getImage(di.arch.Compiled.Anim, di.arch.Compiled.Face).then((bytes: string) => {
+        if (!imageStore[di.arch.Compiled.Anim]) {
+          imageStore[di.arch.Compiled.Anim] = {}
+        }
         di.image = new Image()
         di.image.onload = (ev: Event) => {
           pendingRender()
@@ -114,6 +125,7 @@
           pendingRender()
         }
         di.image.src = "data:image/png;base64,"+bytes
+        imageStore[di.arch.Compiled.Anim][di.arch.Compiled.Face] = di.image
       }).catch((err: any) => {
         di.imageErr = err
         pendingRender()
@@ -283,10 +295,19 @@
     renderCursors()
   }
 
+
   onMount(() => {
     drawlist = buildDrawList()
     collectDrawListImages()
     pendingRender()
+    let unsub = maps.subscribe((v: MapsStoreData) => {
+      drawlist = buildDrawList()
+      collectDrawListImages()
+      pendingRender()
+    })
+    return () => {
+      unsub()
+    }
   })
 </script>
 

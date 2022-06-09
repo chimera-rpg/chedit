@@ -11,8 +11,8 @@
 
 <div>
   <Windows>
-    {#each $maps.maps as group}
-      <MapWindow bind:map={group} on:close={_=>closeMap(group)}></MapWindow>
+    {#each $maps.maps as group, index}
+      <MapWindow bind:map={group} mapIndex={index} on:close={_=>closeMap(group)}></MapWindow>
     {/each}
   </Windows>
 </div>

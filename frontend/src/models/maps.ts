@@ -2,7 +2,7 @@ import { parse } from 'yaml'
 import type { BaseMaps, Maps, ContainerMaps, Map, ContainerMap } from '../interfaces/Map'
 import type { ArchetypeContainer } from '../interfaces/Archetype'
 import { cloneObject, compileInJS } from './archs'
-import type { Undoable, UndoStep } from './undo'
+import { QueueStep, Undoable, UndoStep } from './undo'
 
 export function loadMapsFromYAML(source: string): ContainerMaps {
   let maps: ContainerMaps = {}
@@ -45,12 +45,18 @@ export function makeMap(): ContainerMap {
     stackPos: 0,
     undoable: false,
     redoable: false,
+    queued: false,
+    queueStack: undefined,
     apply: (u: UndoStep) => {
       u.apply(m)
-      m.stack = [...m.stack.slice(0, m.stackPos), u]
-      m.stackPos++
-      m.undoable = m.stackPos >= 1 && m.stack.length > 0
-      m.redoable = m.stackPos < m.stack.length
+      if (m.queueStack) {
+        m.queueStack.push(u)
+      } else {
+        m.stack = [...m.stack.slice(0, m.stackPos), u]
+        m.stackPos++
+        m.undoable = m.stackPos >= 1 && m.stack.length > 0
+        m.redoable = m.stackPos < m.stack.length
+      }
     },
     undo: () => {
       if (!m.undoable) return false
@@ -65,6 +71,25 @@ export function makeMap(): ContainerMap {
       m.undoable = m.stackPos >= 1 && m.stack.length > 0
       m.redoable = m.stackPos < m.stack.length
       return true
+    },
+    queue: () => {
+      if (m.queued) {
+        throw 'already queued!'
+      }
+      m.queueStack = new QueueStep()
+      return m.queued = true
+    },
+    unqueue: () => {
+      if (!m.queued) {
+        throw 'not queued!'
+      }
+      m.stack = [...m.stack.slice(0, m.stackPos), m.queueStack]
+      m.stackPos++
+      m.undoable = m.stackPos >= 1 && m.stack.length > 0
+      m.redoable = m.stackPos < m.stack.length
+
+      m.queueStack = null
+      return m.queued = false
     },
   }
   return m
@@ -136,22 +161,5 @@ export class MapRemoveAction extends MapInsertAction {
   }
   unapply(c: ContainerMap): ContainerMap {
     return super.apply(c)
-  }
-}
-
-export class MapGroupAction implements UndoStep {
-  actions: UndoStep[] = []
-
-  apply(c: ContainerMap): ContainerMap {
-    for (let a of this.actions) {
-      c = a.apply(c)
-    }
-    return c
-  }
-  unapply(c: ContainerMap): ContainerMap {
-    for (let a of this.actions.reverse()) {
-      c = a.unapply(c)
-    }
-    return c
   }
 }

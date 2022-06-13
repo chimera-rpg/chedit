@@ -48,9 +48,9 @@
   let mapEl: HTMLElement = null
   function handleMapMousemove(e: MouseEvent) {
     if (scrolling) return
-    e.stopImmediatePropagation()
-    e.stopPropagation()
-    e.preventDefault()
+    //e.stopImmediatePropagation()
+    //e.stopPropagation()
+    //e.preventDefault()
 
     let r = mapEl.getBoundingClientRect()
 
@@ -100,9 +100,46 @@
     } else if (e.button === 2) {
       e.preventDefault()
       e.stopPropagation()
-      let [y, x, z] = getNearestFromMouse(e)
-      insertArchetype($palette.focused, y, x, z, -1)
+
+      map.queue()
+      startMouseDrag(e, (t: TraversedTile) => {
+        insertArchetype($palette.focused, t.y, t.x, t.z, -1)
+      }, (t: TraversedTile[]) => {
+        map.unqueue()
+        mapsStore.set($mapsStore)
+      })
     }
+  }
+
+  interface TraversedTile {
+    y: number
+    x: number
+    z: number
+  }
+  let traversedTiles: TraversedTile[] = []
+  function startMouseDrag(e: MouseEvent, cb1: (t: TraversedTile) => void, cb2: (t: TraversedTile[]) => void) {
+    let [y, x, z] = getNearestFromMouse(e)
+    traversedTiles.push({y, x, z})
+    cb1(traversedTiles[traversedTiles.length-1])
+
+    const handleMouseUp = (e: MouseEvent) => {
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('mousemove', handleMouseMove)
+
+      cb2(traversedTiles)
+
+      traversedTiles = []
+    }
+    const handleMouseMove = (e: MouseEvent) => {
+      let [y, x, z] = getNearestFromMouse(e)
+      if (!traversedTiles.find(v=>v.y===y&&v.x===x&&v.z===z)) {
+        traversedTiles.push({y, x, z})
+        cb1(traversedTiles[traversedTiles.length-1])
+      }
+    }
+
+    document.addEventListener('mouseup', handleMouseUp)
+    document.addEventListener('mousemove', handleMouseMove)
   }
 
   function undo() {
@@ -131,7 +168,6 @@
     }))
   }
 
-  // FIXME: Make this undoable!
   function insertArchetype(arch: string, y: number, x: number, z: number, p: number) {
     if (y < 0 || x < 0 || z < 0) return
     if (y >= map.Height || x >= map.Width || z >= map.Depth) return

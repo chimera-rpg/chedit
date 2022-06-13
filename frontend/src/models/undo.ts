@@ -9,6 +9,10 @@ export interface Undoable {
   undoable: boolean
   redo(): boolean
   redoable: boolean
+  queue(): boolean
+  unqueue(): boolean
+  queued: boolean
+  queueStack: QueueStep
 }
 
 /**
@@ -17,4 +21,25 @@ export interface Undoable {
 export interface UndoStep {
   apply(c: Undoable): Undoable
   unapply(c: Undoable): Undoable
+}
+
+
+export class QueueStep implements UndoStep {
+  steps: UndoStep[] = []
+
+  push(u: UndoStep) {
+    this.steps.push(u)
+  }
+  apply(c: Undoable): Undoable {
+    for (let a of this.steps) {
+      c = a.apply(c)
+    }
+    return c
+  }
+  unapply(c: Undoable): Undoable {
+    for (let a of this.steps.reverse()) {
+      c = a.unapply(c)
+    }
+    return c
+  }
 }

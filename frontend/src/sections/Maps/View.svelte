@@ -11,6 +11,7 @@
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import { compileInJS } from '../../models/archs'
   import { maps as mapsStore, MapsStoreData } from '../../stores/maps'
+  import { MapInsertAction } from '../../models/maps'
 
   export let mapsContainer: MapsContainer
   export let map: ContainerMap
@@ -104,6 +105,32 @@
     }
   }
 
+  function undo() {
+    mapsStore.update(((v: MapsStoreData) => {
+      let mc = v.maps.find(v=>v===mapsContainer)
+      if (mc) {
+        let m = mc.Maps[mapsContainer.SelectedMap]
+        if (m) {
+          m.undo()
+        }
+      }
+      return v
+    }))
+  }
+
+  function redo() {
+    mapsStore.update(((v: MapsStoreData) => {
+      let mc = v.maps.find(v=>v===mapsContainer)
+      if (mc) {
+        let m = mc.Maps[mapsContainer.SelectedMap]
+        if (m) {
+          m.redo()
+        }
+      }
+      return v
+    }))
+  }
+
   // FIXME: Make this undoable!
   function insertArchetype(arch: string, y: number, x: number, z: number, p: number) {
     if (y < 0 || x < 0 || z < 0) return
@@ -113,14 +140,16 @@
       if (mc) {
         let m = mc.Maps[mapsContainer.SelectedMap]
         if (m) {
-          let archetype: ArchetypeContainer = {
-            Original: { Archs: [arch] },
-            Compiled: compileInJS({Archs: [arch]}, true),
-          }
-          if (p === -1) {
-            p = m.Tiles[y][x][z].length
-          }
-          m.Tiles[y][x][z].splice(p, 0, archetype)
+          m.apply(new MapInsertAction({
+            arch: {
+              Original: { Archs: [arch] },
+              Compiled: compileInJS({Archs: [arch]}, true),
+            },
+            y: y,
+            x: x,
+            z: z,
+            i: p,
+          }))
         }
       }
       return v
@@ -172,6 +201,10 @@
 
 <div style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
   {#if map}
+    <header>
+      <button disabled={!map.undoable} on:click={undo}>undo</button>
+      <button disabled={!map.redoable} on:click={redo}>redo</button>
+    </header>
     <section>
       <SplitPane type='horizontal' pos={80}>
         <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
@@ -211,7 +244,7 @@
   div {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
   }
   section {
     display: grid;

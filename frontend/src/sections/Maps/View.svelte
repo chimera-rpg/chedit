@@ -238,6 +238,7 @@
 <div style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
   {#if map}
     <header>
+      <button on:click={_=>console.log(map.export())}>save</button>
       <button disabled={!map.undoable} on:click={undo}>undo</button>
       <button disabled={!map.redoable} on:click={redo}>redo</button>
     </header>
@@ -247,7 +248,7 @@
           <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
         </article>
         <aside slot=b>
-          <TilesList bind:y={cursorY} x={cursorX} z={cursorZ} map={map}></TilesList>
+          <TilesList bind:y={cursorY} bind:hoverY={hoverY} x={cursorX} z={cursorZ} map={map}></TilesList>
         </aside>
       </SplitPane>
     </section>

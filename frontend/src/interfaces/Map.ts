@@ -1,7 +1,7 @@
 import type { Undoable } from "../models/undo"
 import type { ArchetypeContainer, Archetype } from "./Archetype"
 
-export interface BaseMap extends Undoable {
+export interface BaseMap {
   DataName?: string
   Name?: string
   Description?: string
@@ -17,8 +17,9 @@ export interface BaseMap extends Undoable {
   Script?: string
 }
 
-export interface ContainerMap extends BaseMap {
+export interface ContainerMap extends BaseMap, Undoable {
   Tiles?: ArchetypeContainer[][][][]
+  export(): Map
 }
 
 export interface Map extends BaseMap {

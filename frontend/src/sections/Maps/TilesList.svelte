@@ -8,6 +8,7 @@
 
   export let map: ContainerMap
   export let y = 0
+  export let hoverY = 0
   export let x = 0
   export let z = 0
 
@@ -44,7 +45,7 @@
   </header>
   <ol class='tiles'>
     {#each tiles as tile, tileY}
-      <li class='tile' class:selected={y===tileY} on:click={_=>y=tileY}>
+      <li class='tile' class:selected={y===tileY} on:click={_=>(y=tileY)&&(hoverY=tileY)}>
         <span>{tileY}</span>
         <ol class='archs'>
           {#each tile as arch}

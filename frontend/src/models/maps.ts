@@ -91,6 +91,30 @@ export function makeMap(): ContainerMap {
       m.queueStack = null
       return m.queued = false
     },
+    export: (): Map => {
+      let m2: Map = {}
+
+      for (let [key, value] of Object.entries(m)) {
+        if (['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'ResetTime', 'Y', 'X', 'Z', 'Script'].includes(key)) {
+          m2[key] = value
+        }
+      }
+      m2.Tiles = []
+      for (let y = 0; y < m.Tiles.length; y++) {
+        m2.Tiles[y] = []
+        for (let x = 0; x < m.Tiles[y].length; x++) {
+          m2.Tiles[y][x] = []
+          for (let z = 0; z < m.Tiles[y][x].length; z++) {
+            m2.Tiles[y][x][z] = []
+            for (let i = 0; i < m.Tiles[y][x][z].length; i++) {
+              m2.Tiles[y][x][z][i] = m.Tiles[y][x][z][i].Original
+            }
+          }
+        }
+      }
+
+      return m2
+    }
   }
   return m
 }

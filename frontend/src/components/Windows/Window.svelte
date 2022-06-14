@@ -10,6 +10,7 @@
     y: 32,
     width: window.innerWidth/2,
     height: window.innerHeight/2,
+    maximized: false,
   };
 
 	const { registerWindow, selectWindow, selectedWindow } = getContext(WINDOWS);
@@ -38,6 +39,10 @@
     if (win.height < 100) {
       win.height = 100
     }
+  }
+
+  function maximizeWindow() {
+    win.maximized = !win.maximized
   }
 
   function drag(node: HTMLElement, callback: any) {
@@ -78,7 +83,7 @@
 
 </script>
 
-<section transition:scale class:dragging={dragging} class:window class:selected={$selectedWindow === win} on:click={_=>selectWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
+<section transition:scale class:dragging={dragging} class:window class:selected={$selectedWindow === win} class:maximized={win.maximized} on:click={_=>selectWindow(win)} on:dblclick={_=>maximizeWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
   <header use:drag={updatePosition}>
     <nav class='header'>
       <slot name="header"></slot>
@@ -105,6 +110,12 @@
 		color: #333;
     z-index: 99;
 	}
+  .maximized {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
   header {
     background: var(--window-header);
     color: var(--window-color);

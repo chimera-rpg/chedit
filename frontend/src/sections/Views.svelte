@@ -47,5 +47,8 @@
     position: relative;
     background: var(--content);
     overflow: hidden;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 </style>

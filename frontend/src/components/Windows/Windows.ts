@@ -3,4 +3,5 @@ export interface WindowI {
   y: number
   width: number
   height: number
+  maximized: boolean
 }

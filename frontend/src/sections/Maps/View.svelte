@@ -137,6 +137,9 @@
       }, (t: TraversedTile[]) => {
         $cursor.selecting = []
         $cursor.selected = getCoordinateBox($cursor.start, $cursor.end)
+        $cursor.start.y = $cursor.end.y
+        $cursor.start.x = $cursor.end.x
+        $cursor.start.z = $cursor.end.z
       })
     } else if (e.button === 2) {
       e.preventDefault()

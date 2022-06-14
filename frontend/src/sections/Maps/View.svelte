@@ -496,9 +496,16 @@
   .toolbar {
   }
   .toolbar > button {
+    min-width: 2em;
+    min-height: 2em;
     border-radius: 0;
     background: transparent;
     border-style: none;
+    display: inline-grid;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
   }
   .toolbar > button.-active {
     background: rgba(128, 128, 128, 0.5);

@@ -11,6 +11,7 @@ export const defaultColors: Colors = {
   hoverBorder: '#fff',
   selectedBorder: '#ff0',
   selectingBorder: '#ff0',
+  placingBorder: '#00f',
 }
 
 export const styles: Writable<Styles> = ((): Writable<Styles> => {

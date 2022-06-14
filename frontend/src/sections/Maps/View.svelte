@@ -17,8 +17,11 @@
   import insertIcon from '../../assets/icons/insert.png'
   import { Writable, writable } from 'svelte/store'
   import type { Coordinate, Cursor } from '../../interfaces/editor'
+  import { blueprints } from '../../stores/blueprints'
 
-  let tool: 'insert'|'erase' = 'insert'
+  type ToolType = 'insert'|'erase'|'placing'
+  let tool: ToolType = 'insert'
+  let lastTool: ToolType = 'insert'
 
   export let mapsContainer: MapsContainer
   export let map: ContainerMap
@@ -34,6 +37,7 @@
     hover: {x: 0, y: 0, z: 0},
     selected: [],
     selecting: [],
+    placing: [],
   })
 
   let lastWheelTimestamp = 0
@@ -123,48 +127,64 @@
 
   type KeysState = {[key: string]: boolean}
 
-  function adjustSelection(coords: Coordinate[], keys: KeysState) {
+  function adjustShape(base: Coordinate[], coords: Coordinate[], keys: KeysState) {
     if (keys.shift) {
       // add
       for (let v of coords) {
-        if (!$cursor.selected.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z)) {
-          $cursor.selected.push(v)
+        if (!base.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z)) {
+          base.push(v)
         }
       }
     } else if (keys.ctrl) {
       // remove
-      $cursor.selected = $cursor.selected.filter(v=>!coords.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z))
+      base = base.filter(v=>!coords.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z))
     } else {
       // replace
-      $cursor.selected = coords
+      base = coords
     }
+    return base
+  }
+
+  function adjustSelection(coords: Coordinate[], keys: KeysState) {
+    $cursor.selected = adjustShape($cursor.selected, coords, keys)
   }
 
   function handleMapMousedown(e: MouseEvent) {
     if (e.button === 0) {
-      cursorY = $cursor.hover.y
-      cursorX = $cursor.hover.x
-      cursorZ = $cursor.hover.z
-      $cursor.start.y = $cursor.hover.y
-      $cursor.start.x = $cursor.hover.x
-      $cursor.start.z = $cursor.hover.z
-      startMouseDrag(e, (t: TraversedTile) => {
-        $cursor.end.y = $cursor.hover.y
-        $cursor.end.x = $cursor.hover.x
-        $cursor.end.z = $cursor.hover.z
-        $cursor.selecting = getCoordinateBox($cursor.start, $cursor.end)
-      }, (t: TraversedTile[], e: MouseEvent) => {
-        $cursor.selecting = []
-        adjustSelection(getCoordinateBox($cursor.start, $cursor.end), {
-          alt: e.altKey,
-          shift: e.shiftKey,
-          ctrl: e.ctrlKey,
-          meta: e.metaKey,
+      if (tool === 'placing') {
+        $cursor.start.y = $cursor.hover.y
+        $cursor.start.x = $cursor.hover.x
+        $cursor.start.z = $cursor.hover.z
+
+        $cursor.selected = adjustShape($cursor.selected, $cursor.placing.map(v=>({
+          y: v.y + $cursor.hover.y,
+          x: v.x + $cursor.hover.x,
+          z: v.z + $cursor.hover.z,
+        })), { alt: e.altKey, shift: e.shiftKey, ctrl: e.ctrlKey, meta: e.metaKey })
+        $cursor.placing = []
+        swapTool(lastTool)
+      } else {
+        $cursor.start.y = $cursor.hover.y
+        $cursor.start.x = $cursor.hover.x
+        $cursor.start.z = $cursor.hover.z
+        startMouseDrag(e, (t: TraversedTile) => {
+          $cursor.end.y = $cursor.hover.y
+          $cursor.end.x = $cursor.hover.x
+          $cursor.end.z = $cursor.hover.z
+          $cursor.selecting = getCoordinateBox($cursor.start, $cursor.end)
+        }, (t: TraversedTile[], e: MouseEvent) => {
+          $cursor.selecting = []
+          adjustSelection(getCoordinateBox($cursor.start, $cursor.end), {
+            alt: e.altKey,
+            shift: e.shiftKey,
+            ctrl: e.ctrlKey,
+            meta: e.metaKey,
+          })
+          $cursor.start.y = $cursor.end.y
+          $cursor.start.x = $cursor.end.x
+          $cursor.start.z = $cursor.end.z
         })
-        $cursor.start.y = $cursor.end.y
-        $cursor.start.x = $cursor.end.x
-        $cursor.start.z = $cursor.end.z
-      })
+      }
     } else if (e.button === 2) {
       e.preventDefault()
       e.stopPropagation()
@@ -296,6 +316,47 @@
     }))
   }
 
+  function trimShape(c: Coordinate[]): Coordinate[] {
+    let sortX = c.sort((a, b) => {
+      if (a.x < b.x) return -1
+      if (a.x > b.x) return 1
+      return 0
+    })
+    let sortY = c.sort((a, b) => {
+      if (a.y < b.y) return -1
+      if (a.y > b.y) return 1
+      return 0
+    })
+    let sortZ = c.sort((a, b) => {
+      if (a.z < b.z) return -1
+      if (a.z > b.z) return 1
+      return 0
+    })
+    let minX = sortX[0]?.x || 0
+    let minY = sortY[0]?.y || 0
+    let minZ = sortZ[0]?.z || 0
+    return c.map(v=>({
+      y: v.y - minY,
+      x: v.x - minX,
+      z: v.z - minZ,
+    }))
+  }
+
+  function copyShape() {
+    $blueprints.shape = trimShape($cursor.selected)
+  }
+  function pasteShape() {
+    if ($blueprints.shape.length > 0) {
+      $cursor.placing = $blueprints.shape
+      swapTool('placing')
+    }
+  }
+
+  function swapTool(t: ToolType) {
+    lastTool = tool
+    tool = t
+  }
+
   let scrolling: boolean = false
   let scrollX = 0
   let scrollY = 0
@@ -346,6 +407,13 @@
     </button>
     <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
       <img src={eraserIcon} alt='erase'>
+    </button>
+    <hr>
+    <button on:click={copyShape}>
+      copy shape
+    </button>
+    <button on:click={pasteShape}>
+      paste shape
     </button>
   </section>
   <section class='view'>

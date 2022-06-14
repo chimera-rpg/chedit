@@ -200,6 +200,22 @@
   function renderCursors() {
     ctx.translate(.5, .5)
     ctx.lineWidth = 1
+    // Draw placing.
+    ctx.strokeStyle = $styles.colors.placingBorder
+    ctx.globalAlpha = 0.5
+    for (let t of $cursor.placing) {
+      let y1 = t.y + $cursor.hover.y
+      let x1 = t.x + $cursor.hover.x
+      let z1 = t.z + $cursor.hover.z
+      drawVerticalBoxLines(y1, x1, z1, y1-1)
+
+      let [x, y] = getCoordinatePosition(y1, x1, z1)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ;[x, y] = getCoordinatePosition(y1-1, x1, z1)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+    }
+
     // Draw selected.
     ctx.strokeStyle = $styles.colors.selectedBorder
     ctx.globalAlpha = 0.4

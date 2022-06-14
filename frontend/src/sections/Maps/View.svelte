@@ -16,9 +16,18 @@
   import eraserIcon from '../../assets/icons/eraser.png'
   import insertIcon from '../../assets/icons/insert.png'
   import fillIcon from '../../assets/icons/fill.png'
+  import saveIcon from '../../assets/icons/save.png'
+  import undoIcon from '../../assets/icons/undo.png'
+  import redoIcon from '../../assets/icons/redo.png'
+  import mapIcon from '../../assets/icons/map.png'
+  import scriptIcon from '../../assets/icons/script.png'
   import { Writable, writable } from 'svelte/store'
   import type { Coordinate, Cursor } from '../../interfaces/editor'
   import { blueprints } from '../../stores/blueprints'
+  import Menus from '../../components/Menus/Menus.svelte'
+  import MenuBar from '../../components/Menus/MenuBar.svelte'
+  import MenuItem from '../../components/Menus/MenuItem.svelte'
+  import MenuList from '../../components/Menus/MenuList.svelte'
 
   type ToolType = 'insert'|'erase'|'fill'|'placing'
   let tool: ToolType = 'insert'
@@ -392,6 +401,13 @@
     tool = t
   }
 
+  function showProperties() {
+    console.log('TODO: popup properties')
+  }
+  function showScripts() {
+    console.log('TODO: popup scripts')
+  }
+
   let scrolling: boolean = false
   let scrollX = 0
   let scrollY = 0
@@ -456,11 +472,25 @@
   </section>
   <section class='view'>
     {#if map}
-      <header>
-        <button on:click={_=>console.log(map.export())}>save</button>
-        <button disabled={!map.undoable} on:click={undo}>undo</button>
-        <button disabled={!map.redoable} on:click={redo}>redo</button>
-      </header>
+      <Menus>
+        <MenuBar>
+          <MenuItem on:click={_=>console.log(map.export())}>
+            <img src={saveIcon} alt='save'>
+          </MenuItem>
+          <MenuItem disabled={!map.undoable} on:click={undo}>
+            <img src={undoIcon} alt='undo'>
+          </MenuItem>
+          <MenuItem disabled={!map.redoable} on:click={redo}>
+            <img src={redoIcon} alt='redo'>
+          </MenuItem>
+          <MenuItem on:click={showProperties}>
+            <img src={mapIcon} alt='map properties'>
+          </MenuItem>
+          <MenuItem on:click={showScripts}>
+            <img src={scriptIcon} alt='scripts'>
+          </MenuItem>
+        </MenuBar>
+      </Menus>
       <section class='map'>
         <SplitPane type='horizontal' pos={80}>
           <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>

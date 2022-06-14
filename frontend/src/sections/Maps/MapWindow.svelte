@@ -5,10 +5,9 @@
 
   export let map: MapsContainer
   export let mapIndex: number
-  let showScriptEditor: boolean = true
 </script>
 
-<Window on:close hasModal={showScriptEditor}>
+<Window on:close>
   <svelte:fragment slot="header">
     <span>{map.Path.split('/').reverse()[0]}</span>
   </svelte:fragment>
@@ -20,9 +19,6 @@
     </nav>
     <View map={map.Maps[map.SelectedMap]} mapsContainer={map} mapIndex={mapIndex}></View>
   </section>
-  <span slot='modal'>
-    <button on:click={_=>showScriptEditor=false}>close me</button>
-  </span>
 </Window>
 
 <style>

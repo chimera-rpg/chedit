@@ -13,9 +13,7 @@
   let self: Element
 
   function click(e: MouseEvent) {
-    //if (e.target !== self) return
-    console.log(self.contains(e.target))
-    if (!self.contains(e.target) || e.target !== self) return
+    if (!self.contains(e.target) && e.target !== self) return
 
     let rect = self.getBoundingClientRect()
     if (popup) {

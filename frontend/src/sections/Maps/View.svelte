@@ -11,7 +11,12 @@
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import { compileInJS } from '../../models/archs'
   import { maps as mapsStore, MapsStoreData } from '../../stores/maps'
-  import { MapInsertAction } from '../../models/maps'
+  import { MapInsertAction, MapRemoveAction } from '../../models/maps'
+
+  import eraserIcon from '../../assets/icons/eraser.png'
+  import insertIcon from '../../assets/icons/insert.png'
+
+  let tool: 'insert'|'erase' = 'insert'
 
   export let mapsContainer: MapsContainer
   export let map: ContainerMap
@@ -103,7 +108,7 @@
 
       map.queue()
       startMouseDrag(e, (t: TraversedTile) => {
-        insertArchetype($palette.focused, t.y, t.x, t.z, -1)
+        applyTool(t)
       }, (t: TraversedTile[]) => {
         map.unqueue()
         mapsStore.set($mapsStore)
@@ -111,15 +116,24 @@
     }
   }
 
+  function applyTool(t: TraversedTile) {
+    if (tool === 'insert') {
+      insertArchetype($palette.focused, t.y, t.x, t.z, t.i)
+    } else if (tool === 'erase') {
+      removeArchetype(t.y, t.x, t.z, t.i)
+    }
+  }
+
   interface TraversedTile {
     y: number
     x: number
     z: number
+    i: number
   }
   let traversedTiles: TraversedTile[] = []
   function startMouseDrag(e: MouseEvent, cb1: (t: TraversedTile) => void, cb2: (t: TraversedTile[]) => void) {
     let [y, x, z] = getNearestFromMouse(e)
-    traversedTiles.push({y, x, z})
+    traversedTiles.push({y, x, z, i: -1})
     cb1(traversedTiles[traversedTiles.length-1])
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -133,7 +147,7 @@
     const handleMouseMove = (e: MouseEvent) => {
       let [y, x, z] = getNearestFromMouse(e)
       if (!traversedTiles.find(v=>v.y===y&&v.x===x&&v.z===z)) {
-        traversedTiles.push({y, x, z})
+        traversedTiles.push({y, x, z, i: -1})
         cb1(traversedTiles[traversedTiles.length-1])
       }
     }
@@ -192,6 +206,28 @@
     }))
   }
 
+  function removeArchetype(y: number, x: number, z: number, i: number) {
+    if (y < 0 || x < 0 || z < 0) return
+    if (y >= map.Height || x >= map.Width || z >= map.Depth) return
+    mapsStore.update(((v: MapsStoreData) => {
+      let mc = v.maps.find(v=>v===mapsContainer)
+      if (mc) {
+        let m = mc.Maps[mapsContainer.SelectedMap]
+        if (m) {
+          if (i === -1) {
+            i = m.Tiles[y][x][z].length-1
+          }
+          if (i !== -1) {
+            m.apply(new MapRemoveAction({
+              y, x, z, i,
+            }))
+          }
+        }
+      }
+      return v
+    }))
+  }
+
   let scrolling: boolean = false
   let scrollX = 0
   let scrollY = 0
@@ -235,55 +271,79 @@
 
 </script>
 
-<div style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
-  {#if map}
-    <header>
-      <button on:click={_=>console.log(map.export())}>save</button>
-      <button disabled={!map.undoable} on:click={undo}>undo</button>
-      <button disabled={!map.redoable} on:click={redo}>redo</button>
-    </header>
-    <section>
-      <SplitPane type='horizontal' pos={80}>
-        <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
-          <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
-        </article>
-        <aside slot=b>
-          <TilesList bind:y={cursorY} bind:hoverY={hoverY} x={cursorX} z={cursorZ} map={map}></TilesList>
-        </aside>
-      </SplitPane>
-    </section>
-    <footer>
-      <div class='map__dimensions'>
-        <span>{map.Width}</span>
-        <span>{map.Height}</span>
-      </div>
-      <div class='map__cursor'>
-        <span>
-          <span class='cursor__text'>{cursorY}</span>
-          <span class='hover__text'>({hoverY})</span>
-        </span>
-        <span>
-          <span class='cursor__text'>{cursorX}</span>
-          <span class='hover__text'>({hoverX})</span>
-        </span>
-        <span>
-          <span class='cursor__text'>{cursorZ}</span>
-          <span class='hover__text'>({hoverZ})</span>
-        </span>
-      </div>
-    </footer>
-  {:else}
-    select a map
-  {/if}
+<div class='main' style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
+  <section class='toolbar'>
+    <button class:-active={tool==='insert'} on:click={_=>tool='insert'}>
+      <img src={insertIcon} alt='insert'>
+    </button>
+    <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
+      <img src={eraserIcon} alt='erase'>
+    </button>
+  </section>
+  <section class='view'>
+    {#if map}
+      <header>
+        <button on:click={_=>console.log(map.export())}>save</button>
+        <button disabled={!map.undoable} on:click={undo}>undo</button>
+        <button disabled={!map.redoable} on:click={redo}>redo</button>
+      </header>
+      <section class='map'>
+        <SplitPane type='horizontal' pos={80}>
+          <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
+            <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
+          </article>
+          <aside slot=b>
+            <TilesList bind:y={cursorY} bind:hoverY={hoverY} x={cursorX} z={cursorZ} map={map}></TilesList>
+          </aside>
+        </SplitPane>
+      </section>
+      <footer>
+        <div class='map__dimensions'>
+          <span>{map.Width}</span>
+          <span>{map.Height}</span>
+        </div>
+        <div class='map__cursor'>
+          <span>
+            <span class='cursor__text'>{cursorY}</span>
+            <span class='hover__text'>({hoverY})</span>
+          </span>
+          <span>
+            <span class='cursor__text'>{cursorX}</span>
+            <span class='hover__text'>({hoverX})</span>
+          </span>
+          <span>
+            <span class='cursor__text'>{cursorZ}</span>
+            <span class='hover__text'>({hoverZ})</span>
+          </span>
+        </div>
+      </footer>
+    {:else}
+      select a map
+    {/if}
+  </section>
 </div>
 
 <style>
-  div {
+  .main {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .toolbar {
+  }
+  .toolbar > button {
+    border-radius: 0;
+    background: transparent;
+    border-style: none;
+  }
+  .toolbar > button.-active {
+    background: rgba(128, 128, 128, 0.5);
+  }
+  .view {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr) auto;
   }
-  section {
+  .map {
     display: grid;
     grid-template-rows: minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) auto;

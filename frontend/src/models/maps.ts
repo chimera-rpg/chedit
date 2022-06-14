@@ -127,7 +127,7 @@ type MapActionPosition = {
 }
 
 type MapActionArchetype = {
-  arch: ArchetypeContainer
+  arch?: ArchetypeContainer
 }
 
 export class MapInsertAction implements UndoStep {

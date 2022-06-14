@@ -9,10 +9,13 @@
   export let popup = ''
   export let subpopup = ''
   export let disabled = false
+  export let noclose = false
   let self: Element
 
   function click(e: MouseEvent) {
-    if (e.target !== self) return
+    //if (e.target !== self) return
+    console.log(self.contains(e.target))
+    if (!self.contains(e.target) || e.target !== self) return
 
     let rect = self.getBoundingClientRect()
     if (popup) {
@@ -21,6 +24,7 @@
       openSubPopup(subpopup, rect.x + rect.width, rect.y)
     } else {
       dispatch('click', e)
+      if (noclose) return
       closePopup()
     }
   }

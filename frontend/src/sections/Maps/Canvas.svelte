@@ -33,7 +33,7 @@
   $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
   $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
 
-  $: onChange(zoom, map, $cursor)
+  $: onChange(zoom, map, $cursor, $settingsStore)
   function onChange(...args: any) {
     //pendingRender()
     render()
@@ -200,7 +200,7 @@
   }
 
   function renderHeightNumbers() {
-    if (!$settingsStore.showHeightNumbers)
+    if (!$settingsStore.showHeightNumbers) return
     if ($settingsStore.showHeightNumbersOnAlt && !$keysStore.held.Alt) return
     ctx.globalAlpha = 0.5
     ctx.lineWidth = 3
@@ -210,7 +210,7 @@
     for (let x = 0; x < map.Width; x++) {
       for (let z = 0; z < map.Depth; z++) {
         let y = getOpenPositionBelow($cursor.hover.y, x, z)
-        if ($settingsStore.showHeightNumbersSameYOnly && y !== $cursor.hover.y) continue
+        if ($settingsStore.showHeightNumbersSameYOnly && y !== $cursor.hover.y-1) continue
         let [left, top] = getCoordinatePosition(y, x, z)
         ctx.strokeText(`${y+1}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
         ctx.fillText(`${y+1}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
@@ -387,6 +387,7 @@
   }
 
   function renderPositionLines(y: number, x: number, z: number) {
+    if (!$settingsStore.showPlacementLines) return
     let i = getOpenPositionBelow(y, x, z)
     if (i >= 0) {
       drawVerticalBoxLines(y, x, z, i)

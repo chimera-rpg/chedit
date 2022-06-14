@@ -5,6 +5,8 @@
   import { scale } from 'svelte/transition'
   import { createEventDispatcher } from 'svelte'
 
+  export let hasModal: boolean = false
+
 	const win: WindowI = {
     x: 32,
     y: 32,
@@ -92,7 +94,15 @@
       <button on:click={closeWindow}>✖</button>
     </nav>
   </header>
-  <slot></slot>
+  <div class='content'>
+    <slot></slot>
+    {#if hasModal}
+      <div class='modal__blocker'></div>
+      <div class='modal'>
+        <slot name="modal"></slot>
+      </div>
+    {/if}
+  </div>
   <aside use:drag={updateSize}></aside>
 </section>
 
@@ -104,6 +114,12 @@
     grid-template-rows: auto minmax(0, 1fr);
     overflow: hidden;
     background: var(--window);
+  }
+  .content {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
   }
 	.selected {
 		border-bottom: 2px solid teal;
@@ -141,6 +157,23 @@
     width: 1em;
     height: 1em;
     cursor: nwse-resize
+  }
+  .modal__blocker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .modal {
+    overflow: auto;
+    position: absolute;
+    left: 25%;
+    top: 25%;
+    width: 50%;
+    height: 50%;
+    box-shadow: 0 0 0.2em 0.1em #000;
   }
 </style>
 

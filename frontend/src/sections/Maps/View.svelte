@@ -15,11 +15,12 @@
 
   import eraserIcon from '../../assets/icons/eraser.png'
   import insertIcon from '../../assets/icons/insert.png'
+  import fillIcon from '../../assets/icons/fill.png'
   import { Writable, writable } from 'svelte/store'
   import type { Coordinate, Cursor } from '../../interfaces/editor'
   import { blueprints } from '../../stores/blueprints'
 
-  type ToolType = 'insert'|'erase'|'placing'
+  type ToolType = 'insert'|'erase'|'fill'|'placing'
   let tool: ToolType = 'insert'
   let lastTool: ToolType = 'insert'
 
@@ -189,21 +190,45 @@
       e.preventDefault()
       e.stopPropagation()
 
-      map.queue()
-      startMouseDrag(e, (t: TraversedTile) => {
-        if (t.initial) {
-          applyTool(t)
-        }
-      }, (t: TraversedTile[]) => {
-        map.unqueue()
-        mapsStore.set($mapsStore)
-      })
+      if (tool === 'fill') {
+        startMouseDrag(e, (t: TraversedTile) => {
+        }, (t: TraversedTile[]) => {
+          applyTool({
+            y: $cursor.hover.y,
+            x: $cursor.hover.x,
+            z: $cursor.hover.z,
+            i: -1,
+            initial: true,
+          })
+        })
+      } else {
+        map.queue()
+        startMouseDrag(e, (t: TraversedTile) => {
+          if (t.initial) {
+            applyTool(t)
+          }
+        }, (t: TraversedTile[]) => {
+          map.unqueue()
+          mapsStore.set($mapsStore)
+        })
+      }
     }
   }
 
   function applyTool(t: TraversedTile) {
     if (tool === 'insert') {
       insertArchetype($palette.focused, t.y, t.x, t.z, t.i)
+    } else if (tool === 'fill') {
+      if ($cursor.selected.length <= 1) {
+        // TODO: flood fill based upon some logic.
+      } else {
+        map.queue()
+        for (let t of $cursor.selected) {
+          insert($palette.focused, t.y, t.x, t.z, -1)
+        }
+        map.unqueue()
+        mapsStore.set($mapsStore)
+      }
     } else if (tool === 'erase') {
       removeArchetype(t.y, t.x, t.z, t.i)
     }
@@ -270,26 +295,26 @@
     }))
   }
 
+  function insert(arch: string, y: number, x: number, z: number, p: number) {
+    if (y < 0 || x < 0 || z < 0) return
+    if (y >= map.Height || x >= map.Width || z >= map.Depth) return
+    map.apply(new MapInsertAction({
+      arch: {
+        Original: { Archs: [arch] },
+        Compiled: compileInJS({Archs: [arch]}, true),
+      },
+      y: y,
+      x: x,
+      z: z,
+      i: p,
+    }))
+  }
+
   function insertArchetype(arch: string, y: number, x: number, z: number, p: number) {
     if (y < 0 || x < 0 || z < 0) return
     if (y >= map.Height || x >= map.Width || z >= map.Depth) return
     mapsStore.update(((v: MapsStoreData) => {
-      let mc = v.maps.find(v=>v===mapsContainer)
-      if (mc) {
-        let m = mc.Maps[mapsContainer.SelectedMap]
-        if (m) {
-          m.apply(new MapInsertAction({
-            arch: {
-              Original: { Archs: [arch] },
-              Compiled: compileInJS({Archs: [arch]}, true),
-            },
-            y: y,
-            x: x,
-            z: z,
-            i: p,
-          }))
-        }
-      }
+      insert(arch, y, x, z, p)
       return v
     }))
   }
@@ -404,6 +429,9 @@
   <section class='toolbar'>
     <button class:-active={tool==='insert'} on:click={_=>tool='insert'}>
       <img src={insertIcon} alt='insert'>
+    </button>
+    <button class:-active={tool==='fill'} on:click={_=>tool='fill'}>
+      <img src={fillIcon} alt='fill'>
     </button>
     <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
       <img src={eraserIcon} alt='erase'>

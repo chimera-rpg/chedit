@@ -16,7 +16,7 @@
   import eraserIcon from '../../assets/icons/eraser.png'
   import insertIcon from '../../assets/icons/insert.png'
   import { Writable, writable } from 'svelte/store'
-  import type { Cursor } from '../../interfaces/editor'
+  import type { Coordinate, Cursor } from '../../interfaces/editor'
 
   let tool: 'insert'|'erase' = 'insert'
 
@@ -32,6 +32,8 @@
     start: {x: 0, y: 0, z: 0},
     end: {x: 0, y: 0, z: 0},
     hover: {x: 0, y: 0, z: 0},
+    selected: [],
+    selecting: [],
   })
 
   let lastWheelTimestamp = 0
@@ -101,6 +103,24 @@
     return [$cursor.hover.y, nearestX, nearestZ]
   }
 
+  function getCoordinateBox(start: Coordinate, end: Coordinate): Coordinate[] {
+    let coords: Coordinate[] = []
+    let minY = Math.min(start.y, end.y)
+    let maxY = Math.max(start.y, end.y)
+    let minX = Math.min(start.x, end.x)
+    let maxX = Math.max(start.x, end.x)
+    let minZ = Math.min(start.z, end.z)
+    let maxZ = Math.max(start.z, end.z)
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        for (let z = minZ; z <= maxZ; z++) {
+          coords.push({y, x, z})
+        }
+      }
+    }
+    return coords
+  }
+
   function handleMapMousedown(e: MouseEvent) {
     if (e.button === 0) {
       cursorY = $cursor.hover.y
@@ -113,8 +133,10 @@
         $cursor.end.y = $cursor.hover.y
         $cursor.end.x = $cursor.hover.x
         $cursor.end.z = $cursor.hover.z
+        $cursor.selecting = getCoordinateBox($cursor.start, $cursor.end)
       }, (t: TraversedTile[]) => {
-        console.log('set selection range to', cursorY, cursorX, cursorZ, 'by', $cursor.end.y, $cursor.end.x, $cursor.end.z)
+        $cursor.selecting = []
+        $cursor.selected = getCoordinateBox($cursor.start, $cursor.end)
       })
     } else if (e.button === 2) {
       e.preventDefault()

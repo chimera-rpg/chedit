@@ -9,6 +9,8 @@ interface Styles {
 export const defaultColors: Colors = {
   cursorBorder: '#f00',
   hoverBorder: '#fff',
+  selectedBorder: '#ff0',
+  selectingBorder: '#ff0',
 }
 
 export const styles: Writable<Styles> = ((): Writable<Styles> => {

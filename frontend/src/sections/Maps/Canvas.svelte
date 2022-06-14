@@ -199,9 +199,34 @@
 
   function renderCursors() {
     ctx.translate(.5, .5)
+    ctx.lineWidth = 1
+    // Draw selected.
+    ctx.strokeStyle = $styles.colors.selectedBorder
+    ctx.globalAlpha = 0.4
+    for (let t of $cursor.selected) {
+      drawVerticalBoxLines(t.y, t.x, t.z, t.y-1)
+
+      let [x, y] = getCoordinatePosition(t.y, t.x, t.z)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ;[x, y] = getCoordinatePosition(t.y-1, t.x, t.z)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+    }
+    // Draw selecting.
+    ctx.strokeStyle = $styles.colors.selectingBorder
+    ctx.globalAlpha = 0.6
+    for (let t of $cursor.selecting) {
+      drawVerticalBoxLines(t.y, t.x, t.z, t.y-1)
+
+      let [x, y] = getCoordinatePosition(t.y, t.x, t.z)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ;[x, y] = getCoordinatePosition(t.y-1, t.x, t.z)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+    }
+    ctx.globalAlpha = 1
     // Draw active cursor.
     {
-      ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.cursorBorder
       //drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
       drawVerticalBoxLines($cursor.start.y, $cursor.start.x, $cursor.start.z, $cursor.start.y-1)
@@ -218,7 +243,6 @@
     // Draw hover $cursor.start.
     {
       let [x, y, zIndex] = getCoordinatePosition($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
-      ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.hoverBorder
 
       drawVerticalBoxLines($cursor.hover.y, $cursor.hover.x, $cursor.hover.z, $cursor.hover.y-1)

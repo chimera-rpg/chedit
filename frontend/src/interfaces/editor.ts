@@ -8,5 +8,7 @@ export type Cursor = {
   start: Coordinate
   end: Coordinate
   hover: Coordinate
+  selected: Coordinate[]
+  selecting: Coordinate[]
 }
 

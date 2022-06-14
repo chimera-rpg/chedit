@@ -121,6 +121,25 @@
     return coords
   }
 
+  type KeysState = {[key: string]: boolean}
+
+  function adjustSelection(coords: Coordinate[], keys: KeysState) {
+    if (keys.shift) {
+      // add
+      for (let v of coords) {
+        if (!$cursor.selected.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z)) {
+          $cursor.selected.push(v)
+        }
+      }
+    } else if (keys.ctrl) {
+      // remove
+      $cursor.selected = $cursor.selected.filter(v=>!coords.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z))
+    } else {
+      // replace
+      $cursor.selected = coords
+    }
+  }
+
   function handleMapMousedown(e: MouseEvent) {
     if (e.button === 0) {
       cursorY = $cursor.hover.y
@@ -134,9 +153,14 @@
         $cursor.end.x = $cursor.hover.x
         $cursor.end.z = $cursor.hover.z
         $cursor.selecting = getCoordinateBox($cursor.start, $cursor.end)
-      }, (t: TraversedTile[]) => {
+      }, (t: TraversedTile[], e: MouseEvent) => {
         $cursor.selecting = []
-        $cursor.selected = getCoordinateBox($cursor.start, $cursor.end)
+        adjustSelection(getCoordinateBox($cursor.start, $cursor.end), {
+          alt: e.altKey,
+          shift: e.shiftKey,
+          ctrl: e.ctrlKey,
+          meta: e.metaKey,
+        })
         $cursor.start.y = $cursor.end.y
         $cursor.start.x = $cursor.end.x
         $cursor.start.z = $cursor.end.z
@@ -173,16 +197,16 @@
     initial: boolean
   }
   let traversedTiles: TraversedTile[] = []
-  function startMouseDrag(e: MouseEvent, cb1: (t: TraversedTile) => void, cb2: (t: TraversedTile[]) => void) {
+  function startMouseDrag(e: MouseEvent, cb1: (t: TraversedTile, e?: MouseEvent) => void, cb2: (t: TraversedTile[], e?: MouseEvent) => void) {
     let [y, x, z] = getNearestFromMouse(e)
     traversedTiles.push({y, x, z, i: -1, initial: true})
-    cb1(traversedTiles[traversedTiles.length-1])
+    cb1(traversedTiles[traversedTiles.length-1], e)
 
     const handleMouseUp = (e: MouseEvent) => {
       document.removeEventListener('mouseup', handleMouseUp)
       document.removeEventListener('mousemove', handleMouseMove)
 
-      cb2(traversedTiles)
+      cb2(traversedTiles, e)
 
       traversedTiles = []
     }
@@ -190,9 +214,9 @@
       let [y, x, z] = getNearestFromMouse(e)
       if (!traversedTiles.find(v=>v.y===y&&v.x===x&&v.z===z)) {
         traversedTiles.push({y, x, z, i: -1, initial: true})
-        cb1(traversedTiles[traversedTiles.length-1])
+        cb1(traversedTiles[traversedTiles.length-1], e)
       } else {
-        cb1({y, x, z, i: -1, initial: false})
+        cb1({y, x, z, i: -1, initial: false}, e)
       }
     }
 

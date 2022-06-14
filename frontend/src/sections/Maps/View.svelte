@@ -54,7 +54,7 @@
     if (e.altKey) {
       $cursor.hover.y += e.deltaY > 0 ? -1 : 1
       if ($cursor.hover.y < 0) $cursor.hover.y = 0
-      if ($cursor.hover.y > map.Height) $cursor.hover.y = map.Height
+      if ($cursor.hover.y >= map.Height) $cursor.hover.y = map.Height-1
     } else if (e.ctrlKey) {
       zoom += e.deltaY > 0 ? -1 : 1
       if (zoom < 1) zoom = 1
@@ -81,8 +81,8 @@
 
     if (nearestX < 0) nearestX = 0
     if (nearestZ < 0) nearestZ = 0
-    if (nearestX > map.Width) nearestX = map.Width
-    if (nearestZ > map.Depth) nearestZ = map.Depth
+    if (nearestX >= map.Width) nearestX = map.Width-1
+    if (nearestZ >= map.Depth) nearestZ = map.Depth-1
 
     $cursor.hover.x = nearestX
     $cursor.hover.z = nearestZ
@@ -102,8 +102,8 @@
 
     if (nearestX < 0) nearestX = 0
     if (nearestZ < 0) nearestZ = 0
-    if (nearestX > map.Width) nearestX = map.Width
-    if (nearestZ > map.Depth) nearestZ = map.Depth
+    if (nearestX >= map.Width) nearestX = map.Width-1
+    if (nearestZ >= map.Depth) nearestZ = map.Depth-1
 
     return [$cursor.hover.y, nearestX, nearestZ]
   }

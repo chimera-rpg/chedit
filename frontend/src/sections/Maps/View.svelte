@@ -52,9 +52,13 @@
     }
 
     if (e.altKey) {
-      $cursor.hover.y += e.deltaY > 0 ? -1 : 1
+      $cursor.hover.y += (e.shiftKey?e.deltaX:e.deltaY) > 0 ? -1 : 1
       if ($cursor.hover.y < 0) $cursor.hover.y = 0
       if ($cursor.hover.y >= map.Height) $cursor.hover.y = map.Height-1
+      if (e.shiftKey) {
+        // TODO: Grow/shrink our selection if shift is held.
+      }
+      return false
     } else if (e.ctrlKey) {
       zoom += e.deltaY > 0 ? -1 : 1
       if (zoom < 1) zoom = 1

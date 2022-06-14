@@ -11,7 +11,8 @@
   import { setAnimationsConfig } from '../models/config'
   import { parse } from 'yaml'
   import type { main } from '../../wailsjs/go/models'
-  import { loadMapsFromYAML } from '../models/maps'
+  import { createMap, loadMapsFromYAML } from '../models/maps'
+  import type { MapsContainer } from '../interfaces/Map'
 
   async function openMap() {
     if (false) { // This unmarshals the maps in go, then sends those here.
@@ -26,6 +27,17 @@
         Maps: m,
       })
     }
+  }
+
+  function newMap() {
+    let mr: MapsContainer = {
+      Path: '',
+      SelectedMap: 'map',
+      Maps: {
+        'map': createMap(),
+      }
+    }
+    mapsStore.open(mr)
   }
 
   async function refreshAssets() {
@@ -58,6 +70,9 @@
       <MenuItem popup='map-menu'>
         Maps
         <MenuList popup='map-menu'>
+          <MenuItem on:click={newMap}>
+            New
+          </MenuItem>
           <MenuItem on:click={openMap}>
             Open...
           </MenuItem>

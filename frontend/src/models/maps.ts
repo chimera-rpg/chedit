@@ -39,6 +39,33 @@ export function loadMapsFromYAML(source: string): ContainerMaps {
   return maps
 }
 
+export function createMap(): ContainerMap {
+  let m = makeMap()
+  m.Name = 'new map'
+  m.Description = ''
+  m.Lore = ''
+  m.ResetTime = 0
+  m.Darkness = 0
+  m.Width = 20
+  m.Height = 20
+  m.Depth = 20
+  m.Y = 0
+  m.X = 0
+  m.Z = 0
+  m.Script = ''
+  m.Tiles = []
+  for (let y = 0; y < m.Height; y++) {
+    m.Tiles[y] = []
+    for (let x = 0; x < m.Width; x++) {
+      m.Tiles[y][x] = []
+      for (let z = 0; z < m.Depth; z++) {
+        m.Tiles[y][x][z] = []
+      }
+    }
+  }
+  return m
+}
+
 export function makeMap(): ContainerMap {
   let m: ContainerMap = {
     stack: [],

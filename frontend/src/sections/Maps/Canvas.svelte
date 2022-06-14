@@ -3,13 +3,14 @@
   import { compileInJS } from "../../models/archs"
   import { animations } from "../../stores/animations"
   import { styles } from '../../stores/styles'
+  import type { Cursor } from '../../interfaces/editor'
 
   import { onMount } from "svelte"
 
   import type { data } from "../../../wailsjs/go/models"
   import type { ContainerMap } from '../../interfaces/Map'
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
-  import { get } from "svelte/store"
+  import { get, Writable } from "svelte/store"
   import { maps, MapsStoreData } from "../../stores/maps"
 
   let canvas: HTMLCanvasElement
@@ -18,12 +19,7 @@
   export let zoom: number = 1
   export let map: ContainerMap
 
-  export let cursorY = 0
-  export let cursorX = 0
-  export let cursorZ = 0
-  export let hoverY = 0
-  export let hoverX = 0
-  export let hoverZ = 0
+  export let cursor: Writable<Cursor>
 
   export let fadeAbove: boolean = true
   export let fadeBelow: boolean = false
@@ -35,7 +31,7 @@
   $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
   $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
 
-  $: onChange(zoom, map, cursorY, cursorX, cursorZ, hoverY, hoverX, hoverZ)
+  $: onChange(zoom, map, $cursor)
   function onChange(...args: any) {
     //pendingRender()
     render()
@@ -151,17 +147,17 @@
       return a.zIndex - b.zIndex
     })
     for (let item of dl) {
-      if (fadeAbove && item.y > hoverY) {
+      if (fadeAbove && item.y > $cursor.hover.y) {
         ctx.globalAlpha = 0.2
-      } else if (fadeBelow && item.y < hoverY) {
+      } else if (fadeBelow && item.y < $cursor.hover.y) {
         ctx.globalAlpha = 0.2
-      } else if (fadeLeft && item.x < hoverX) {
+      } else if (fadeLeft && item.x < $cursor.hover.x) {
         ctx.globalAlpha = 0.2
-      } else if (fadeRight && item.x > hoverX) {
+      } else if (fadeRight && item.x > $cursor.hover.x) {
         ctx.globalAlpha = 0.2
-      } else if (fadeBehind && item.z < hoverZ) {
+      } else if (fadeBehind && item.z < $cursor.hover.z) {
         ctx.globalAlpha = 0.2
-      } else if (fadeFront && item.z > hoverZ) {
+      } else if (fadeFront && item.z > $cursor.hover.z) {
         ctx.globalAlpha = 0.2
       } else {
         ctx.globalAlpha = 1
@@ -207,32 +203,33 @@
     {
       ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.cursorBorder
-      drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
+      //drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
+      drawVerticalBoxLines($cursor.start.y, $cursor.start.x, $cursor.start.z, $cursor.start.y-1)
 
-      let [x, y] = getCoordinatePosition(cursorY, cursorX, cursorZ)
+      let [x, y] = getCoordinatePosition($cursor.start.y, $cursor.start.x, $cursor.start.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
-      ;[x, y] = getCoordinatePosition(cursorY-1, cursorX, cursorZ)
+      ;[x, y] = getCoordinatePosition($cursor.start.y-1, $cursor.start.x, $cursor.start.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     ctx.globalAlpha = 0.7
-    renderPositionLines(cursorY, cursorX, cursorZ)
+    renderPositionLines($cursor.start.y, $cursor.start.x, $cursor.start.z)
     ctx.globalAlpha = 1
-    // Draw hover cursor
+    // Draw hover $cursor.start.
     {
-      let [x, y, zIndex] = getCoordinatePosition(hoverY, hoverX, hoverZ)
+      let [x, y, zIndex] = getCoordinatePosition($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
       ctx.lineWidth = 1
       ctx.strokeStyle = $styles.colors.hoverBorder
 
-      drawVerticalBoxLines(hoverY, hoverX, hoverZ, hoverY-1)
+      drawVerticalBoxLines($cursor.hover.y, $cursor.hover.x, $cursor.hover.z, $cursor.hover.y-1)
 
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
-      ;[x, y] = getCoordinatePosition(hoverY-1, hoverX, hoverZ)
+      ;[x, y] = getCoordinatePosition($cursor.hover.y-1, $cursor.hover.x, $cursor.hover.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     ctx.globalAlpha = 0.7
-    renderPositionLines(hoverY, hoverX, hoverZ)
+    renderPositionLines($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
     ctx.globalAlpha = 1
     ctx.setTransform(1, 0, 0, 1, 0, 0)
   }

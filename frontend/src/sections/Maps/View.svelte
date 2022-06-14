@@ -15,6 +15,8 @@
 
   import eraserIcon from '../../assets/icons/eraser.png'
   import insertIcon from '../../assets/icons/insert.png'
+  import { Writable, writable } from 'svelte/store'
+  import type { Cursor } from '../../interfaces/editor'
 
   let tool: 'insert'|'erase' = 'insert'
 
@@ -26,9 +28,11 @@
   let cursorX: number = 0
   let cursorZ: number = 0
 
-  let hoverY: number = 0
-  let hoverX: number = 0
-  let hoverZ: number = 0
+  let cursor: Writable<Cursor> = writable({
+    start: {x: 0, y: 0, z: 0},
+    end: {x: 0, y: 0, z: 0},
+    hover: {x: 0, y: 0, z: 0},
+  })
 
   let lastWheelTimestamp = 0
   function handleMapMousewheel(e: WheelEvent) {
@@ -41,9 +45,9 @@
     }
 
     if (e.altKey) {
-      hoverY += e.deltaY > 0 ? -1 : 1
-      if (hoverY < 0) hoverY = 0
-      if (hoverY > map.Height) hoverY = map.Height
+      $cursor.hover.y += e.deltaY > 0 ? -1 : 1
+      if ($cursor.hover.y < 0) $cursor.hover.y = 0
+      if ($cursor.hover.y > map.Height) $cursor.hover.y = map.Height
     } else if (e.ctrlKey) {
       zoom += e.deltaY > 0 ? -1 : 1
       if (zoom < 1) zoom = 1
@@ -62,8 +66,8 @@
     let hitX = (e.clientX - r.left + mapEl.scrollLeft) / zoom
     let hitY = (e.clientY - r.top + mapEl.scrollTop) / zoom
 
-    let xOffset = hoverY * -animationsConfig.YStep.X
-    let yOffset = hoverY * animationsConfig.YStep.Y + (map.Height * -animationsConfig.YStep.Y)
+    let xOffset = $cursor.hover.y * -animationsConfig.YStep.X
+    let yOffset = $cursor.hover.y * animationsConfig.YStep.Y + (map.Height * -animationsConfig.YStep.Y)
 
     let nearestX = Math.floor((hitX + xOffset) / animationsConfig.TileWidth)
     let nearestZ = Math.floor((hitY - yOffset) / animationsConfig.TileHeight)
@@ -73,8 +77,8 @@
     if (nearestX > map.Width) nearestX = map.Width
     if (nearestZ > map.Depth) nearestZ = map.Depth
 
-    hoverX = nearestX
-    hoverZ = nearestZ
+    $cursor.hover.x = nearestX
+    $cursor.hover.z = nearestZ
   }
 
   function getNearestFromMouse(e: MouseEvent): [number, number, number] {
@@ -83,8 +87,8 @@
     let hitX = (e.clientX - r.left + mapEl.scrollLeft) / zoom
     let hitY = (e.clientY - r.top + mapEl.scrollTop) / zoom
 
-    let xOffset = hoverY * -animationsConfig.YStep.X
-    let yOffset = hoverY * animationsConfig.YStep.Y + (map.Height * -animationsConfig.YStep.Y)
+    let xOffset = $cursor.hover.y * -animationsConfig.YStep.X
+    let yOffset = $cursor.hover.y * animationsConfig.YStep.Y + (map.Height * -animationsConfig.YStep.Y)
 
     let nearestX = Math.floor((hitX + xOffset) / animationsConfig.TileWidth)
     let nearestZ = Math.floor((hitY - yOffset) / animationsConfig.TileHeight)
@@ -94,21 +98,33 @@
     if (nearestX > map.Width) nearestX = map.Width
     if (nearestZ > map.Depth) nearestZ = map.Depth
 
-    return [hoverY, nearestX, nearestZ]
+    return [$cursor.hover.y, nearestX, nearestZ]
   }
 
   function handleMapMousedown(e: MouseEvent) {
     if (e.button === 0) {
-      cursorY = hoverY
-      cursorX = hoverX
-      cursorZ = hoverZ
+      cursorY = $cursor.hover.y
+      cursorX = $cursor.hover.x
+      cursorZ = $cursor.hover.z
+      $cursor.start.y = $cursor.hover.y
+      $cursor.start.x = $cursor.hover.x
+      $cursor.start.z = $cursor.hover.z
+      startMouseDrag(e, (t: TraversedTile) => {
+        $cursor.end.y = $cursor.hover.y
+        $cursor.end.x = $cursor.hover.x
+        $cursor.end.z = $cursor.hover.z
+      }, (t: TraversedTile[]) => {
+        console.log('set selection range to', cursorY, cursorX, cursorZ, 'by', $cursor.end.y, $cursor.end.x, $cursor.end.z)
+      })
     } else if (e.button === 2) {
       e.preventDefault()
       e.stopPropagation()
 
       map.queue()
       startMouseDrag(e, (t: TraversedTile) => {
-        applyTool(t)
+        if (t.initial) {
+          applyTool(t)
+        }
       }, (t: TraversedTile[]) => {
         map.unqueue()
         mapsStore.set($mapsStore)
@@ -129,11 +145,12 @@
     x: number
     z: number
     i: number
+    initial: boolean
   }
   let traversedTiles: TraversedTile[] = []
   function startMouseDrag(e: MouseEvent, cb1: (t: TraversedTile) => void, cb2: (t: TraversedTile[]) => void) {
     let [y, x, z] = getNearestFromMouse(e)
-    traversedTiles.push({y, x, z, i: -1})
+    traversedTiles.push({y, x, z, i: -1, initial: true})
     cb1(traversedTiles[traversedTiles.length-1])
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -147,8 +164,10 @@
     const handleMouseMove = (e: MouseEvent) => {
       let [y, x, z] = getNearestFromMouse(e)
       if (!traversedTiles.find(v=>v.y===y&&v.x===x&&v.z===z)) {
-        traversedTiles.push({y, x, z, i: -1})
+        traversedTiles.push({y, x, z, i: -1, initial: true})
         cb1(traversedTiles[traversedTiles.length-1])
+      } else {
+        cb1({y, x, z, i: -1, initial: false})
       }
     }
 
@@ -290,10 +309,10 @@
       <section class='map'>
         <SplitPane type='horizontal' pos={80}>
           <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
-            <Canvas cursorY={cursorY} cursorX={cursorX} cursorZ={cursorZ} hoverY={hoverY} hoverX={hoverX} hoverZ={hoverZ} map={map} zoom={zoom}></Canvas>
+            <Canvas cursor={cursor} map={map} zoom={zoom}></Canvas>
           </article>
           <aside slot=b>
-            <TilesList bind:y={cursorY} bind:hoverY={hoverY} x={cursorX} z={cursorZ} map={map}></TilesList>
+            <TilesList cursor={cursor} map={map}></TilesList>
           </aside>
         </SplitPane>
       </section>
@@ -304,16 +323,16 @@
         </div>
         <div class='map__cursor'>
           <span>
-            <span class='cursor__text'>{cursorY}</span>
-            <span class='hover__text'>({hoverY})</span>
+            <span class='cursor__text'>{$cursor.start.y}</span>
+            <span class='hover__text'>({$cursor.hover.y})</span>
           </span>
           <span>
-            <span class='cursor__text'>{cursorX}</span>
-            <span class='hover__text'>({hoverX})</span>
+            <span class='cursor__text'>{$cursor.start.x}</span>
+            <span class='hover__text'>({$cursor.hover.x})</span>
           </span>
           <span>
-            <span class='cursor__text'>{cursorZ}</span>
-            <span class='hover__text'>({hoverZ})</span>
+            <span class='cursor__text'>{$cursor.start.z}</span>
+            <span class='hover__text'>({$cursor.hover.z})</span>
           </span>
         </div>
       </footer>
@@ -327,6 +346,7 @@
   .main {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
   }
   .toolbar {
   }

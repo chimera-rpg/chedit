@@ -5,25 +5,25 @@
   import type { data } from '../../../wailsjs/go/models'
   import ArchView from '../ArchView.svelte'
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
+  import type { Cursor } from '../../interfaces/editor'
+  import type { Writable } from 'svelte/store'
 
   export let map: ContainerMap
-  export let y = 0
-  export let hoverY = 0
-  export let x = 0
-  export let z = 0
+
+  export let cursor: Writable<Cursor>
 
   let tiles: ArchetypeContainer[][] = []
 
-  $: onChange(map, y, x, z)
+  $: onChange(map, $cursor)
   function onChange(...args: any) {
     let ctiles = []
     // Get the entire Y stack.
     for (let i = 0; i < map.Height; i++) {
       let p = map.Tiles[i]
       if (!p) return
-      p = p[x]
+      p = p[$cursor.start.x]
       if (!p) return
-      p = p[z]
+      p = p[$cursor.start.z]
       if (!p) return
       ctiles.push(p)
     }
@@ -45,7 +45,7 @@
   </header>
   <ol class='tiles'>
     {#each tiles as tile, tileY}
-      <li class='tile' class:selected={y===tileY} on:click={_=>(y=tileY)&&(hoverY=tileY)}>
+      <li class='tile' class:selected={$cursor.start.y===tileY} on:click={_=>($cursor.start.y=tileY)&&($cursor.hover.y=tileY)}>
         <span>{tileY}</span>
         <ol class='archs'>
           {#each tile as arch}

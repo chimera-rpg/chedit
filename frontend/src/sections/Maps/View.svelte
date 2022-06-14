@@ -1,6 +1,7 @@
 <script lang='ts'>
   import { animationsConfig } from '../../models/config'
   import { styles } from '../../stores/styles'
+  import { fly, slide, scale, blur } from 'svelte/transition'
 
   import { main, data } from '../../../wailsjs/go/models'
   import Canvas from './Canvas.svelte'
@@ -401,12 +402,8 @@
     tool = t
   }
 
-  function showProperties() {
-    console.log('TODO: popup properties')
-  }
-  function showScripts() {
-    console.log('TODO: popup scripts')
-  }
+  let showProperties: boolean = false
+  let showScripts: boolean = false
 
   let scrolling: boolean = false
   let scrollX = 0
@@ -483,10 +480,10 @@
           <MenuItem disabled={!map.redoable} on:click={redo}>
             <img src={redoIcon} alt='redo'>
           </MenuItem>
-          <MenuItem on:click={showProperties}>
+          <MenuItem on:click={_=>showProperties=!showProperties}>
             <img src={mapIcon} alt='map properties'>
           </MenuItem>
-          <MenuItem on:click={showScripts}>
+          <MenuItem on:click={_=>showScripts=!showScripts}>
             <img src={scriptIcon} alt='scripts'>
           </MenuItem>
         </MenuBar>
@@ -500,6 +497,16 @@
             <TilesList cursor={cursor} map={map}></TilesList>
           </aside>
         </SplitPane>
+        {#if showProperties}
+          <div transition:slide class='dialog' on:click={_=>showProperties=false}>
+            close me
+          </div>
+        {/if}
+        {#if showScripts}
+          <div transition:slide class='dialog' on:click={_=>showScripts=false}>
+            <textarea>{map.Script}</textarea>
+          </div>
+        {/if}
       </section>
       <footer>
         <div class='map__dimensions'>
@@ -533,6 +540,13 @@
     grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
   }
+  .dialog {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--subsection);
+    color: var(--subsection-color);
+  }
   .toolbar {
   }
   .toolbar > button {
@@ -556,6 +570,7 @@
     grid-template-rows: auto minmax(0, 1fr) auto;
   }
   .map {
+    position: relative;
     display: grid;
     grid-template-rows: minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) auto;

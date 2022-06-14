@@ -74,7 +74,8 @@ export function makeMap(): ContainerMap {
     },
     queue: () => {
       if (m.queued) {
-        throw 'already queued!'
+        console.error(new Error('queue request when already queued -- closing previous'))
+        m.unqueue()
       }
       m.queueStack = new QueueStep()
       return m.queued = true

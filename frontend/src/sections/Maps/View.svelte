@@ -185,9 +185,15 @@
             ctrl: e.ctrlKey,
             meta: e.metaKey,
           })
+          let y = $cursor.start.y
+          let x = $cursor.start.x
+          let z = $cursor.start.z
           $cursor.start.y = $cursor.end.y
           $cursor.start.x = $cursor.end.x
           $cursor.start.z = $cursor.end.z
+          $cursor.end.y = y
+          $cursor.end.x = x
+          $cursor.end.z = z
         })
       }
     } else if (e.button === 2) {

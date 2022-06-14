@@ -12,6 +12,8 @@
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import { get, Writable } from "svelte/store"
   import { maps, MapsStoreData } from "../../stores/maps"
+  import { keysStore } from "../../stores/keys"
+  import { settingsStore } from "../../stores/settings"
 
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
@@ -197,6 +199,56 @@
     }
   }
 
+  function renderHeightNumbers() {
+    if (!$settingsStore.showHeightNumbers)
+    if ($settingsStore.showHeightNumbersOnAlt && !$keysStore.held.Alt) return
+    ctx.globalAlpha = 0.5
+    ctx.lineWidth = 3
+    ctx.strokeStyle = 'black'
+    ctx.fillStyle = 'white'
+    ctx.font = '10px Sans-serif'
+    for (let x = 0; x < map.Width; x++) {
+      for (let z = 0; z < map.Depth; z++) {
+        let y = getOpenPositionBelow($cursor.hover.y, x, z)
+        if ($settingsStore.showHeightNumbersSameYOnly && y !== $cursor.hover.y) continue
+        let [left, top] = getCoordinatePosition(y, x, z)
+        ctx.strokeText(`${y+1}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+        ctx.fillText(`${y+1}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+      }
+    }
+    ctx.globalAlpha = 1
+  }
+
+  function renderPlacementHeightNumbers() {
+    if (!$settingsStore.showPlacementHeightNumber) return
+    ctx.globalAlpha = 0.5
+    ctx.lineWidth = 3
+    ctx.strokeStyle = 'white'
+    ctx.fillStyle = 'black'
+    ctx.font = '10px Sans-serif'
+    // Draw hover
+    let y = getOpenPositionBelow($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
+    let [left, top] = getCoordinatePosition(y, $cursor.hover.x, $cursor.hover.z)
+    y++
+    ctx.strokeText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+    ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+
+    // Draw cursor start and end
+    y = getOpenPositionBelow($cursor.start.y, $cursor.start.x, $cursor.start.z)
+    ;[left, top] = getCoordinatePosition(y, $cursor.start.x, $cursor.start.z)
+    y++
+    ctx.strokeText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+    ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+
+    y = getOpenPositionBelow($cursor.end.y, $cursor.end.x, $cursor.end.z)
+    ;[left, top] = getCoordinatePosition(y, $cursor.end.x, $cursor.end.z)
+    y++
+    ctx.strokeText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+    ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+
+    ctx.globalAlpha = 1
+  }
+
   function renderCursors() {
     ctx.translate(.5, .5)
     ctx.lineWidth = 1
@@ -241,7 +293,7 @@
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     ctx.globalAlpha = 1
-    // Draw active cursor.
+    // Draw cursor start.
     {
       ctx.strokeStyle = $styles.colors.cursorBorder
       //drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
@@ -252,11 +304,30 @@
 
       ;[x, y] = getCoordinatePosition($cursor.start.y-1, $cursor.start.x, $cursor.start.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ctx.globalAlpha = 0.7
+      renderPositionLines($cursor.start.y, $cursor.start.x, $cursor.start.z)
+      ctx.globalAlpha = 1
     }
-    ctx.globalAlpha = 0.7
-    renderPositionLines($cursor.start.y, $cursor.start.x, $cursor.start.z)
-    ctx.globalAlpha = 1
-    // Draw hover $cursor.start.
+    // Draw cursor end.
+    if ($cursor.start.x !== $cursor.end.x || $cursor.start.y !== $cursor.end.y || $cursor.start.z !== $cursor.end.z) {
+      ctx.globalAlpha = 0.3
+      ctx.strokeStyle = $styles.colors.cursorBorder
+      //drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
+      drawVerticalBoxLines($cursor.end.y, $cursor.end.x, $cursor.end.z, $cursor.end.y-1)
+
+      let [x, y] = getCoordinatePosition($cursor.end.y, $cursor.end.x, $cursor.end.z)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ;[x, y] = getCoordinatePosition($cursor.end.y-1, $cursor.end.x, $cursor.end.z)
+      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+      ctx.globalAlpha = 0.7
+      renderPositionLines($cursor.end.y, $cursor.end.x, $cursor.end.z)
+      ctx.globalAlpha = 1
+    }
+
+    // Draw hover.
     {
       let [x, y, zIndex] = getCoordinatePosition($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
       ctx.strokeStyle = $styles.colors.hoverBorder
@@ -329,7 +400,9 @@
     ctx.imageSmoothingEnabled = false
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     renderDrawList(drawlist)
+    renderHeightNumbers()
     renderCursors()
+    renderPlacementHeightNumbers()
   }
 
 

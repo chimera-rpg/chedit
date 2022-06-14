@@ -21,6 +21,7 @@
   import undoIcon from '../../assets/icons/undo.png'
   import redoIcon from '../../assets/icons/redo.png'
   import mapIcon from '../../assets/icons/map.png'
+  import propertiesIcon from '../../assets/icons/properties.png'
   import scriptIcon from '../../assets/icons/script.png'
   import { Writable, writable } from 'svelte/store'
   import type { Coordinate, Cursor } from '../../interfaces/editor'
@@ -481,7 +482,10 @@
             <img src={redoIcon} alt='redo'>
           </MenuItem>
           <MenuItem on:click={_=>showProperties=!showProperties}>
-            <img src={mapIcon} alt='map properties'>
+            <img src={mapIcon} alt='map'>
+          </MenuItem>
+          <MenuItem on:click={_=>showProperties=!showProperties}>
+            <img src={propertiesIcon} alt='properties'>
           </MenuItem>
           <MenuItem on:click={_=>showScripts=!showScripts}>
             <img src={scriptIcon} alt='scripts'>

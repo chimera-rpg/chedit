@@ -85,8 +85,8 @@
 
 </script>
 
-<section transition:scale class:dragging={dragging} class:window class:selected={$selectedWindow === win} class:maximized={win.maximized} on:click={_=>selectWindow(win)} on:dblclick={_=>maximizeWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
-  <header use:drag={updatePosition}>
+<section transition:scale class:dragging={dragging} class:window class:selected={$selectedWindow === win} class:maximized={win.maximized} on:click={_=>selectWindow(win)} style="left: {win.x}px; top: {win.y}px; width: {win.width}px; height: {win.height}px">
+  <header use:drag={updatePosition} on:dblclick={_=>maximizeWindow()}>
     <nav class='header'>
       <slot name="header"></slot>
     </nav>

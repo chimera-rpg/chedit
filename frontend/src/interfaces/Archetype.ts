@@ -3,6 +3,7 @@
 export interface ArchetypeContainer {
   Compiled: Archetype
   Original: Archetype
+  Error: any
 }
 
 export interface Archetype {

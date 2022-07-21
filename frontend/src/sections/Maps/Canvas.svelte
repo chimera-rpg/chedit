@@ -165,8 +165,13 @@
         ctx.globalAlpha = 1
       }
 
+      ctx.lineWidth = 3
       ctx.strokeStyle = '#f00'
-      if (item.image && item.image.complete && !item.imageErr) {
+      ctx.fillStyle = 'white'
+      ctx.font = '10px Sans-serif'
+      if (item.arch.Error) {
+        ctx.strokeText("?", item.left*zoom, item.top * zoom)
+      } else if (item.image && item.image.complete && !item.imageErr) {
         // Get adjustments.
         let x = 0
         let y = 0

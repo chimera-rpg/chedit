@@ -1,6 +1,6 @@
 import { parse } from 'yaml'
 import type { BaseMaps, Maps, ContainerMaps, Map, ContainerMap } from '../interfaces/Map'
-import type { ArchetypeContainer } from '../interfaces/Archetype'
+import type { Archetype, ArchetypeContainer } from '../interfaces/Archetype'
 import { cloneObject, compileInJS } from './archs'
 import { QueueStep, Undoable, UndoStep } from './undo'
 
@@ -24,8 +24,17 @@ export function loadMapsFromYAML(source: string): ContainerMaps {
           for (let z = 0; z < m.Tiles[y][x].length; z++) {
             m2.Tiles[y][x][z] = []
             for (let i = 0; i < m.Tiles[y][x][z].length; i++) {
+              let compiled: Archetype
+              let error: any
+              try {
+                compiled = compileInJS(cloneObject(m.Tiles[y][x][z][i]), true)
+              } catch(err) {
+                compiled = cloneObject(m.Tiles[y][x][z][i])
+                error = err
+              }
               m2.Tiles[y][x][z][i] = {
-                Compiled: compileInJS(cloneObject(m.Tiles[y][x][z][i]), true),
+                Compiled: compiled,
+                Error: error,
                 Original: m.Tiles[y][x][z][i],
               }
             }

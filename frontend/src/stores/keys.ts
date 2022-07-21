@@ -9,6 +9,9 @@ export const keysStore: Writable<KeysStore> = writable({
 })
 
 window.addEventListener('keydown', (e: KeyboardEvent) => {
+  if (e.key === 'Alt') {
+    e.preventDefault()
+  }
   keysStore.update(v => {
     v.held[e.key] = true
     return v
@@ -16,6 +19,9 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
 })
 
 window.addEventListener('keyup', (e: KeyboardEvent) => {
+  if (e.key === 'Alt') {
+    e.preventDefault()
+  }
   keysStore.update(v => {
     delete v.held[e.key]
     return v

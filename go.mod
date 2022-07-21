@@ -4,14 +4,15 @@ go 1.17
 
 require (
 	github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b
-	github.com/chimera-rpg/go-server v0.0.0-20220601083230-188495c509ea
+	github.com/chimera-rpg/go-server v0.0.0-20220603004030-bcd454480575
 	github.com/sqweek/dialog v0.0.0-20220504154117-be45b268883a
-	github.com/wailsapp/wails/v2 v2.0.0-beta.37
+	github.com/wailsapp/wails/v2 v2.0.0-beta.38
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
+	github.com/bep/debounce v1.2.1 // indirect
 	github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.1.2 // indirect
@@ -20,7 +21,6 @@ require (
 	github.com/labstack/echo/v4 v4.7.2 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/leaanthony/go-ansi-parser v1.0.1 // indirect
-	github.com/leaanthony/go-common-file-dialog v1.0.3 // indirect
 	github.com/leaanthony/gosod v1.0.3 // indirect
 	github.com/leaanthony/slicer v1.5.0 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect

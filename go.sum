@@ -1,9 +1,11 @@
 github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf h1:FPsprx82rdrX2jiKyS17BH6IrTmUBYqZa/CXT4uvb+I=
 github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf/go.mod h1:peYoMncQljjNS6tZwI9WVyQB3qZS6u79/N3mBOcnd3I=
+github.com/bep/debounce v1.2.1 h1:v67fRdBA9UQu2NhLFXrSg0Brw7CexQekrBwDMM8bzeY=
+github.com/bep/debounce v1.2.1/go.mod h1:H8yggRPQKLUhUoqrJC1bO2xNya7vanpDl7xR3ISbCJ0=
 github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b h1:+Y/F5oMFp09+8qNkewMzMPv8X73/J3Ln4DU7yNmEJAQ=
 github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b/go.mod h1:/FwRKhQznOZpTqwkeKsxXiRD2BJVU5hU5B932mDTQnY=
-github.com/chimera-rpg/go-server v0.0.0-20220601083230-188495c509ea h1:kA7LldH5p7jH0xto9pvcyc2uilKZJaePlOHzcRzXKbU=
-github.com/chimera-rpg/go-server v0.0.0-20220601083230-188495c509ea/go.mod h1:WgvC+vkS8RRLN0TgZpJQjQ4ymKVOjqLBPUTBIrZrseA=
+github.com/chimera-rpg/go-server v0.0.0-20220603004030-bcd454480575 h1:FqnIceAOYv4m2fNTTfv/8phWzAiDb2xGitkkQ0iYbGQ=
+github.com/chimera-rpg/go-server v0.0.0-20220603004030-bcd454480575/go.mod h1:WgvC+vkS8RRLN0TgZpJQjQ4ymKVOjqLBPUTBIrZrseA=
 github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898 h1:wJEWj0f2mjjweXAOsqw0YxEnfTwzWNpxDRGkN+SaIV0=
 github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898/go.mod h1:60O8/t169OwS8bX0BeWSjxlGGb/I5cGYc6Brt5rWDL0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -74,6 +76,8 @@ github.com/valyala/fasttemplate v1.2.1 h1:TVEnxayobAdVkhQfrfes2IzOB6o+z4roRkPF52
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
+github.com/wailsapp/wails/v2 v2.0.0-beta.38 h1:HrEix98IM0mVhfsFlQJaF0HSh5WvQC1oG+4/VMRiohE=
+github.com/wailsapp/wails/v2 v2.0.0-beta.38/go.mod h1:svKnlTCrzOInYw4NJQjSIugCp7f3K0K+qZipOk4rMuo=
 github.com/yuin/goldmark v1.4.1/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=

@@ -11,6 +11,8 @@
     --window: rgb(64, 72, 64);
     --window-color: rgb(220, 230, 220);
     --window-header: rgb(96, 112, 96);
+    /* */
+    --selected: rgb(128, 196, 128, 0.5);
 }
 
 * {

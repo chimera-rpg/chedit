@@ -571,6 +571,7 @@
     height: 100%;
     background: var(--subsection);
     color: var(--subsection-color);
+    overflow: auto;
   }
   .toolbar {
   }

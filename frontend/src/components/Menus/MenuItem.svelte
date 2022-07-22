@@ -10,6 +10,7 @@
   export let subpopup = ''
   export let disabled = false
   export let noclose = false
+  export let highlighted = false
   let self: Element
 
   function click(e: MouseEvent) {
@@ -28,7 +29,7 @@
   }
 </script>
 
-<button class:disabled={disabled} bind:this={self} on:click={click}>
+<button class:disabled={disabled} class:highlighted bind:this={self} on:click={click}>
   <slot></slot>
 </button>
 
@@ -46,5 +47,8 @@
   button.disabled {
     pointer-events: none;
     opacity: 0.5;
+  }
+  button.highlighted {
+    background: var(--selected);
   }
 </style>

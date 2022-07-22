@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { animationsConfig } from '../../models/config'
   import { styles } from '../../stores/styles'
-  import { fly, slide, scale, blur } from 'svelte/transition'
+  import { fly, slide, scale, blur, fade } from 'svelte/transition'
 
   import { main, data } from '../../../wailsjs/go/models'
   import Canvas from './Canvas.svelte'
@@ -31,10 +31,15 @@
   import MenuItem from '../../components/Menus/MenuItem.svelte'
   import MenuList from '../../components/Menus/MenuList.svelte'
   import { SaveMap } from '../../../wailsjs/go/main/Editor'
+  import ScriptsEditor from './ScriptsEditor.svelte'
+  import PropertiesEditor from './PropertiesEditor.svelte'
 
   type ToolType = 'insert'|'erase'|'fill'|'placing'
   let tool: ToolType = 'insert'
   let lastTool: ToolType = 'insert'
+
+  type ViewMode = 'map'|'properties'|'scripts'
+  let viewMode: ViewMode = 'map'
 
   export let mapsContainer: MapsContainer
   export let map: ContainerMap
@@ -498,13 +503,13 @@
           <MenuItem disabled={!map.redoable} on:click={redo}>
             <img src={redoIcon} alt='redo'>
           </MenuItem>
-          <MenuItem on:click={_=>showProperties=!showProperties}>
+          <MenuItem on:click={_=>viewMode='map'} highlighted={viewMode==='map'}>
             <img src={mapIcon} alt='map'>
           </MenuItem>
-          <MenuItem on:click={_=>showProperties=!showProperties}>
+          <MenuItem on:click={_=>viewMode='properties'} highlighted={viewMode==='properties'}>
             <img src={propertiesIcon} alt='properties'>
           </MenuItem>
-          <MenuItem on:click={_=>showScripts=!showScripts}>
+          <MenuItem on:click={_=>viewMode='scripts'} highlighted={viewMode==='scripts'}>
             <img src={scriptIcon} alt='scripts'>
           </MenuItem>
         </MenuBar>
@@ -518,14 +523,13 @@
             <TilesList cursor={cursor} map={map}></TilesList>
           </aside>
         </SplitPane>
-        {#if showProperties}
-          <div transition:slide class='dialog' on:click={_=>showProperties=false}>
-            close me
+        {#if viewMode === 'properties'}
+          <div transition:fade class='dialog' on:click={_=>showProperties=false}>
+            <PropertiesEditor bind:map={map}></PropertiesEditor>
           </div>
-        {/if}
-        {#if showScripts}
-          <div transition:slide class='dialog' on:click={_=>showScripts=false}>
-            <textarea>{map.Script}</textarea>
+        {:else if viewMode === 'scripts'}
+          <div transition:fade class='dialog' on:click={_=>showScripts=false}>
+            <ScriptsEditor script={map.Script}></ScriptsEditor>
           </div>
         {/if}
       </section>

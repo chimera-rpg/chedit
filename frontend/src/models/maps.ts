@@ -224,3 +224,36 @@ export class MapRemoveAction extends MapInsertAction {
     return super.apply(c)
   }
 }
+
+export class MapChangeFieldAction implements UndoStep {
+  key = ""
+  value: any = ""
+
+  constructor({ key = "", value = ""}: {key: string, value: any}) {
+    this.key = key
+    this.value = value
+  }
+
+  apply(c: ContainerMap): ContainerMap {
+    if (c[this.key] === undefined) {
+      return c
+    }
+
+    let oldValue = c[this.key]
+    c[this.key] = this.value
+    this.value = oldValue
+
+    return c
+  }
+  unapply(c: ContainerMap): ContainerMap {
+    if (c[this.key] === undefined) {
+      return c
+    }
+
+    let oldValue = c[this.key]
+    c[this.key] = this.value
+    this.value = oldValue
+
+    return c
+  }
+}

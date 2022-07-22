@@ -529,7 +529,7 @@
           </div>
         {:else if viewMode === 'scripts'}
           <div transition:fade class='dialog' on:click={_=>showScripts=false}>
-            <ScriptsEditor script={map.Script}></ScriptsEditor>
+            <ScriptsEditor bind:map={map}></ScriptsEditor>
           </div>
         {/if}
       </section>

@@ -227,6 +227,24 @@ func (e *Editor) LoadMap(unmarshal bool) (*MapReference, error) {
 	return mr, nil
 }
 
+func (e *Editor) SaveMap(mr *MapReference) error {
+	r, err := e.saveMapDialog(mr.Path)
+	if err != nil {
+		return err
+	}
+
+	b, err := yaml.Marshal(mr.Maps)
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile(r, b, 0755); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // GetBytes gets bytes from a file relative to the archetypes root directory.
 func (e *Editor) GetBytes(p string) ([]byte, error) {
 	p = filepath.Join(*e.Config.ArchetypesRoot, p)

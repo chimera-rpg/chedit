@@ -31,10 +31,10 @@
 
   function newMap() {
     let mr: MapsContainer = {
-      Path: '',
-      SelectedMap: 'map',
+      Path: 'mapset.map.yaml',
+      SelectedMap: 'map 1',
       Maps: {
-        'map': createMap(),
+        'map 1': createMap(),
       }
     }
     mapsStore.open(mr)

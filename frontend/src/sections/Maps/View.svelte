@@ -30,6 +30,7 @@
   import MenuBar from '../../components/Menus/MenuBar.svelte'
   import MenuItem from '../../components/Menus/MenuItem.svelte'
   import MenuList from '../../components/Menus/MenuList.svelte'
+  import { SaveMap } from '../../../wailsjs/go/main/Editor'
 
   type ToolType = 'insert'|'erase'|'fill'|'placing'
   let tool: ToolType = 'insert'
@@ -316,6 +317,22 @@
     }))
   }
 
+  async function save() {
+    let m = {
+      Path: mapsContainer.Path,
+      Maps: {},
+    }
+    for (let [k, v] of Object.entries(mapsContainer.Maps)) {
+      m.Maps[k] = v.export()
+    }
+
+    let err = await SaveMap(m as main.MapReference)
+    if (err) {
+      // TODO: POPUP ERROR!
+      console.log(err)
+    }
+  }
+
   function insert(arch: string, y: number, x: number, z: number, p: number) {
     if (y < 0 || x < 0 || z < 0) return
     if (y >= map.Height || x >= map.Width || z >= map.Depth) return
@@ -472,7 +489,7 @@
     {#if map}
       <Menus>
         <MenuBar>
-          <MenuItem on:click={_=>console.log(map.export())}>
+          <MenuItem on:click={_=>save()}>
             <img src={saveIcon} alt='save'>
           </MenuItem>
           <MenuItem disabled={!map.undoable} on:click={undo}>

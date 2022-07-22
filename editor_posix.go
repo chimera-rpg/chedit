@@ -16,3 +16,17 @@ func (e *Editor) openMapDialog() (string, error) {
 		},
 	})
 }
+
+func (e *Editor) saveMapDialog(fname string) (string, error) {
+	return runtime.SaveFileDialog(e.ctx, runtime.SaveDialogOptions{
+		DefaultDirectory: *e.Config.MapsRoot,
+		DefaultFilename:  fname,
+		Title:            "Save a mapset",
+		Filters: []runtime.FileFilter{runtime.FileFilter{
+			DisplayName: "Map Files (*.map.yaml)",
+			Pattern:     "*.map.yaml;*.map.yml",
+		},
+		},
+		CanCreateDirectories: true,
+	})
+}

@@ -56,6 +56,10 @@
 
 <style>
   span {
+    min-width: 2em;
+    display: grid;
+    align-items: center;
+    justify-content: center;
   }
   img {
     image-rendering: pixelated;

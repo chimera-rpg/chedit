@@ -46,9 +46,9 @@
     if (e.timeStamp - lastWheelTimestamp <= 1) return
     lastWheelTimestamp = e.timeStamp
 
-    if (e.deltaY < 0) {
+    if (e.deltaY > 0) {
       if ($cursor.hover.y > 0) $cursor.hover.y--
-    } else if (e.deltaY > 0) {
+    } else if (e.deltaY < 0) {
       if ($cursor.hover.y < tiles.length-1) $cursor.hover.y++
     }
   }
@@ -100,6 +100,11 @@
   }
   .tile.selected {
     background: rgba(128, 196, 128, 0.5);
+  }
+  /* I'm lazy and don't want to manually reverse the array and deal with negating values from length */
+  ol {
+    display: flex;
+    flex-direction: column-reverse;
   }
   ol, li {
     list-style: none;

@@ -101,6 +101,9 @@
   .tile.selected {
     background: rgba(128, 196, 128, 0.5);
   }
+  .tile > span {
+    min-width: 1.2em;
+  }
   /* I'm lazy and don't want to manually reverse the array and deal with negating values from length */
   ol {
     display: flex;

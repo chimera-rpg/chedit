@@ -37,15 +37,30 @@
       tiles.push(s)
     }
   }
+
+  let lastWheelTimestamp = 0
+  function onWheel(e: WheelEvent) {
+    // Limit the frequency of scrolling allowed to once per ms.
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.timeStamp - lastWheelTimestamp <= 1) return
+    lastWheelTimestamp = e.timeStamp
+
+    if (e.deltaY < 0) {
+      if ($cursor.hover.y > 0) $cursor.hover.y--
+    } else if (e.deltaY > 0) {
+      if ($cursor.hover.y < tiles.length-1) $cursor.hover.y++
+    }
+  }
 </script>
 
 <div>
   <header>
     Tiles
   </header>
-  <ol class='tiles'>
+  <ol class='tiles' on:mousewheel={onWheel}>
     {#each tiles as tile, tileY}
-      <li class='tile' class:selected={$cursor.start.y===tileY} on:click={_=>($cursor.start.y=tileY)&&($cursor.hover.y=tileY)}>
+      <li class='tile' class:selected={$cursor.start.y===tileY} class:hovered={$cursor.hover.y===tileY} on:click|preventDefault|stopPropagation={_=>($cursor.start.y=tileY)} on:dblclick|preventDefault|stopPropagation={_=>($cursor.hover.y=tileY)}>
         <span>{tileY}</span>
         <ol class='archs'>
           {#each tile as arch}
@@ -79,6 +94,9 @@
   }
   .tile:nth-child(even) {
     background: rgba(128, 128, 128, 0.25);
+  }
+ .tile.hovered {
+    background: rgba(196, 196, 196, 0.5);
   }
   .tile.selected {
     background: rgba(128, 196, 128, 0.5);

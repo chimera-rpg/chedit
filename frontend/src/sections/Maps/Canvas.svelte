@@ -190,6 +190,16 @@
           yOffset = -(item.image.naturalHeight - animationsConfig.TileHeight)
         }
 
+        // Draw root tile positional indicator for large objects.
+        let oldAlpha = ctx.globalAlpha
+        if (item.arch.Compiled.Height > 1 || item.arch.Compiled.Depth > 1 || item.arch.Compiled.Width > 1) {
+          let [left, top] = getCoordinatePosition(item.y-1, item.x, item.z)
+          ctx.globalAlpha += 2
+          ctx.fillStyle = 'red'
+          ctx.fillRect((left)*zoom, (top)*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+        }
+        ctx.globalAlpha = oldAlpha
+
         try {
           ctx.drawImage(item.image, (x+item.left)*zoom, (y+item.top+yOffset)*zoom, item.image.naturalWidth*zoom, item.image.naturalHeight*zoom)
         } catch(err) {
@@ -203,7 +213,6 @@
           ctx.strokeText("E", (x+item.left+animationsConfig.TileWidth/2)*zoom, (y+item.top+yOffset+animationsConfig.TileHeight/2) * zoom)
           ctx.fillText("E", (x+item.left+animationsConfig.TileWidth/2)*zoom, (y+item.top+yOffset+animationsConfig.TileHeight/2) * zoom)
         }
-
       } else if (item.imageErr) {
         ctx.strokeText("!", item.left*zoom, item.top * zoom)
       } else {

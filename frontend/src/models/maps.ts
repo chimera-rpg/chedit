@@ -257,3 +257,100 @@ export class MapChangeFieldAction implements UndoStep {
     return c
   }
 }
+
+export class MapResizeAction implements UndoStep {
+  height = 0
+  width = 0
+  depth = 0
+  left = 0
+  right = 0
+  top = 0
+  bottom = 0
+  up = 0
+  down = 0
+  acquired = false
+  tiles: ArchetypeContainer[][][][]
+
+  constructor({left = 0, right = 0, top = 0, bottom = 0, up = 0, down = 0}) {
+    this.left = left
+    this.right = right
+    this.top = top
+    this.bottom = bottom
+    this.up = up
+    this.down = down
+  }
+
+  apply(c: ContainerMap): ContainerMap {
+    if (this.acquired) {
+      // We're calling unapply since all it does is restore tiles and dimensions, then stores whatever the overriding value is.
+      return this.unapply(c)
+    }
+
+    let newHeight = c.Height + this.up + this.down
+    let newWidth = c.Width + this.left + this.right
+    let newDepth = c.Depth + this.top + this.bottom
+
+    let offsetY = this.down
+    let offsetX = this.left
+    let offsetZ = this.top
+
+    // FIXME: This is unhealthily lazy to just clone the tiles.
+    let newTiles: ArchetypeContainer[][][][] = []
+    for (let y = 0; y < newHeight; y++) {
+      newTiles.push([])
+      for (let x = 0; x < newWidth; x++) {
+        newTiles[y].push([])
+        for (let z = 0; z < newDepth; z++) {
+          newTiles[y][x].push([])
+        }
+      }
+    }
+    // Copy 'em.
+    for (let y = 0; y < c.Height; y++) {
+      if (y+offsetY < 0 || y+offsetY >= newHeight) continue
+      for (let x = 0; x < c.Width; x++) {
+        if (x+offsetX < 0 || x+offsetX >= newWidth) continue
+        for (let z = 0; z < c.Depth; z++) {
+          if (z+offsetZ < 0 || z+offsetZ >= newDepth) continue
+          for (let o of c.Tiles[y][x][z]) {
+            newTiles[y+offsetY][x+offsetX][z+offsetZ].push(cloneObject(o))
+          }
+        }
+      }
+    }
+
+    // Store values for undoing.
+    this.tiles = c.Tiles
+    this.width = c.Width
+    this.height = c.Height
+    this.depth = c.Depth
+
+    // Replace map's properties with our new ones.
+    c.Tiles = newTiles
+    c.Height = newHeight
+    c.Width = newWidth
+    c.Depth = newDepth
+
+    this.acquired = true
+
+    return c
+  }
+  unapply(c: ContainerMap): ContainerMap {
+    let newTiles = c.Tiles
+    let newHeight = c.Height
+    let newWidth = c.Width
+    let newDepth = c.Depth
+
+    c.Tiles = this.tiles
+    c.Height = this.height
+    c.Width = this.width
+    c.Depth = this.depth
+
+    this.tiles = newTiles
+    this.height = newHeight
+    this.width = newWidth
+    this.depth = newDepth
+
+    return c
+  }
+}

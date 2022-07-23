@@ -5,15 +5,18 @@
   import Menus from '../../components/Menus/Menus.svelte'
   import MenuBar from '../../components/Menus/MenuBar.svelte'
   import MenuItem from '../../components/Menus/MenuItem.svelte'
-  import { MapChangeFieldAction } from '../../models/maps'
+  import { MapChangeFieldAction, MapResizeAction } from '../../models/maps'
   import { maps as mapsStore, MapsStoreData } from '../../stores/maps'
   import { onMount } from 'svelte'
 
   export let map: ContainerMap
 
+  let growLeft=0, growRight=0, growBottom=0, growTop=0, growUp=0, growDown=0
+
   let fields = ['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'ResetTime', 'Y', 'X', 'Z']
   let changes = Object.keys(map).filter(k => fields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
-  $: changed = Object.keys(changes).map(k=>changes[k]===map[k]).filter(v=>v!==true)
+  $: changeCount = Object.keys(changes).map(k=>changes[k]===map[k]).filter(v=>v!==true)
+  $: changed = changeCount.length>0 || growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0
 
   function change(key: string, v: any) {
     if (['Depth','Width','Height','Darkness','ResetTime','Y','X','Z'].includes(key)) {
@@ -24,14 +27,28 @@
 
   function reset() {
     changes = Object.keys(map).filter(k => fields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
+    growLeft = growRight = growBottom = growTop = growUp = growDown = 0
   }
   function apply() {
     map.queue()
 
+    // Update fields.
     for (let k of Object.keys(changes).filter(k=>changes[k]!==map[k])) {
       map.apply(new MapChangeFieldAction({
         key: k,
         value: changes[k],
+      }))
+    }
+
+    // Grow/shrink.
+    if (growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0) {
+      map.apply(new MapResizeAction({
+        left: growLeft,
+        right: growRight,
+        bottom: growBottom,
+        top: growTop,
+        up: growUp,
+        down: growDown,
       }))
     }
 
@@ -79,20 +96,54 @@
     </div>
     <div class='dimensions'>
       <header> Dimensions </header>
-      <section>
-        <label>
-          <span>Height</span>
-          <input type='number' value={changes['Height']} on:change={e=>change('Height', e.target.value)}/>
-        </label>
-        <label>
-          <span>Width</span>
-          <input type='number' value={changes['Width']} on:change={e=>change('Width', e.target.value)}/>
-        </label>
-        <label>
-          <span>Depth</span>
-          <input type='number' value={changes['Depth']} on:change={e=>change('Depth', e.target.value)}/>
-        </label>
-      </section>
+      <article>
+        <section>
+          <label>
+            <span>Height</span>
+            <input type='number' disabled value={changes['Height']} on:change={e=>change('Height', e.target.value)}/>
+          </label>
+          <label>
+            <span>Width</span>
+            <input type='number' disabled value={changes['Width']} on:change={e=>change('Width', e.target.value)}/>
+          </label>
+          <label>
+            <span>Depth</span>
+            <input type='number' disabled value={changes['Depth']} on:change={e=>change('Depth', e.target.value)}/>
+          </label>
+        </section>
+        <section>
+          <article>
+            <label>
+              <span>Left</span>
+              <input type='number' bind:value={growLeft} placeholder=0/>
+            </label>
+            <label>
+              <span>Right</span>
+              <input type='number' bind:value={growRight} placeholder=0/>
+            </label>
+          </article>
+          <article>
+            <label>
+              <span>Top</span>
+              <input type='number' bind:value={growTop} placeholder=0/>
+            </label>
+            <label>
+              <span>Bottom</span>
+              <input type='number' bind:value={growBottom} placeholder=0/>
+            </label>
+          </article>
+          <article>
+            <label>
+              <span>Up</span>
+              <input type='number' bind:value={growUp} placeholder=0/>
+            </label>
+            <label>
+              <span>Down</span>
+              <input type='number' bind:value={growDown} placeholder=0/>
+            </label>
+          </article>
+        </section>
+      </article>
     </div>
     <div class='properties'>
       <header> Properties </header>
@@ -123,10 +174,10 @@
   <div class='toolbar'>
     <Menus>
       <MenuBar>
-        <MenuItem disabled={changed.length===0} on:click={reset}>
+        <MenuItem disabled={!changed} on:click={reset}>
           <img src={resetIcon} alt='reset'>
         </MenuItem>
-        <MenuItem disabled={!changed.length} on:click={apply}>
+        <MenuItem disabled={!changed} on:click={apply}>
           <img src={applyIcon} alt='apply'>
         </MenuItem>
       </MenuBar>
@@ -167,6 +218,11 @@
     justify-content: stretch;
     padding: .5em;
   }
+  article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    justify-content: stretch;
+  }
   label {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -182,7 +238,7 @@
     min-width: 8em;
   }
   .dimensions label > span {
-    min-width: 8em;
+    min-width: 5em;
   }
   .properties label > span {
     min-width: 12em;

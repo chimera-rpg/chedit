@@ -98,46 +98,46 @@
       <header> Dimensions </header>
       <article>
         <section>
-          <label>
+          <label class='small-number'>
             <span>Height</span>
             <input type='number' disabled value={changes['Height']} on:change={e=>change('Height', e.target.value)}/>
           </label>
-          <label>
+          <label class='small-number'>
             <span>Width</span>
             <input type='number' disabled value={changes['Width']} on:change={e=>change('Width', e.target.value)}/>
           </label>
-          <label>
+          <label class='small-number'>
             <span>Depth</span>
             <input type='number' disabled value={changes['Depth']} on:change={e=>change('Depth', e.target.value)}/>
           </label>
         </section>
         <section>
           <article>
-            <label>
+            <label class='small-number'>
               <span>Left</span>
               <input type='number' bind:value={growLeft} placeholder=0/>
             </label>
-            <label>
+            <label class='small-number'>
               <span>Right</span>
               <input type='number' bind:value={growRight} placeholder=0/>
             </label>
           </article>
           <article>
-            <label>
+            <label class='small-number'>
               <span>Top</span>
               <input type='number' bind:value={growTop} placeholder=0/>
             </label>
-            <label>
+            <label class='small-number'>
               <span>Bottom</span>
               <input type='number' bind:value={growBottom} placeholder=0/>
             </label>
           </article>
           <article>
-            <label>
+            <label class='small-number'>
               <span>Up</span>
               <input type='number' bind:value={growUp} placeholder=0/>
             </label>
-            <label>
+            <label class='small-number'>
               <span>Down</span>
               <input type='number' bind:value={growDown} placeholder=0/>
             </label>
@@ -148,18 +148,21 @@
     <div class='properties'>
       <header> Properties </header>
       <section>
-        <label>
-          <span>Default Start Y</span>
-          <input type='number' value={changes['Y']} on:change={e=>change('Y', e.target.value)}/>
-        </label>
-        <label>
-          <span>Default Start X</span>
-          <input type='number' value={changes['X']} on:change={e=>change('X', e.target.value)}/>
-        </label>
-        <label>
-          <span>Default Start Z</span>
-          <input type='number' value={changes['Z']} on:change={e=>change('Z', e.target.value)}/>
-        </label>
+        <article>
+          <span>Default Start</span>
+          <label class='small-number'>
+            <span>Y</span>
+            <input type='number' value={changes['Y']} on:change={e=>change('Y', e.target.value)}/>
+          </label>
+          <label class='small-number'>
+            <span>X</span>
+            <input type='number' value={changes['X']} on:change={e=>change('X', e.target.value)}/>
+          </label>
+          <label class='small-number'>
+            <span>Z</span>
+            <input type='number' value={changes['Z']} on:change={e=>change('Z', e.target.value)}/>
+          </label>
+        </article>
         <label>
           <span>Reset Time</span>
           <input type='number' value={changes['ResetTime']} on:change={e=>change('ResetTime', e.target.value)}/>
@@ -219,8 +222,7 @@
     padding: .5em;
   }
   article {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    display: flex;
     justify-content: stretch;
   }
   label {
@@ -234,14 +236,20 @@
   textarea {
     min-height: 8em;
   }
-  .descriptive label > span {
+ .descriptive span {
     min-width: 8em;
   }
-  .dimensions label > span {
+  .dimensions span {
     min-width: 5em;
   }
-  .properties label > span {
+  .properties span {
     min-width: 12em;
   }
-
+  label.small-number > span {
+    min-width: 5em;
+    text-align: right;
+  }
+  label.small-number > input {
+    width: 4em;
+  }
 </style>

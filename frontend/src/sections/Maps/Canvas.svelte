@@ -195,6 +195,15 @@
         } catch(err) {
           ctx.strokeText("!", item.left*zoom, item.top * zoom)
         }
+
+        // Render extra info for exits, etc.
+        if (item.arch.Compiled.Exit) {
+          ctx.textAlign = 'center'
+          ctx.strokeStyle = '#00f'
+          ctx.strokeText("E", (x+item.left+animationsConfig.TileWidth/2)*zoom, (y+item.top+yOffset+animationsConfig.TileHeight/2) * zoom)
+          ctx.fillText("E", (x+item.left+animationsConfig.TileWidth/2)*zoom, (y+item.top+yOffset+animationsConfig.TileHeight/2) * zoom)
+        }
+
       } else if (item.imageErr) {
         ctx.strokeText("!", item.left*zoom, item.top * zoom)
       } else {
@@ -252,6 +261,18 @@
     ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
 
     ctx.globalAlpha = 1
+  }
+
+  function renderSpawn() {
+    ctx.globalAlpha = 0.5
+    ctx.lineWidth = 3
+    ctx.strokeStyle = 'white'
+    ctx.fillStyle = 'black'
+    ctx.font = '10px Sans-serif'
+
+    let [left, top] = getCoordinatePosition(map.Y, map.X, map.Z)
+    ctx.strokeText(`S`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+    ctx.fillText(`S`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
   }
 
   function renderCursors() {
@@ -406,6 +427,7 @@
     ctx.imageSmoothingEnabled = false
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     renderDrawList(drawlist)
+    renderSpawn()
     renderHeightNumbers()
     renderCursors()
     renderPlacementHeightNumbers()

@@ -50,9 +50,9 @@
   let cursorZ: number = 0
 
   let cursor: Writable<Cursor> = writable({
-    start: {x: 0, y: 0, z: 0},
-    end: {x: 0, y: 0, z: 0},
-    hover: {x: 0, y: 0, z: 0},
+    start: {x: 0, y: 0, z: 0, i: 0},
+    end: {x: 0, y: 0, z: 0, i: 0},
+    hover: {x: 0, y: 0, z: 0, i: 0},
     selected: [],
     selecting: [],
     placing: [],
@@ -140,7 +140,7 @@
     for (let y = minY; y <= maxY; y++) {
       for (let x = minX; x <= maxX; x++) {
         for (let z = minZ; z <= maxZ; z++) {
-          coords.push({y, x, z})
+          coords.push({y, x, z, i: 0})
         }
       }
     }
@@ -182,6 +182,7 @@
           y: v.y + $cursor.hover.y,
           x: v.x + $cursor.hover.x,
           z: v.z + $cursor.hover.z,
+          i: v.i + $cursor.hover.i,
         })), { alt: e.altKey, shift: e.shiftKey, ctrl: e.ctrlKey, meta: e.metaKey })
         $cursor.placing = []
         swapTool(lastTool)
@@ -345,6 +346,7 @@
       arch: {
         Original: { Archs: [arch] },
         Compiled: compileInJS({Archs: [arch]}, true),
+        Error: null,
       },
       y: y,
       x: x,
@@ -407,6 +409,7 @@
       y: v.y - minY,
       x: v.x - minX,
       z: v.z - minZ,
+      i: v.i,
     }))
   }
 

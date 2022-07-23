@@ -7,6 +7,7 @@
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import type { Cursor } from '../../interfaces/editor'
   import type { Writable } from 'svelte/store'
+import { start_hydrating } from 'svelte/internal';
 
   export let map: ContainerMap
 
@@ -60,11 +61,11 @@
   </header>
   <ol class='tiles' on:mousewheel={onWheel}>
     {#each tiles as tile, tileY}
-      <li class='tile' class:selected={$cursor.start.y===tileY} class:hovered={$cursor.hover.y===tileY} on:click|preventDefault|stopPropagation={_=>($cursor.start.y=tileY)} on:dblclick|preventDefault|stopPropagation={_=>($cursor.hover.y=tileY)}>
+      <li class='tile' class:selected={$cursor.start.y===tileY} class:hovered={$cursor.hover.y===tileY} on:click|preventDefault|stopPropagation={_=>($cursor.start.y=tileY)&&($cursor.start.i=tile.length-1)} on:dblclick|preventDefault|stopPropagation={_=>($cursor.hover.y=tileY)}>
         <span>{tileY}</span>
         <ol class='archs'>
-          {#each tile as arch}
-            <li class='arch'>
+          {#each tile as arch, archI}
+            <li class='arch' class:selected={$cursor.start.i===archI&&$cursor.start.y===tileY} on:click|preventDefault|stopPropagation={_=>($cursor.start.y=tileY)&&($cursor.start.i=archI)}>
               <ArchView arch={arch.Compiled}></ArchView>
               {arch.Compiled.Name||arch.Compiled.Self}
             </li>
@@ -103,6 +104,12 @@
   }
   .tile > span {
     min-width: 1.2em;
+  }
+  .arch {
+    border: 1px solid transparent;
+  }
+  .arch.selected {
+    border-color: red;
   }
   /* I'm lazy and don't want to manually reverse the array and deal with negating values from length */
   ol {

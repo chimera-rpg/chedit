@@ -2,6 +2,7 @@ export type Coordinate = {
   x: number
   y: number
   z: number
+  i: number
 }
 
 export type Cursor = {

@@ -33,6 +33,7 @@
   import { SaveMap } from '../../../wailsjs/go/main/Editor'
   import ScriptsEditor from './ScriptsEditor.svelte'
   import PropertiesEditor from './PropertiesEditor.svelte'
+  import ArchPreEditor from './ArchPreEditor.svelte'
 
   type ToolType = 'insert'|'erase'|'fill'|'placing'
   let tool: ToolType = 'insert'
@@ -522,8 +523,11 @@
           <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
             <Canvas cursor={cursor} map={map} zoom={zoom}></Canvas>
           </article>
-          <aside slot=b>
-            <TilesList cursor={cursor} map={map}></TilesList>
+          <aside slot=b class='archlist'>
+            <SplitPane type='vertical' pos={50}>
+              <TilesList slot=a cursor={cursor} map={map}></TilesList>
+              <ArchPreEditor slot=b cursor={cursor} map={map}></ArchPreEditor>
+            </SplitPane>
           </aside>
         </SplitPane>
         {#if viewMode === 'properties'}
@@ -615,6 +619,9 @@
   }
   aside {
     min-width: 4em;
+  }
+  .archlist {
+    display: grid;
   }
   footer {
     display: grid;

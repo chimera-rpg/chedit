@@ -7,7 +7,6 @@
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import type { Cursor } from '../../interfaces/editor'
   import type { Writable } from 'svelte/store'
-import { start_hydrating } from 'svelte/internal';
 
   export let map: ContainerMap
 
@@ -115,6 +114,7 @@ import { start_hydrating } from 'svelte/internal';
   ol {
     display: flex;
     flex-direction: column-reverse;
+    justify-content: flex-end;
   }
   ol, li {
     list-style: none;

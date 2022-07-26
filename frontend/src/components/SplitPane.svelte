@@ -84,6 +84,7 @@ The software is provided "as is", without warranty of any kind, including but no
 		position: relative;
 		width: 100%;
 		height: 100%;
+		overflow: hidden;
 	}
 
 	.pane {

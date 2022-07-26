@@ -46,9 +46,6 @@
   export let map: ContainerMap
   export let mapIndex: number
   let zoom: number = 2
-  let cursorY: number = 0
-  let cursorX: number = 0
-  let cursorZ: number = 0
 
   let cursor: Writable<Cursor> = writable({
     start: {x: 0, y: 0, z: 0, i: 0},
@@ -526,7 +523,7 @@
           <aside slot=b class='archlist'>
             <SplitPane type='vertical' pos={50}>
               <TilesList slot=a cursor={cursor} map={map}></TilesList>
-              <ArchPreEditor slot=b cursor={cursor} map={map}></ArchPreEditor>
+              <ArchPreEditor slot=b arch={map.Tiles[$cursor.start.y]?.[$cursor.start.x]?.[$cursor.start.z]?.[$cursor.start.i]}></ArchPreEditor>
             </SplitPane>
           </aside>
         </SplitPane>

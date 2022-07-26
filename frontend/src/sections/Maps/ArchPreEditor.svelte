@@ -4,10 +4,13 @@
   import type { Writable } from 'svelte/store'
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import ArchView from '../ArchView.svelte'
+  import { cloneObject } from '../../models/archs'
 
-  export let map: ContainerMap
-
-  export let cursor: Writable<Cursor>
+  import applyIcon from '../../assets/icons/apply.png'
+  import resetIcon from '../../assets/icons/reset.png'
+  import Menus from '../../components/Menus/Menus.svelte'
+  import MenuBar from '../../components/Menus/MenuBar.svelte'
+  import MenuItem from '../../components/Menus/MenuItem.svelte'
 
   let fields = [
     'Archs',
@@ -66,11 +69,20 @@
     'Events',
   ]
 
-  let arch: ArchetypeContainer
-  $: arch = map.Tiles?.[$cursor.start.y]?.[$cursor.start.x]?.[$cursor.start.z]?.[$cursor.start.i]
+  export let arch: ArchetypeContainer
+
+  $: cloned = cloneObject(arch?.Original??{})
+  $: changed = JSON.stringify(cloned) !== JSON.stringify(arch?.Original)
 
   function change(which: string, value: any) {
-    console.log('set', which, value)
+    cloned[which] = value
+    cloned = {...cloned}
+  }
+
+  function reset() {
+    cloned = cloneObject(arch.Original??{})
+  }
+  function apply() {
   }
 </script>
 
@@ -78,7 +90,7 @@
   <header>
     {#if arch}
       <span class='archview'>
-        <ArchView arch={arch.Compiled} zoom={2}></ArchView>
+        <ArchView arch={arch.Compiled}></ArchView>
       </span>
       {arch.Compiled.Name||arch.Compiled.Self}
     {/if}
@@ -88,68 +100,80 @@
       <article>
         <label>
           <span>Archs</span>
-          <input value={arch.Original.Archs??''} placeholder={arch.Compiled.Archs} on:change={e=>change('Type', e.target.value)}/>
+          <input value={cloned.Archs??''} placeholder={arch.Compiled.Archs} on:change={e=>change('Type', e.target.value)}/>
         </label>
 
         <label>
           <span>Name</span>
-          <input value={arch.Original.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.target.value)}/>
+          <input value={cloned.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.target.value)}/>
         </label>
         <label>
           <span>Description</span>
-          <textarea value={arch.Original.Description??''} placeholder={arch.Compiled.Description} on:change={e=>change('Description', e.EventTarget.value)}/>
+          <textarea value={cloned.Description??''} placeholder={arch.Compiled.Description} on:change={e=>change('Description', e.target.value)}/>
         </label>
         <label>
           <span>Type</span>
-          <input value={arch.Original.Type??''} placeholder={arch.Compiled.Type} on:change={e=>change('Type', e.target.value)}/>
+          <input value={cloned.Type??''} placeholder={arch.Compiled.Type} on:change={e=>change('Type', e.target.value)}/>
         </label>
 
         <label>
           <span>Anim</span>
-          <input value={arch.Original.Anim??''} placeholder={arch.Compiled.Anim} on:change={e=>change('Anim', e.target.value)}/>
+          <input value={cloned.Anim??''} placeholder={arch.Compiled.Anim} on:change={e=>change('Anim', e.target.value)}/>
         </label>
         <label>
           <span>Face</span>
-          <input value={arch.Original.Face??''} placeholder={arch.Compiled.Face} on:change={e=>change('Face', e.target.value)}/>
+          <input value={cloned.Face??''} placeholder={arch.Compiled.Face} on:change={e=>change('Face', e.target.value)}/>
         </label>
 
         <label>
           <span>Height</span>
-          <input type='number' value={arch.Original.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', e.target.value)}/>
+          <input type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', e.target.value)}/>
         </label>
         <label>
           <span>Width</span>
-          <input type='number' value={arch.Original.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', e.target.value)}/>
+          <input type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', e.target.value)}/>
         </label>
         <label>
           <span>Depth</span>
-          <input type='number' value={arch.Original.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.target.value)}/>
+          <input type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.target.value)}/>
         </label>
 
         <label>
           <span>Matter</span>
-          <input value={arch.Original.Matter??''} placeholder={arch.Compiled.Matter} on:change={e=>change('Matter', e.target.value)}/>
+          <input value={cloned.Matter??''} placeholder={arch.Compiled.Matter} on:change={e=>change('Matter', e.target.value)}/>
         </label>
         <label>
           <span>Blocking</span>
-          <input value={arch.Original.Blocking??''} placeholder={arch.Compiled.Blocking} on:change={e=>change('Blocking', e.target.value)}/>
+          <input value={cloned.Blocking??''} placeholder={arch.Compiled.Blocking} on:change={e=>change('Blocking', e.target.value)}/>
         </label>
 
         <label>
           <span>Audio</span>
-          <input value={arch.Original.Audio??''} placeholder={arch.Compiled.Audio} on:change={e=>change('Audio', e.target.value)}/>
+          <input value={cloned.Audio??''} placeholder={arch.Compiled.Audio} on:change={e=>change('Audio', e.target.value)}/>
         </label>
         <label>
           <span>SoundSet</span>
-          <input value={arch.Original.SoundSet??''} placeholder={arch.Compiled.SoundSet} on:change={e=>change('SoundSet', e.target.value)}/>
+          <input value={cloned.SoundSet??''} placeholder={arch.Compiled.SoundSet} on:change={e=>change('SoundSet', e.target.value)}/>
         </label>
         <label>
           <span>SoundIndex</span>
-          <input type='number' value={arch.Original.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', e.target.value)}/>
+          <input type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', e.target.value)}/>
         </label>
 
       </article>
     {/if}
+    <div class='toolbar'>
+      <Menus>
+        <MenuBar>
+          <MenuItem disabled={!changed} on:click={reset}>
+            <img src={resetIcon} alt='reset'>
+          </MenuItem>
+          <MenuItem disabled={!changed} on:click={apply}>
+            <img src={applyIcon} alt='apply'>
+          </MenuItem>
+        </MenuBar>
+      </Menus>
+    </div>
   </section>
 </div>
 
@@ -163,12 +187,12 @@
     color: var(--section-color);
   }
   section {
-    overflow: auto;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
     min-height: 8ch;
   }
   article {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    overflow: auto;
   }
   label {
     display: grid;
@@ -177,6 +201,7 @@
   header {
     padding: 0.5em;
     font-weight: bold;
+    min-height: 2em;
   }
   .archview {
     float: left;

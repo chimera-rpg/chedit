@@ -69,6 +69,37 @@
     'Events',
   ]
 
+  let archetypeTypes = {
+    "Building": [
+      "Tile",
+      "Block",
+      "Flora",
+      "Exit",
+      "Audio",
+    ],
+    "Items": [
+      "Item",
+      "Armor",
+      "Shield",
+      "Weapon",
+      "Food",
+    ],
+    "Characters": [
+      "PC",
+      "NPC",
+    ],
+    "System": [
+      "Skill",
+      "Bullet",
+      "Genus",
+      "Species",
+      "Faction",
+    ],
+    "Other": [
+      "Generic",
+    ],
+  }
+
   export let arch: ArchetypeContainer
 
   $: cloned = cloneObject(arch?.Original??{})
@@ -113,7 +144,16 @@
         </label>
         <label>
           <span>Type</span>
-          <input value={cloned.Type??''} placeholder={arch.Compiled.Type} on:change={e=>change('Type', e.target.value)}/>
+          <select name="Type" value={cloned.Type??arch.Compiled.Type} on:change={e=>change('Type', e.target.value)}>
+            <option value="">Unknown</option>
+            {#each Object.entries(archetypeTypes) as [k, g]}
+              <optgroup label={k}>
+              {#each g as t}
+                <option value={t}>{t}</option>
+              {/each}
+              </optgroup>
+            {/each}
+          </select>
         </label>
 
         <label>

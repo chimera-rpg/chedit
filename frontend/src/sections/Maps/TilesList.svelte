@@ -91,6 +91,7 @@
   .tile {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
+    min-height: 1.5em;
   }
   .tile:nth-child(even) {
     background: rgba(128, 128, 128, 0.25);
@@ -106,6 +107,7 @@
   }
   .arch {
     border: 1px solid transparent;
+    min-height: 1.5em;
   }
   .arch.selected {
     border-color: red;

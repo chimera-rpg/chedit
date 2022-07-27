@@ -89,6 +89,7 @@
       "NPC",
     ],
     "System": [
+      "Special",
       "Skill",
       "Bullet",
       "Genus",
@@ -216,6 +217,15 @@
           </fieldset>
         {/if}
 
+        {#if (cloned.Type??arch.Compiled.Type) == 'Special'}
+          <fieldset>
+            <legend>Specials</legend>
+            <label>
+              <span>Haven</span>
+              <input type='checkbox' checked={cloned.Haven??arch.Compiled.Specials?.Haven} on:change={e=>change('Specials.Haven', e.target.checked)}/>
+            </label>
+          </fieldset>
+        {/if}
         <fieldset>
           <legend>Appearance</legend>
           <label>

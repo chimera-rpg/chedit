@@ -73,6 +73,8 @@ export interface Archetype {
   Factions?: string[]
   Legacy?: string
   Events?: Events
+
+  Specials?: Specials
 }
 
 export interface Events {
@@ -226,4 +228,8 @@ export interface Light {
   Green: number
   Blue: number
   Intensity: number
+}
+
+export interface Specials {
+  Haven: boolean
 }

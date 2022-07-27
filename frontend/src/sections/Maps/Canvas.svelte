@@ -30,8 +30,8 @@
   export let fadeLeft: boolean = false
   export let fadeRight: boolean = false
 
-  $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X)
-  $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y)
+  $: canvasWidth = (map.Width * animationsConfig.TileWidth) + (map.Height * animationsConfig.YStep.X) + 2
+  $: canvasHeight = (map.Depth * animationsConfig.TileHeight) + (map.Height * -animationsConfig.YStep.Y) + 2
 
   $: onChange(zoom, map, $cursor, $settingsStore)
   function onChange(...args: any) {
@@ -435,6 +435,10 @@
     ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.strokeStyle = '#fff'
+    ctx.lineWidth = zoom
+    ctx.strokeRect(0, 0, canvas.width, canvas.height)
+    ctx.translate(1*zoom, 1*zoom)
     renderDrawList(drawlist)
     renderSpawn()
     renderHeightNumbers()

@@ -24,7 +24,7 @@
   import propertiesIcon from '../../assets/icons/properties.png'
   import scriptIcon from '../../assets/icons/script.png'
   import { Writable, writable } from 'svelte/store'
-  import type { Coordinate, Cursor } from '../../interfaces/editor'
+  import type { Coordinate, CoordinateMatch, Cursor } from '../../interfaces/editor'
   import { blueprints } from '../../stores/blueprints'
   import Menus from '../../components/Menus/Menus.svelte'
   import MenuBar from '../../components/Menus/MenuBar.svelte'
@@ -241,20 +241,69 @@
     }
   }
 
+  function getOpenTiles(t: TraversedTile): CoordinateMatch[] {
+    let coords: CoordinateMatch[] = []
+
+    let getCoord = (y: number, x: number, z: number) => {
+      if (y < 0 || y >= map.Height) return
+      if (x < 0 || x >= map.Width) return
+      if (z < 0 || z >= map.Depth) return
+      if (coords.find(v=>v.y===y&&v.x===x&&v.z===z)) return
+
+      let open = true
+      let tiles = map.Tiles[y][x][z]
+      if (tiles.length > 0) open = false
+
+      if (!open) {
+        coords.push({
+          y, x, z,
+          i: 0,
+          matched: false,
+        })
+        return
+      }
+
+      coords.push({
+        y, x, z,
+        i: 0,
+        matched: true,
+      })
+
+      // Get neighbors.
+      // Left, right
+      getCoord(y, x-1, z)
+      getCoord(y, x+1, z)
+      // Top, bottom
+      getCoord(y, x, z-1)
+      getCoord(y, x, z+1)
+
+      // TODO: up, down, as well as diagonals
+    }
+
+    getCoord(t.y, t.x, t.z)
+
+    return coords
+  }
+
   function applyTool(t: TraversedTile) {
     if (tool === 'insert') {
       insertArchetype($palette.focused, t.y, t.x, t.z, t.i)
     } else if (tool === 'fill') {
+      map.queue()
       if ($cursor.selected.length <= 1) {
-        // TODO: flood fill based upon some logic.
+        // Flood fill if we only have 1 tile selected.
+        let tiles = getOpenTiles(t).filter(v=>v.matched)
+        for (let t of tiles) {
+          insert($palette.focused, t.y, t.x, t.z, -1)
+        }
       } else {
-        map.queue()
+        // Otherwise fill the selection.
         for (let t of $cursor.selected) {
           insert($palette.focused, t.y, t.x, t.z, -1)
         }
-        map.unqueue()
-        mapsStore.set($mapsStore)
       }
+      map.unqueue()
+      mapsStore.set($mapsStore)
     } else if (tool === 'erase') {
       removeArchetype(t.y, t.x, t.z, t.i)
     }
@@ -474,22 +523,27 @@
 
 <div class='main' style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
   <section class='toolbar'>
-    <button class:-active={tool==='insert'} on:click={_=>tool='insert'}>
-      <img src={insertIcon} alt='insert'>
-    </button>
-    <button class:-active={tool==='fill'} on:click={_=>tool='fill'}>
-      <img src={fillIcon} alt='fill'>
-    </button>
-    <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
-      <img src={eraserIcon} alt='erase'>
-    </button>
-    <hr>
-    <button on:click={copyShape}>
-      copy shape
-    </button>
-    <button on:click={pasteShape}>
-      paste shape
-    </button>
+    <article class='toolbar__items'>
+      <button class:-active={tool==='insert'} on:click={_=>tool='insert'}>
+        <img src={insertIcon} alt='insert'>
+      </button>
+      <button class:-active={tool==='fill'} on:click={_=>tool='fill'}>
+        <img src={fillIcon} alt='fill'>
+      </button>
+      <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
+        <img src={eraserIcon} alt='erase'>
+      </button>
+    </article>
+    <article class='toolbar__item__settings'>
+    </article>
+    <article class='toolbar__shapes'>
+      <button on:click={copyShape}>
+        copy shape
+      </button>
+      <button on:click={pasteShape}>
+        paste shape
+      </button>
+    </article>
   </section>
   <section class='view'>
     {#if map}
@@ -578,8 +632,10 @@
     overflow: auto;
   }
   .toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
   }
-  .toolbar > button {
+  .toolbar button {
     min-width: 2em;
     min-height: 2em;
     border-radius: 0;
@@ -591,8 +647,10 @@
     padding: 0;
     margin: 0;
   }
-  .toolbar > button.-active {
+  .toolbar button.-active {
     background: rgba(128, 128, 128, 0.5);
+  }
+  .toolbar__items {
   }
   .view {
     display: grid;
@@ -610,8 +668,6 @@
     overflow: scroll;
     text-align: left;
     cursor: crosshair;
-  }
-  article {
     background: black;
   }
   aside {

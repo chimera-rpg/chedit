@@ -5,6 +5,10 @@ export type Coordinate = {
   i: number
 }
 
+export type CoordinateMatch = Coordinate & {
+  matched: boolean
+}
+
 export type Cursor = {
   start: Coordinate
   end: Coordinate

@@ -13,7 +13,7 @@
 
   let growLeft=0, growRight=0, growBottom=0, growTop=0, growUp=0, growDown=0
 
-  let fields = ['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'ResetTime', 'Y', 'X', 'Z']
+  let fields = ['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'ResetTime', 'Haven', 'Y', 'X', 'Z']
   let changes = Object.keys(map).filter(k => fields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
   $: changeCount = Object.keys(changes).map(k=>changes[k]===map[k]).filter(v=>v!==true)
   $: changed = changeCount.length>0 || growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0
@@ -34,6 +34,7 @@
 
     // Update fields.
     for (let k of Object.keys(changes).filter(k=>changes[k]!==map[k])) {
+      console.log('gonna dodo', k, changes[k])
       map.apply(new MapChangeFieldAction({
         key: k,
         value: changes[k],
@@ -166,6 +167,10 @@
         <label>
           <span>Reset Time</span>
           <input type='number' value={changes['ResetTime']} on:change={e=>change('ResetTime', e.target.value)}/>
+        </label>
+        <label>
+          <span>Haven</span>
+          <input type='checkbox' checked={changes['Haven']} on:change={e=>change('Haven', e.target.checked)}/>
         </label>
         <label>
           <span>Default Darkness</span>

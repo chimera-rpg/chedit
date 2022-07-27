@@ -235,9 +235,9 @@ export class MapChangeFieldAction implements UndoStep {
   }
 
   apply(c: ContainerMap): ContainerMap {
-    if (c[this.key] === undefined) {
+    /*if (c[this.key] === undefined) {
       return c
-    }
+    }*/
 
     let oldValue = c[this.key]
     c[this.key] = this.value
@@ -246,9 +246,9 @@ export class MapChangeFieldAction implements UndoStep {
     return c
   }
   unapply(c: ContainerMap): ContainerMap {
-    if (c[this.key] === undefined) {
+    /*if (c[this.key] === undefined) {
       return c
-    }
+    }*/
 
     let oldValue = c[this.key]
     c[this.key] = this.value

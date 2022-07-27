@@ -27,7 +27,7 @@
     }
 
     // Get our frame adjustment offset.
-    let frame: data.AnimationFramePre = $animationsStore.animations[anim]?.Faces[face][0]
+    let frame: data.AnimationFramePre = $animationsStore.animations[anim]?.Faces[face]?.[0]
     if (frame) {
       x += frame.X
       y += frame.Y

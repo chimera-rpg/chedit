@@ -68,12 +68,23 @@
     }
 
     if (e.altKey) {
-      $cursor.hover.y += (e.shiftKey?e.deltaX:e.deltaY) > 0 ? -1 : 1
-      if ($cursor.hover.y < 0) $cursor.hover.y = 0
-      if ($cursor.hover.y >= map.Height) $cursor.hover.y = map.Height-1
-      if (e.shiftKey) {
-        // TODO: Grow/shrink our selection if shift is held.
+      let deltaY = (e.shiftKey?e.deltaX:e.deltaY) > 0 ? -1 : 1
+      let hoverY = $cursor.hover.y + deltaY
+      if (hoverY < 0) hoverY = 0
+      if (hoverY >= map.Height) hoverY = map.Height-1
+
+      if (hoverY !== $cursor.hover.y) {
+        if (e.shiftKey || e.ctrlKey) {
+          $cursor.selected = adjustShape($cursor.selected, $cursor.selected.map(v=>({
+            y: v.y+deltaY,
+            x: v.x,
+            z: v.z,
+            i: v.i,
+          })), { shift: e.shiftKey, ctrl: e.ctrlKey })
+          $cursor.start.y = hoverY
+        }
       }
+      $cursor.hover.y = hoverY
       return false
     } else if (e.ctrlKey) {
       zoom += e.deltaY > 0 ? -1 : 1
@@ -153,6 +164,7 @@
       // add
       for (let v of coords) {
         if (!base.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z)) {
+          if (v.y < 0 || v.y >= map.Height || v.x < 0 || v.x >= map.Width || v.z < 0 || v.z >= map.Depth) return
           base.push(v)
         }
       }

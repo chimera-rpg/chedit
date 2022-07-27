@@ -15,6 +15,7 @@
   import { MapInsertAction, MapRemoveAction } from '../../models/maps'
 
   import eraserIcon from '../../assets/icons/eraser.png'
+  import wandIcon from '../../assets/icons/wand.png'
   import insertIcon from '../../assets/icons/insert.png'
   import fillIcon from '../../assets/icons/fill.png'
   import saveIcon from '../../assets/icons/save.png'
@@ -24,7 +25,7 @@
   import propertiesIcon from '../../assets/icons/properties.png'
   import scriptIcon from '../../assets/icons/script.png'
   import { Writable, writable } from 'svelte/store'
-  import type { Coordinate, CoordinateMatch, Cursor } from '../../interfaces/editor'
+  import type { ArchMatcher, Coordinate, CoordinateMatch, Cursor } from '../../interfaces/editor'
   import { blueprints } from '../../stores/blueprints'
   import Menus from '../../components/Menus/Menus.svelte'
   import MenuBar from '../../components/Menus/MenuBar.svelte'
@@ -35,7 +36,7 @@
   import PropertiesEditor from './PropertiesEditor.svelte'
   import ArchPreEditor from './ArchPreEditor.svelte'
 
-  type ToolType = 'insert'|'erase'|'fill'|'placing'
+  type ToolType = 'insert'|'erase'|'fill'|'placing'|'wand'
   let tool: ToolType = 'insert'
   let lastTool: ToolType = 'insert'
 
@@ -184,6 +185,31 @@
         })), { alt: e.altKey, shift: e.shiftKey, ctrl: e.ctrlKey, meta: e.metaKey })
         $cursor.placing = []
         swapTool(lastTool)
+      } else if (tool === 'wand') {
+        $cursor.start.y = $cursor.hover.y
+        $cursor.start.x = $cursor.hover.x
+        $cursor.start.z = $cursor.hover.z
+        startMouseDrag(e, (t: TraversedTile) => {
+        }, (t: TraversedTile[], e: MouseEvent) => {
+          let targetTile = t[t.length-1]
+          let tile = map.Tiles[targetTile.y][targetTile.x][targetTile.z]
+          $cursor.selected = getMatchingTiles(t[t.length-1], tile.map(v=>{
+            let m: ArchMatcher = {}
+            // TODO: if MatchArchs
+            if (v.Compiled.Archs.length) {
+              m.archs = v.Original.Archs
+            }
+            // TODO: if MatchName
+            if (v.Compiled.Name !== undefined) {
+              m.name = v.Compiled.Name
+            }
+            // TODO: if MatchType
+            if (v.Compiled.Type !== undefined) {
+              m.type = v.Compiled.Type
+            }
+            return m
+          })).filter(v=>v.matched)
+        })
       } else {
         $cursor.start.y = $cursor.hover.y
         $cursor.start.x = $cursor.hover.x
@@ -241,7 +267,7 @@
     }
   }
 
-  function getOpenTiles(t: TraversedTile): CoordinateMatch[] {
+  function getMatchingTiles(t: TraversedTile, matchers: ArchMatcher[]): CoordinateMatch[] {
     let coords: CoordinateMatch[] = []
 
     let getCoord = (y: number, x: number, z: number) => {
@@ -252,7 +278,51 @@
 
       let open = true
       let tiles = map.Tiles[y][x][z]
-      if (tiles.length > 0) open = false
+      if (tiles.length > 0 && matchers.length===0) open = false
+      else {
+        if (matchers.length !== 0 && tiles.length === 0) {
+          open = false
+        } else {
+          for (let a of tiles) {
+            let okay = true
+            for (let m of matchers) {
+              if (m.archs) {
+                for (let mArch of m.archs) {
+                  let has = false
+                  for (let arch of a.Original.Archs) {
+                    if (mArch === arch) {
+                      has = true
+                      break
+                    }
+                  }
+                  if (!has) {
+                    okay = false
+                    break
+                  }
+                }
+              }
+              if (okay && m.name !== undefined) {
+                let r = new RegExp(m.name)
+                if (!r.test(a.Compiled.Name)) {
+                  okay = false
+                  break
+                }
+              }
+              if (okay && m.type !== undefined) {
+                let r = new RegExp(m.type)
+                if (!r.test(a.Compiled.Type)) {
+                  okay = false
+                  break
+                }
+              }
+            }
+            if (!okay) {
+              open = false
+              break
+            }
+          }
+        }
+      }
 
       if (!open) {
         coords.push({
@@ -292,7 +362,8 @@
       map.queue()
       if ($cursor.selected.length <= 1) {
         // Flood fill if we only have 1 tile selected.
-        let tiles = getOpenTiles(t).filter(v=>v.matched)
+        // FIXME: Use a match based upon the hover tile!
+        let tiles = getMatchingTiles(t, []).filter(v=>v.matched)
         for (let t of tiles) {
           insert($palette.focused, t.y, t.x, t.z, -1)
         }
@@ -532,6 +603,10 @@
       </button>
       <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
         <img src={eraserIcon} alt='erase'>
+      </button>
+      <hr>
+      <button class:-active={tool==='wand'} on:click={_=>tool='wand'}>
+        <img src={wandIcon} alt='wand'>
       </button>
     </article>
     <article class='toolbar__item__settings'>

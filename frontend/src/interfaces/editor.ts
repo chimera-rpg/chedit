@@ -18,3 +18,8 @@ export type Cursor = {
   placing: Coordinate[]
 }
 
+export type ArchMatcher = {
+  archs?: string[]
+  name?: string
+  type?: string
+}

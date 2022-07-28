@@ -132,7 +132,7 @@ export function makeMap(): ContainerMap {
       let m2: Map = {}
 
       for (let [key, value] of Object.entries(m)) {
-        if (['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'ResetTime', 'Y', 'X', 'Z', 'Script'].includes(key)) {
+        if (MapFields.includes(key)) {
           m2[key] = value
         }
       }
@@ -155,6 +155,8 @@ export function makeMap(): ContainerMap {
   }
   return m
 }
+
+export const MapFields = ['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'Haven', 'ResetTime', 'Y', 'X', 'Z', 'Script']
 
 type MapActionPosition = {
   y: number;

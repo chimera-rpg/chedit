@@ -5,7 +5,7 @@
   import Menus from '../../components/Menus/Menus.svelte'
   import MenuBar from '../../components/Menus/MenuBar.svelte'
   import MenuItem from '../../components/Menus/MenuItem.svelte'
-  import { MapChangeFieldAction, MapResizeAction } from '../../models/maps'
+  import { MapChangeFieldAction, MapFields, MapResizeAction } from '../../models/maps'
   import { maps as mapsStore, MapsStoreData } from '../../stores/maps'
   import { onMount } from 'svelte'
 
@@ -13,8 +13,7 @@
 
   let growLeft=0, growRight=0, growBottom=0, growTop=0, growUp=0, growDown=0
 
-  let fields = ['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'ResetTime', 'Haven', 'Y', 'X', 'Z']
-  let changes = Object.keys(map).filter(k => fields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
+  let changes = Object.keys(map).filter(k => MapFields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
   $: changeCount = Object.keys(changes).map(k=>changes[k]===map[k]).filter(v=>v!==true)
   $: changed = changeCount.length>0 || growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0
 
@@ -26,7 +25,7 @@
   }
 
   function reset() {
-    changes = Object.keys(map).filter(k => fields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
+    changes = Object.keys(map).filter(k => MapFields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
     growLeft = growRight = growBottom = growTop = growUp = growDown = 0
   }
   function apply() {
@@ -64,7 +63,7 @@
       for (let m of v.maps) {
         for (let [k, map2] of Object.entries(m.Maps)) {
           if (map === map2) {
-            changes = Object.keys(map).filter(k => fields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
+            changes = Object.keys(map).filter(k => MapFields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
             return
           }
         }

@@ -376,6 +376,8 @@
       ;[x, y] = getCoordinatePosition($cursor.hover.y-1, $cursor.hover.x, $cursor.hover.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
+    ctx.globalAlpha = 0.5
+    drawLineHelpers(getOpenPositionBelow($cursor.hover.y, $cursor.hover.x, $cursor.hover.z), $cursor.hover.x, $cursor.hover.z)
     ctx.globalAlpha = 0.7
     renderPositionLines($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
     ctx.globalAlpha = 1
@@ -419,6 +421,39 @@
 
     ctx.moveTo(x1*zoom, (y1+animationsConfig.TileHeight)*zoom)
     ctx.lineTo(x2*zoom, (y2+animationsConfig.TileHeight)*zoom)
+
+    ctx.stroke()
+  }
+
+  function drawLineHelpers(y: number, x: number, z: number) {
+    let [x1, y1] = getCoordinatePosition(y, x, z)
+    let [x2, y2] = [x1+map.Width*animationsConfig.TileWidth, y1+map.Depth*animationsConfig.TileHeight]
+
+    ctx.beginPath()
+
+    // Left
+    ctx.moveTo(x1*zoom, y1*zoom)
+    ctx.lineTo(0, y1*zoom)
+    ctx.moveTo(x1*zoom, (y1+animationsConfig.TileHeight)*zoom)
+    ctx.lineTo(0, (y1+animationsConfig.TileHeight)*zoom)
+
+    // Top
+    ctx.moveTo(x1*zoom, y1*zoom)
+    ctx.lineTo(x1*zoom, 0)
+    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, y1*zoom)
+    ctx.lineTo((x1+animationsConfig.TileWidth)*zoom, 0)
+
+    // Right
+    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, y1*zoom)
+    ctx.lineTo((x2+animationsConfig.TileWidth)*zoom, y1*zoom)
+    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
+    ctx.lineTo((x2+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
+
+    // Bottom
+    ctx.moveTo((x1)*zoom, (y1+animationsConfig.TileHeight)*zoom)
+    ctx.lineTo((x1)*zoom, (y2+animationsConfig.TileHeight)*zoom)
+    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
+    ctx.lineTo((x1+animationsConfig.TileWidth)*zoom, (y2+animationsConfig.TileHeight)*zoom)
 
     ctx.stroke()
   }

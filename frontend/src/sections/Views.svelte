@@ -34,6 +34,10 @@
             Show Cursor/Hover Placement Lines
             <input type='checkbox' bind:checked={$settingsStore.showPlacementLines}>
           </MenuItem>
+          <MenuItem on:click={_=>$settingsStore.hideSpecials=!$settingsStore.hideSpecials} noclose>
+            Hide Specials
+            <input type='checkbox' bind:checked={$settingsStore.hideSpecials}>
+          </MenuItem>
         </MenuList>
       </MenuItem>
     </MenuBar>

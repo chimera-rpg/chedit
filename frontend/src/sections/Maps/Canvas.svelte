@@ -69,8 +69,9 @@
           let y3 = y2 + z * animationsConfig.TileHeight
           for (let i = 0; i < map.Tiles[y][x][z].length; i++) {
             let zIndex = (z * map.Height * map.Width) + (map.Depth * y) - x
+            let arch = map.Tiles[y][x][z][i]
             let di: DrawListItem = {
-              arch: map.Tiles[y][x][z][i],
+              arch,
               left: x3,
               top: y3,
               y: y,
@@ -149,6 +150,7 @@
       return a.zIndex - b.zIndex
     })
     for (let item of dl) {
+      if ($settingsStore.hideSpecials && item.arch.Compiled.Type === 'Special') continue
       if (fadeAbove && item.y > $cursor.hover.y) {
         ctx.globalAlpha = 0.2
       } else if (fadeBelow && item.y < $cursor.hover.y) {

@@ -6,6 +6,8 @@ export interface SettingsStore {
   showHeightNumbersSameYOnly: boolean
   showPlacementHeightNumber: boolean
   showPlacementLines: boolean
+  //
+  hideSpecials: boolean
 }
 
 export const settingsStore: Writable<SettingsStore> = writable({
@@ -14,4 +16,5 @@ export const settingsStore: Writable<SettingsStore> = writable({
   showHeightNumbersSameYOnly: false,
   showPlacementHeightNumber: true,
   showPlacementLines: true,
+  hideSpecials: false,
 })

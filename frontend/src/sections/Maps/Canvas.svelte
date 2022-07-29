@@ -221,6 +221,15 @@
         ctx.strokeStyle = '#fff'
         ctx.strokeText("?", item.left*zoom, item.top * zoom)
       }
+      // Draw bounding box around larger archetypes.
+      if ($settingsStore.showBoundingBoxes) {
+        if (item.arch.Compiled.Height > 1 || item.arch.Compiled.Depth > 1 || item.arch.Compiled.Width > 1) {
+          ctx.lineWidth = 1
+          ctx.globalAlpha = 0.5
+          ctx.strokeStyle = '#ff0'
+          drawBoundingBox(item.y, item.x, item.z, item.arch.Compiled.Height, item.arch.Compiled.Width, item.arch.Compiled.Depth)
+        }
+      }
     }
   }
 
@@ -454,6 +463,47 @@
     ctx.lineTo((x1)*zoom, (y2+animationsConfig.TileHeight)*zoom)
     ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
     ctx.lineTo((x1+animationsConfig.TileWidth)*zoom, (y2+animationsConfig.TileHeight)*zoom)
+
+    ctx.stroke()
+  }
+
+  function drawBoundingBox(y: number, x: number, z: number, h: number, w: number, d: number) {
+    let ysteppe = y * animationsConfig.YStep.Y
+    ysteppe = ysteppe + z * animationsConfig.TileHeight
+
+    let [ax1, ay1] = getCoordinatePosition(y, x, z)
+    let [ax2, ay2] = [ax1+animationsConfig.TileWidth*w, ay1+animationsConfig.TileHeight*d]
+
+    let [bx1, by1] = getCoordinatePosition(y+h, x, z)
+    let [bx2, by2] = [bx1+animationsConfig.TileWidth*w, by1+animationsConfig.TileHeight*d]
+
+    // bottom box
+    ctx.moveTo(ax1*zoom, ay1*zoom)
+    ctx.lineTo(ax2*zoom, ay1*zoom)
+    ctx.lineTo(ax2*zoom, ay2*zoom)
+    ctx.lineTo(ax1*zoom, ay2*zoom)
+    ctx.lineTo(ax1*zoom, ay1*zoom)
+
+    // top box
+    ctx.moveTo(bx1*zoom, by1*zoom)
+    ctx.lineTo(bx2*zoom, by1*zoom)
+    ctx.lineTo(bx2*zoom, by2*zoom)
+    ctx.lineTo(bx1*zoom, by2*zoom)
+    ctx.lineTo(bx1*zoom, by1*zoom)
+
+    // Lines between boxes.
+    // left lines
+    ctx.moveTo(ax1*zoom, ay1*zoom)
+    ctx.lineTo(bx1*zoom, by1*zoom)
+    ctx.moveTo(ax1*zoom, ay2*zoom)
+    ctx.lineTo(bx1*zoom, by2*zoom)
+
+    // right lines
+    ctx.moveTo(ax2*zoom, ay1*zoom)
+    ctx.lineTo(bx2*zoom, by1*zoom)
+    ctx.moveTo(ax2*zoom, ay2*zoom)
+    ctx.lineTo(bx2*zoom, by2*zoom)
+
 
     ctx.stroke()
   }

@@ -38,6 +38,10 @@
             Hide Specials
             <input type='checkbox' bind:checked={$settingsStore.hideSpecials}>
           </MenuItem>
+          <MenuItem on:click={_=>$settingsStore.showBoundingBoxes=!$settingsStore.showBoundingBoxes} noclose>
+            Show Bounding Boxes
+            <input type='checkbox' bind:checked={$settingsStore.showBoundingBoxes}>
+          </MenuItem>
         </MenuList>
       </MenuItem>
     </MenuBar>

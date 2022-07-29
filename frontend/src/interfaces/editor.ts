@@ -23,3 +23,18 @@ export type ArchMatcher = {
   name?: string
   type?: string
 }
+
+export type WandRules = {
+  shouldMatchArchetypes: boolean
+  shouldMatchName: boolean
+  shouldMatchType: boolean
+  matchArchetypes: string
+  matchName: string
+  matchType: string
+  matchY: boolean
+  matchX: boolean
+  matchZ: boolean
+  diagonal: boolean
+}
+
+export type ToolType = 'insert'|'erase'|'fill'|'placing'|'wand'

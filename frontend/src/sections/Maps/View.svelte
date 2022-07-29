@@ -25,7 +25,7 @@
   import propertiesIcon from '../../assets/icons/properties.png'
   import scriptIcon from '../../assets/icons/script.png'
   import { Writable, writable } from 'svelte/store'
-  import type { ArchMatcher, Coordinate, CoordinateMatch, Cursor } from '../../interfaces/editor'
+  import type { ArchMatcher, Coordinate, CoordinateMatch, Cursor, WandRules, ToolType } from '../../interfaces/editor'
   import { blueprints } from '../../stores/blueprints'
   import Menus from '../../components/Menus/Menus.svelte'
   import MenuBar from '../../components/Menus/MenuBar.svelte'
@@ -35,8 +35,9 @@
   import ScriptsEditor from './ScriptsEditor.svelte'
   import PropertiesEditor from './PropertiesEditor.svelte'
   import ArchPreEditor from './ArchPreEditor.svelte'
+  import ShapesSection from './ShapesSection.svelte'
+  import ToolSettingsSection from './ToolSettingsSection.svelte';
 
-  type ToolType = 'insert'|'erase'|'fill'|'placing'|'wand'
   let tool: ToolType = 'insert'
   let lastTool: ToolType = 'insert'
 
@@ -56,6 +57,19 @@
     selecting: [],
     placing: [],
   })
+
+ let wandRules: WandRules = {
+    shouldMatchArchetypes: true,
+    shouldMatchName: false,
+    shouldMatchType: false,
+    matchArchetypes: '',
+    matchName: '',
+    matchType: '',
+    matchY: false,
+    matchX: true,
+    matchZ: true,
+    diagonal: false,
+  }
 
   let lastWheelTimestamp = 0
   function handleMapMousewheel(e: WheelEvent) {
@@ -208,16 +222,28 @@
           $cursor.selected = getMatchingTiles(t[t.length-1], tile.map(v=>{
             let m: ArchMatcher = {}
             // TODO: if MatchArchs
-            if (v.Compiled.Archs.length) {
-              m.archs = v.Original.Archs
+            if (wandRules.shouldMatchArchetypes) {
+              if (wandRules.matchArchetypes) {
+                m.archs = wandRules.matchArchetypes.split(',')
+              } else if (v.Original.Archs.length) {
+                m.archs = v.Original.Archs
+              }
             }
-            // TODO: if MatchName
-            if (v.Compiled.Name !== undefined) {
-              m.name = v.Compiled.Name
+
+            if (wandRules.shouldMatchName) {
+              if (wandRules.matchName) {
+                m.name = wandRules.matchName
+              } else if (v.Compiled.Name !== undefined) {
+                m.name = v.Compiled.Name
+              }
             }
-            // TODO: if MatchType
-            if (v.Compiled.Type !== undefined) {
-              m.type = v.Compiled.Type
+
+            if (wandRules.shouldMatchType) {
+              if (wandRules.matchType) {
+                m.type = wandRules.matchType
+              } else if (v.Compiled.Type !== undefined) {
+                m.type = v.Compiled.Type
+              }
             }
             return m
           })).filter(v=>v.matched)
@@ -295,9 +321,9 @@
         if (matchers.length !== 0 && tiles.length === 0) {
           open = false
         } else {
-          for (let a of tiles) {
+          for (let m of matchers) {
             let okay = true
-            for (let m of matchers) {
+            for (let a of tiles) {
               if (m.archs) {
                 for (let mArch of m.archs) {
                   let has = false
@@ -352,12 +378,42 @@
       })
 
       // Get neighbors.
+      // Up, Down
+      if (wandRules.matchY) {
+        getCoord(y-1, x, z)
+        getCoord(y+1, x, z)
+      }
       // Left, right
-      getCoord(y, x-1, z)
-      getCoord(y, x+1, z)
+      if (wandRules.matchX) {
+        getCoord(y, x-1, z)
+        getCoord(y, x+1, z)
+      }
       // Top, bottom
-      getCoord(y, x, z-1)
-      getCoord(y, x, z+1)
+      if (wandRules.matchZ) {
+        getCoord(y, x, z-1)
+        getCoord(y, x, z+1)
+      }
+
+      if (wandRules.diagonal) {
+        if (wandRules.matchX && wandRules.matchY) {
+          getCoord(y-1, x-1, z)
+          getCoord(y+1, x-1, z)
+          getCoord(y+1, x+1, z)
+          getCoord(y-1, x+1, z)
+        }
+        if (wandRules.matchX && wandRules.matchZ) {
+          getCoord(y, x-1, z-1)
+          getCoord(y, x-1, z+1)
+          getCoord(y, x+1, z+1)
+          getCoord(y, x+1, z-1)
+        }
+        if (wandRules.matchY && wandRules.matchZ) {
+          getCoord(y-1, x, z-1)
+          getCoord(y-1, x, z+1)
+          getCoord(y+1, x, z+1)
+          getCoord(y+1, x, z-1)
+        }
+      }
 
       // TODO: up, down, as well as diagonals
     }
@@ -605,109 +661,103 @@
 </script>
 
 <div class='main' style={Object.entries($styles.colors).map(v=>`--${v[0]}: ${v[1]}`).join(';\n')}>
-  <section class='toolbar'>
-    <article class='toolbar__items'>
-      <button class:-active={tool==='insert'} on:click={_=>tool='insert'}>
-        <img src={insertIcon} alt='insert'>
-      </button>
-      <button class:-active={tool==='fill'} on:click={_=>tool='fill'}>
-        <img src={fillIcon} alt='fill'>
-      </button>
-      <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
-        <img src={eraserIcon} alt='erase'>
-      </button>
-      <hr>
-      <button class:-active={tool==='wand'} on:click={_=>tool='wand'}>
-        <img src={wandIcon} alt='wand'>
-      </button>
-    </article>
-    <article class='toolbar__item__settings'>
-    </article>
-    <article class='toolbar__shapes'>
-      <button on:click={copyShape}>
-        copy shape
-      </button>
-      <button on:click={pasteShape}>
-        paste shape
-      </button>
-    </article>
-  </section>
-  <section class='view'>
-    {#if map}
-      <Menus>
-        <MenuBar>
-          <MenuItem on:click={_=>save()}>
-            <img src={saveIcon} alt='save'>
-          </MenuItem>
-          <MenuItem disabled={!map.undoable} on:click={undo}>
-            <img src={undoIcon} alt='undo'>
-          </MenuItem>
-          <MenuItem disabled={!map.redoable} on:click={redo}>
-            <img src={redoIcon} alt='redo'>
-          </MenuItem>
-          <MenuItem on:click={_=>viewMode='map'} highlighted={viewMode==='map'}>
-            <img src={mapIcon} alt='map'>
-          </MenuItem>
-          <MenuItem on:click={_=>viewMode='properties'} highlighted={viewMode==='properties'}>
-            <img src={propertiesIcon} alt='properties'>
-          </MenuItem>
-          <MenuItem on:click={_=>viewMode='scripts'} highlighted={viewMode==='scripts'}>
-            <img src={scriptIcon} alt='scripts'>
-          </MenuItem>
-        </MenuBar>
-      </Menus>
-      <section class='map'>
-        <SplitPane type='horizontal' pos={80}>
-          <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
-            <Canvas cursor={cursor} map={map} zoom={zoom}></Canvas>
-          </article>
-          <aside slot=b class='archlist'>
-            <SplitPane type='vertical' pos={50}>
-              <TilesList slot=a cursor={cursor} map={map}></TilesList>
-              <ArchPreEditor slot=b arch={map.Tiles[$cursor.start.y]?.[$cursor.start.x]?.[$cursor.start.z]?.[$cursor.start.i]}></ArchPreEditor>
-            </SplitPane>
-          </aside>
-        </SplitPane>
-        {#if viewMode === 'properties'}
-          <div transition:fade class='dialog' on:click={_=>showProperties=false}>
-            <PropertiesEditor bind:map={map}></PropertiesEditor>
+  <SplitPane type='horizontal' pos={20}>
+    <section slot=a class='toolbar'>
+      <article class='toolbar__items'>
+        <button class:-active={tool==='insert'} on:click={_=>tool='insert'}>
+          <img src={insertIcon} alt='insert'>
+        </button>
+        <button class:-active={tool==='fill'} on:click={_=>tool='fill'}>
+          <img src={fillIcon} alt='fill'>
+        </button>
+        <button class:-active={tool==='erase'} on:click={_=>tool='erase'}>
+          <img src={eraserIcon} alt='erase'>
+        </button>
+        <hr>
+        <button class:-active={tool==='wand'} on:click={_=>tool='wand'}>
+          <img src={wandIcon} alt='wand'>
+        </button>
+      </article>
+      <ToolSettingsSection tool={tool} bind:wandRules={wandRules}/>
+      <ShapesSection on:copy={copyShape} on:paste={pasteShape}/>
+    </section>
+    <section slot=b class='view'>
+      {#if map}
+        <Menus>
+          <MenuBar>
+            <MenuItem on:click={_=>save()}>
+              <img src={saveIcon} alt='save'>
+            </MenuItem>
+            <MenuItem disabled={!map.undoable} on:click={undo}>
+              <img src={undoIcon} alt='undo'>
+            </MenuItem>
+            <MenuItem disabled={!map.redoable} on:click={redo}>
+              <img src={redoIcon} alt='redo'>
+            </MenuItem>
+            <MenuItem on:click={_=>viewMode='map'} highlighted={viewMode==='map'}>
+              <img src={mapIcon} alt='map'>
+            </MenuItem>
+            <MenuItem on:click={_=>viewMode='properties'} highlighted={viewMode==='properties'}>
+              <img src={propertiesIcon} alt='properties'>
+            </MenuItem>
+            <MenuItem on:click={_=>viewMode='scripts'} highlighted={viewMode==='scripts'}>
+              <img src={scriptIcon} alt='scripts'>
+            </MenuItem>
+          </MenuBar>
+        </Menus>
+        <section class='map'>
+          <SplitPane type='horizontal' pos={80}>
+            <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
+              <Canvas cursor={cursor} map={map} zoom={zoom}></Canvas>
+            </article>
+            <aside slot=b class='archlist'>
+              <SplitPane type='vertical' pos={50}>
+                <TilesList slot=a cursor={cursor} map={map}></TilesList>
+                <ArchPreEditor slot=b arch={map.Tiles[$cursor.start.y]?.[$cursor.start.x]?.[$cursor.start.z]?.[$cursor.start.i]}></ArchPreEditor>
+              </SplitPane>
+            </aside>
+          </SplitPane>
+          {#if viewMode === 'properties'}
+            <div transition:fade class='dialog' on:click={_=>showProperties=false}>
+              <PropertiesEditor bind:map={map}></PropertiesEditor>
+            </div>
+          {:else if viewMode === 'scripts'}
+            <div transition:fade class='dialog' on:click={_=>showScripts=false}>
+              <ScriptsEditor bind:map={map}></ScriptsEditor>
+            </div>
+          {/if}
+        </section>
+        <footer>
+          <div class='map__dimensions'>
+            <span>{map.Width}</span>
+            <span>{map.Height}</span>
           </div>
-        {:else if viewMode === 'scripts'}
-          <div transition:fade class='dialog' on:click={_=>showScripts=false}>
-            <ScriptsEditor bind:map={map}></ScriptsEditor>
+          <div class='map__cursor'>
+            <span>
+              <span class='cursor__text'>{$cursor.start.y}</span>
+              <span class='hover__text'>({$cursor.hover.y})</span>
+            </span>
+            <span>
+              <span class='cursor__text'>{$cursor.start.x}</span>
+              <span class='hover__text'>({$cursor.hover.x})</span>
+            </span>
+            <span>
+              <span class='cursor__text'>{$cursor.start.z}</span>
+              <span class='hover__text'>({$cursor.hover.z})</span>
+            </span>
           </div>
-        {/if}
-      </section>
-      <footer>
-        <div class='map__dimensions'>
-          <span>{map.Width}</span>
-          <span>{map.Height}</span>
-        </div>
-        <div class='map__cursor'>
-          <span>
-            <span class='cursor__text'>{$cursor.start.y}</span>
-            <span class='hover__text'>({$cursor.hover.y})</span>
-          </span>
-          <span>
-            <span class='cursor__text'>{$cursor.start.x}</span>
-            <span class='hover__text'>({$cursor.hover.x})</span>
-          </span>
-          <span>
-            <span class='cursor__text'>{$cursor.start.z}</span>
-            <span class='hover__text'>({$cursor.hover.z})</span>
-          </span>
-        </div>
-      </footer>
-    {:else}
-      select a map
-    {/if}
-  </section>
+        </footer>
+      {:else}
+        select a map
+      {/if}
+    </section>
+  </SplitPane>
 </div>
 
 <style>
   .main {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
   }
   .dialog {
@@ -737,7 +787,9 @@
   .toolbar button.-active {
     background: rgba(128, 128, 128, 0.5);
   }
-  .toolbar__items {
+  .wand_settings {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
   }
   .view {
     display: grid;

@@ -133,15 +133,17 @@
   }
 
   function getCoordinatePosition(y: number, x: number, z: number): [number, number, number] {
-    let x1 = 0
-    let y1 = map.Height * -animationsConfig.YStep.Y
-    let x2 = x1 + y * animationsConfig.YStep.X
-    let y2 = y1 + y * animationsConfig.YStep.Y
-    let x3 = x2 + x * animationsConfig.TileWidth
-    let y3 = y2 + z * animationsConfig.TileHeight
+    let originX = 0
+    let originY = map.Height * -animationsConfig.YStep.Y
+
+    originX += y * animationsConfig.YStep.X
+    originY += y * animationsConfig.YStep.Y
+    originX += x * animationsConfig.TileWidth
+    originY += z * animationsConfig.TileHeight
+
     let zIndex = (z * map.Height * map.Width) + (map.Depth * y) - x
 
-    return [x3, y3, zIndex]
+    return [originX, originY, zIndex]
   }
 
   function renderDrawList(dl: DrawListItem[]) {
@@ -179,8 +181,12 @@
         let y = 0
         let adjustment = animationsConfig.Adjustments[item.arch.Compiled.Type]
         if (adjustment) {
-          x = adjustment.X
-          y = adjustment.Y
+          if (adjustment.X !== undefined) {
+            x = adjustment.X
+          }
+          if (adjustment.Y !== undefined) {
+            y = adjustment.Y
+          }
         }
         if (item.frame) {
           x += item.frame.X

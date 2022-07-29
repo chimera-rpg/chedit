@@ -3,7 +3,7 @@
   import MenuBar from "../components/Menus/MenuBar.svelte"
   import MenuList from "../components/Menus/MenuList.svelte"
   import MenuItem from "../components/Menus/MenuItem.svelte"
-  import { LoadMap, GetArchetypes, GetAnimations, GetAnimationsConfig, LoadAnimations, LoadAnimationsConfig } from "../../wailsjs/go/main/Editor"
+  import { LoadMap, GetArchetypes, GetAnimations, GetAnimationsConfigSource, LoadAnimations, LoadAnimationsConfig } from "../../wailsjs/go/main/Editor"
   import { collectArchetypes, compileArchetypes, localArchetypes, getArchetypes } from '../models/archs'
   import { maps as mapsStore } from '../stores/maps'
   import { animations as animationStore } from '../stores/animations'
@@ -53,8 +53,8 @@
       await LoadAnimationsConfig()
       await LoadAnimations()
 
-      let animationConfig = await GetAnimationsConfig()
-      setAnimationsConfig(animationConfig)
+      let animationConfig = await GetAnimationsConfigSource()
+      setAnimationsConfig(parse(animationConfig))
 
       let animations = await GetAnimations()
       animationStore.set({animations, tree: {}, images: {}})

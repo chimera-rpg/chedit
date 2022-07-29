@@ -173,8 +173,10 @@ func (e *Editor) LoadAnimations() error {
 }
 
 // GetAnimationsConfig returns the animations config.
-func (e *Editor) GetAnimationsConfig() cdata.AnimationsConfig {
-	return e.AnimationsConfig
+func (e *Editor) GetAnimationsConfigSource() (string, error) {
+	p := filepath.Join(*e.Config.ArchetypesRoot, "config.yaml")
+	b, err := os.ReadFile(p)
+	return string(b), err
 }
 
 // GetArchetypes returns the archetypes field.

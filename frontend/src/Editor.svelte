@@ -2,6 +2,7 @@
   import { onMount } from "svelte"
   import * as GoEditor from '../wailsjs/go/main/Editor'
   import { collectArchetypes, compileArchetypes, getArchetypes } from "./models/archs"
+  import { parse } from 'yaml'
 
   import ArchPalette from "./sections/ArchPalette.svelte"
   import MainMenu from "./sections/MainMenu.svelte"
@@ -26,8 +27,8 @@
     }
     try {
       // Get our animations config since we're storing that in our animation store.
-      let animationConfig = await GoEditor.GetAnimationsConfig()
-      setAnimationsConfig(animationConfig)
+      let animationConfig = await GoEditor.GetAnimationsConfigSource()
+      setAnimationsConfig(parse(animationConfig))
 
       let animations = await GoEditor.GetAnimations()
       animationStore.set({animations, tree: {}, images: {}})

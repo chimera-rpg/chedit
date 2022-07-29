@@ -31,10 +31,17 @@ export type WandRules = {
   matchArchetypes: string
   matchName: string
   matchType: string
-  matchY: boolean
-  matchX: boolean
-  matchZ: boolean
-  diagonal: boolean
+  matchY?: boolean
+  matchX?: boolean
+  matchZ?: boolean
+  diagonal?: boolean
+}
+
+// Note: We don't use matchY,X,Z,diagonal
+export type ReplaceRules = WandRules & {
+  matchMode: 'entire' | 'top' | 'range'
+  range: [number, number]
+  replaceMode: 'replace' | 'merge'
 }
 
 export type ToolType = 'insert'|'erase'|'fill'|'placing'|'wand'

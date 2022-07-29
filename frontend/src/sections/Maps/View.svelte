@@ -37,6 +37,7 @@
   import ArchPreEditor from './ArchPreEditor.svelte'
   import ShapesSection from './ShapesSection.svelte'
   import ToolSettingsSection from './ToolSettingsSection.svelte';
+  import ReplaceSection from './ReplaceSection.svelte'
 
   let tool: ToolType = 'insert'
   let lastTool: ToolType = 'insert'
@@ -680,6 +681,7 @@
       </article>
       <ToolSettingsSection tool={tool} bind:wandRules={wandRules}/>
       <ShapesSection on:copy={copyShape} on:paste={pasteShape}/>
+      <ReplaceSection/>
     </section>
     <section slot=b class='view'>
       {#if map}

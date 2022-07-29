@@ -169,6 +169,11 @@ type MapActionArchetype = {
   arch?: ArchetypeContainer
 }
 
+type MapActionArchetypeReplace = {
+  archName: string
+  replace: boolean
+}
+
 export class MapInsertAction implements UndoStep {
   y = 0
   x = 0
@@ -207,6 +212,51 @@ export class MapInsertAction implements UndoStep {
     }
     this.i = p
     c.Tiles[this.y][this.x][this.z].splice(p, 1)
+    return c
+  }
+}
+
+export class MapReplaceAction implements UndoStep {
+  y = 0
+  x = 0
+  z = 0
+  i = 0
+  replace = false
+  arch: Archetype
+  archName = ''
+
+  constructor({ y = 0, x = 0, z = 0, i = 0, replace = true, archName }: MapActionPosition & MapActionArchetypeReplace) {
+    this.archName = archName
+    this.replace = replace
+    this.y = y
+    this.x = x
+    this.z = z
+    this.i = i
+  }
+
+  apply(c: ContainerMap): ContainerMap {
+    if (this.y < 0 || this.x < 0 || this.z < 0) return c
+    if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
+    if (this.i < 0 || this.i >= c.Tiles[this.y][this.x][this.z].length) return c
+
+    this.arch = c.Tiles[this.y][this.x][this.z][this.y].Original
+    if (this.replace) {
+      c.Tiles[this.y][this.x][this.z][this.i].Original = {
+        Archs: [this.archName]
+      }
+    } else {
+      c.Tiles[this.y][this.x][this.z][this.i].Original.Archs = [this.archName]
+    }
+
+    return c
+  }
+  unapply(c: ContainerMap): ContainerMap {
+    if (this.y < 0 || this.x < 0 || this.z < 0) return c
+    if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
+    if (this.i < 0 || this.i >= c.Tiles[this.y][this.x][this.z].length) return c
+
+    c.Tiles[this.y][this.x][this.z][this.i].Original = this.arch
+
     return c
   }
 }

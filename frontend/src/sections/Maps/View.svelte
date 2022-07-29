@@ -199,7 +199,48 @@
 
   function handleMapMousedown(e: MouseEvent) {
     if (e.button === 0) {
-      if (tool === 'placing') {
+      $cursor.start.y = $cursor.hover.y
+      $cursor.start.x = $cursor.hover.x
+      $cursor.start.z = $cursor.hover.z
+      startMouseDrag(e, (t: TraversedTile) => {
+        $cursor.end.y = $cursor.hover.y
+        $cursor.end.x = $cursor.hover.x
+        $cursor.end.z = $cursor.hover.z
+        $cursor.selecting = getCoordinateBox($cursor.start, $cursor.end)
+      }, (t: TraversedTile[], e: MouseEvent) => {
+        $cursor.selecting = []
+        adjustSelection(getCoordinateBox($cursor.start, $cursor.end), {
+          alt: e.altKey,
+          shift: e.shiftKey,
+          ctrl: e.ctrlKey,
+          meta: e.metaKey,
+        })
+        let y = $cursor.start.y
+        let x = $cursor.start.x
+        let z = $cursor.start.z
+        $cursor.start.y = $cursor.end.y
+        $cursor.start.x = $cursor.end.x
+        $cursor.start.z = $cursor.end.z
+        $cursor.end.y = y
+        $cursor.end.x = x
+        $cursor.end.z = z
+      })
+    } else if (e.button === 2) {
+      e.preventDefault()
+      e.stopPropagation()
+
+      if (tool === 'fill') {
+        startMouseDrag(e, (t: TraversedTile) => {
+        }, (t: TraversedTile[]) => {
+          applyTool({
+            y: $cursor.hover.y,
+            x: $cursor.hover.x,
+            z: $cursor.hover.z,
+            i: -1,
+            initial: true,
+          })
+        })
+      } else if (tool === 'placing') {
         $cursor.start.y = $cursor.hover.y
         $cursor.start.x = $cursor.hover.x
         $cursor.start.z = $cursor.hover.z
@@ -248,49 +289,6 @@
             }
             return m
           })).filter(v=>v.matched)
-        })
-      } else {
-        $cursor.start.y = $cursor.hover.y
-        $cursor.start.x = $cursor.hover.x
-        $cursor.start.z = $cursor.hover.z
-        startMouseDrag(e, (t: TraversedTile) => {
-          $cursor.end.y = $cursor.hover.y
-          $cursor.end.x = $cursor.hover.x
-          $cursor.end.z = $cursor.hover.z
-          $cursor.selecting = getCoordinateBox($cursor.start, $cursor.end)
-        }, (t: TraversedTile[], e: MouseEvent) => {
-          $cursor.selecting = []
-          adjustSelection(getCoordinateBox($cursor.start, $cursor.end), {
-            alt: e.altKey,
-            shift: e.shiftKey,
-            ctrl: e.ctrlKey,
-            meta: e.metaKey,
-          })
-          let y = $cursor.start.y
-          let x = $cursor.start.x
-          let z = $cursor.start.z
-          $cursor.start.y = $cursor.end.y
-          $cursor.start.x = $cursor.end.x
-          $cursor.start.z = $cursor.end.z
-          $cursor.end.y = y
-          $cursor.end.x = x
-          $cursor.end.z = z
-        })
-      }
-    } else if (e.button === 2) {
-      e.preventDefault()
-      e.stopPropagation()
-
-      if (tool === 'fill') {
-        startMouseDrag(e, (t: TraversedTile) => {
-        }, (t: TraversedTile[]) => {
-          applyTool({
-            y: $cursor.hover.y,
-            x: $cursor.hover.x,
-            z: $cursor.hover.z,
-            i: -1,
-            initial: true,
-          })
         })
       } else {
         map.queue()

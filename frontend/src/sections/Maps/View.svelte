@@ -58,6 +58,7 @@
   binds.addHandler('Swap to Erase', () => { swapTool('erase')})
   binds.addHandler('Swap to Fill', () => { swapTool('fill')})
   binds.addHandler('Swap to Wand', () => { swapTool('wand')})
+  binds.addHandler('Erase Selection', () => { erase($cursor.selected) })
 
   binds.addShortcut('Undo', ['Control', 'Z'])
   binds.addShortcut('Redo', ['Control', 'Shift', 'Z'])
@@ -66,6 +67,8 @@
   binds.addShortcut('Swap to Fill', ['2'])
   binds.addShortcut('Swap to Erase', ['3'])
   binds.addShortcut('Swap to Wand', ['4'])
+  binds.addShortcut('Erase Selection', ['Delete'])
+  binds.addShortcut('Erase Selection', ['Backspace'])
 
   //
   export let mapsContainer: MapsContainer
@@ -468,6 +471,21 @@
     } else if (tool === 'erase') {
       removeArchetype(t.y, t.x, t.z, t.i)
     }
+  }
+
+  function erase(coords: Coordinate[]) {
+    map.queue()
+    for (let c of coords) {
+      for (let i = map.Tiles[c.y][c.x][c.z].length-1; i >= 0; i--) {
+        if (c.y < 0 || c.x < 0 || c.z < 0) return
+        if (c.y >= map.Height || c.x >= map.Width || c.z >= map.Depth) return
+        map.apply(new MapRemoveAction({
+          y: c.y, x: c.x, z: c.z, i,
+        }))
+      }
+    }
+    map.unqueue()
+    mapsStore.set($mapsStore)
   }
 
   interface TraversedTile {

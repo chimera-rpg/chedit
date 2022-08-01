@@ -192,6 +192,7 @@ export class MapInsertAction implements UndoStep {
   apply(c: ContainerMap): ContainerMap {
     if (this.y < 0 || this.x < 0 || this.z < 0) return c
     if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
+    if (!this.arch) return c
 
     let p = this.i
     if (p === -1) {

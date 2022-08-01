@@ -13,6 +13,7 @@
   import { compileInJS } from '../../models/archs'
   import { maps as mapsStore, MapsStoreData } from '../../stores/maps'
   import { MapInsertAction, MapRemoveAction } from '../../models/maps'
+  import { Binds } from '../../models/binds'
 
   import eraserIcon from '../../assets/icons/eraser.png'
   import wandIcon from '../../assets/icons/wand.png'
@@ -45,6 +46,20 @@
   type ViewMode = 'map'|'properties'|'scripts'
   let viewMode: ViewMode = 'map'
 
+  // Binds
+  export let binds: Binds
+  binds.addHandler('Undo', () => {
+    undo()
+  })
+  binds.addHandler('Redo', () => {
+    redo()
+  })
+
+  binds.addShortcut('Undo', ['Control', 'Z'])
+  binds.addShortcut('Redo', ['Control', 'Shift', 'Z'])
+  binds.addShortcut('Redo', ['Control', 'Y'])
+
+  //
   export let mapsContainer: MapsContainer
   export let map: ContainerMap
   export let mapIndex: number

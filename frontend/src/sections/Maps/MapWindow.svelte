@@ -1,13 +1,16 @@
 <script lang='ts'>
+  import { Binds } from '../../models/binds'
+
   import Window from '../../components/Windows/Window.svelte'
   import type { MapsContainer } from '../../interfaces/Map'
   import View from './View.svelte'
 
   export let map: MapsContainer
   export let mapIndex: number
+  let binds: Binds = new Binds()
 </script>
 
-<Window on:close>
+<Window on:close on:mousedown={_=>binds.activate()}>
   <svelte:fragment slot="header">
     <span>{map.Path.split('/').reverse()[0]}</span>
   </svelte:fragment>
@@ -17,7 +20,7 @@
         <li>{key}</li>
       {/each}
     </nav>
-    <View map={map.Maps[map.SelectedMap]} mapsContainer={map} mapIndex={mapIndex}></View>
+    <View binds={binds} map={map.Maps[map.SelectedMap]} mapsContainer={map} mapIndex={mapIndex}></View>
   </section>
 </Window>
 

@@ -26,6 +26,7 @@ type Editor struct {
 	Animations       map[string]*sdata.AnimationPre `json:"Animations"`
 	AnimationsConfig cdata.AnimationsConfig         `json:"AnimationsConfig"`
 	Config           Config                         `json:"Config"`
+	ConfigDir        string
 	compiled         bool
 }
 
@@ -50,14 +51,14 @@ func (e *Editor) Initialize() (err error) {
 	if err != nil {
 		return err
 	}
-	configDir = filepath.Join(configDir, "chimera", "editor")
+	e.ConfigDir = filepath.Join(configDir, "chimera", "editor")
 
 	err = os.MkdirAll(configDir, 0755)
 	if err != nil {
 		return err
 	}
 
-	configPath := filepath.Join(configDir, "cfg.yml")
+	configPath := filepath.Join(e.ConfigDir, "cfg.yml")
 
 	// Load our configuration.
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
@@ -255,4 +256,19 @@ func (e *Editor) GetBytes(p string) ([]byte, error) {
 		return nil, err
 	}
 	return b, nil
+}
+
+func (e *Editor) SaveSettings(s string) error {
+	p := filepath.Join(e.ConfigDir, "settings.yml")
+	err := os.WriteFile(p, []byte(s), 0755)
+	return err
+}
+
+func (e *Editor) LoadSettings() (string, error) {
+	p := filepath.Join(e.ConfigDir, "settings.yml")
+	b, err := os.ReadFile(p)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

@@ -10,6 +10,7 @@
 
   import SplitPane from "./components/SplitPane.svelte"
 
+  import { settingsStore } from './stores/settings'
   import { animations as animationStore } from './stores/animations'
   import { archetypes as archetypesStore } from './stores/archetypes'
 
@@ -17,6 +18,7 @@
 
   onMount(async () =>{
     await GoEditor.Initialize()
+    settingsStore.load()
     try {
       await collectArchetypes()
       compileArchetypes()

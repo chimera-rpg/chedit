@@ -287,7 +287,7 @@
         }, (t: TraversedTile[], e: MouseEvent) => {
           let targetTile = t[t.length-1]
           let tile = map.Tiles[targetTile.y][targetTile.x][targetTile.z]
-          $cursor.selected = getMatchingTiles(t[t.length-1], tile.map(v=>{
+          $cursor.selected = adjustShape($cursor.selected, getMatchingTiles(t[t.length-1], tile.map(v=>{
             let m: ArchMatcher = {}
             // TODO: if MatchArchs
             if (wandRules.shouldMatchArchetypes) {
@@ -314,7 +314,10 @@
               }
             }
             return m
-          })).filter(v=>v.matched)
+          })).filter(v=>v.matched), {
+            shift: e.shiftKey,
+            ctrl: e.ctrlKey,
+          })
         })
       } else {
         map.queue()

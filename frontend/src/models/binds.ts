@@ -18,6 +18,7 @@ export class Binds {
   activate() {
     if (this.unsub) return
     this.unsub = keysStore.subscribe((s: KeysStore) => {
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return
       let keys = Object.keys(s.held).map(v=>v.toLowerCase()).sort().join('+')
       let cmd = this.commands[this.shortcuts[keys]]
       if (cmd) {

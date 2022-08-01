@@ -54,10 +54,18 @@
   binds.addHandler('Redo', () => {
     redo()
   })
+  binds.addHandler('Swap to Insert', () => { swapTool('insert')})
+  binds.addHandler('Swap to Erase', () => { swapTool('erase')})
+  binds.addHandler('Swap to Fill', () => { swapTool('fill')})
+  binds.addHandler('Swap to Wand', () => { swapTool('wand')})
 
   binds.addShortcut('Undo', ['Control', 'Z'])
   binds.addShortcut('Redo', ['Control', 'Shift', 'Z'])
   binds.addShortcut('Redo', ['Control', 'Y'])
+  binds.addShortcut('Swap to Insert', ['1'])
+  binds.addShortcut('Swap to Fill', ['2'])
+  binds.addShortcut('Swap to Erase', ['3'])
+  binds.addShortcut('Swap to Wand', ['4'])
 
   //
   export let mapsContainer: MapsContainer

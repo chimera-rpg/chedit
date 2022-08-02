@@ -132,20 +132,20 @@
       <article>
         <label>
           <span>Archs</span>
-          <input value={cloned.Archs??''} placeholder={arch.Compiled.Archs} on:change={e=>change('Type', e.target.value)}/>
+          <input value={cloned.Archs??''} placeholder={arch.Compiled.Archs} on:change={e=>change('Type', e.currentTarget.value)}/>
         </label>
 
         <label>
           <span>Name</span>
-          <input value={cloned.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.target.value)}/>
+          <input value={cloned.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Description</span>
-          <textarea value={cloned.Description??''} placeholder={arch.Compiled.Description} on:change={e=>change('Description', e.target.value)}/>
+          <textarea value={cloned.Description??''} placeholder={arch.Compiled.Description} on:change={e=>change('Description', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Type</span>
-          <select name="Type" value={cloned.Type??arch.Compiled.Type} on:change={e=>change('Type', e.target.value)}>
+          <select name="Type" value={cloned.Type??arch.Compiled.Type} on:change={e=>change('Type', e.currentTarget.value)}>
             <option value="">Unknown</option>
             {#each Object.entries(archetypeTypes) as [k, g]}
               <optgroup label={k}>
@@ -162,39 +162,39 @@
             <legend>Exit</legend>
             <label>
               <span>Name</span>
-              <input value={cloned.Exit?.Name??''} placeholder={arch.Compiled.Exit?.Name} on:change={e=>change('Exit.Name', e.target.value)}/>
+              <input value={cloned.Exit?.Name??''} placeholder={arch.Compiled.Exit?.Name} on:change={e=>change('Exit.Name', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Y</span>
-              <input type='number' value={cloned.Exit?.Y??''} placeholder={arch.Compiled.Exit?.Y} on:change={e=>change('Exit.Y', e.target.value)}/>
+              <input type='number' value={cloned.Exit?.Y??''} placeholder={arch.Compiled.Exit?.Y} on:change={e=>change('Exit.Y', e.currentTarget.value)}/>
             </label>
             <label>
               <span>X</span>
-              <input type='number' value={cloned.Exit?.X??''} placeholder={arch.Compiled.Exit?.X} on:change={e=>change('Exit.X', e.target.value)}/>
+              <input type='number' value={cloned.Exit?.X??''} placeholder={arch.Compiled.Exit?.X} on:change={e=>change('Exit.X', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Z</span>
-              <input type='number' value={cloned.Exit?.Z??''} placeholder={arch.Compiled.Exit?.Z} on:change={e=>change('Exit.Z', e.target.value)}/>
+              <input type='number' value={cloned.Exit?.Z??''} placeholder={arch.Compiled.Exit?.Z} on:change={e=>change('Exit.Z', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Touch</span>
-              <input type='checkbox' checked={cloned.Exit?.Touch??''} placeholder={arch.Compiled.Exit?.Touch} on:change={e=>change('Exit.Touch', e.target.checked)}/>
+              <input type='checkbox' checked={cloned.Exit?.Touch??''} placeholder={arch.Compiled.Exit?.Touch} on:change={e=>change('Exit.Touch', e.currentTarget.checked)}/>
             </label>
             <label>
               <span>Cooldown</span>
-              <input value={cloned.Exit?.Cooldown??''} placeholder={arch.Compiled.Exit?.Cooldown} on:change={e=>change('Exit.Cooldown', e.target.value)}/>
+              <input value={cloned.Exit?.Cooldown??''} placeholder={arch.Compiled.Exit?.Cooldown} on:change={e=>change('Exit.Cooldown', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Size Ratio</span>
-              <input type='number' value={cloned.Exit?.SizeRatio??''} placeholder={arch.Compiled.Exit?.SizeRatio} on:change={e=>change('Exit.SizeRatio', e.target.value)}/>
+              <input type='number' value={cloned.Exit?.SizeRatio??''} placeholder={arch.Compiled.Exit?.SizeRatio} on:change={e=>change('Exit.SizeRatio', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Uses</span>
-              <input type='number' value={cloned.Exit?.Uses??''} placeholder={arch.Compiled.Exit?.Uses} on:change={e=>change('Exit.Uses', e.target.value)}/>
+              <input type='number' value={cloned.Exit?.Uses??''} placeholder={arch.Compiled.Exit?.Uses} on:change={e=>change('Exit.Uses', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Unique Uses</span>
-              <input type='number' value={cloned.Exit?.UniqueUses??''} placeholder={arch.Compiled.Exit?.UniqueUses} on:change={e=>change('Exit.UniqueUses', e.target.value)}/>
+              <input type='number' value={cloned.Exit?.UniqueUses??''} placeholder={arch.Compiled.Exit?.UniqueUses} on:change={e=>change('Exit.UniqueUses', e.currentTarget.value)}/>
             </label>
           </fieldset>
         {/if}
@@ -204,15 +204,15 @@
             <legend>Audio</legend>
             <label>
               <span>Audio</span>
-              <input value={cloned.Audio??''} placeholder={arch.Compiled.Audio} on:change={e=>change('Audio', e.target.value)}/>
+              <input value={cloned.Audio??''} placeholder={arch.Compiled.Audio} on:change={e=>change('Audio', e.currentTarget.value)}/>
             </label>
             <label>
               <span>SoundSet</span>
-              <input value={cloned.SoundSet??''} placeholder={arch.Compiled.SoundSet} on:change={e=>change('SoundSet', e.target.value)}/>
+              <input value={cloned.SoundSet??''} placeholder={arch.Compiled.SoundSet} on:change={e=>change('SoundSet', e.currentTarget.value)}/>
             </label>
             <label>
               <span>SoundIndex</span>
-              <input type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', e.target.value)}/>
+              <input type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', e.currentTarget.value)}/>
             </label>
           </fieldset>
         {/if}
@@ -222,7 +222,7 @@
             <legend>Specials</legend>
             <label>
               <span>Haven</span>
-              <input type='checkbox' checked={cloned.Haven??arch.Compiled.Specials?.Haven} on:change={e=>change('Specials.Haven', e.target.checked)}/>
+              <input type='checkbox' checked={cloned.Haven??arch.Compiled.Specials?.Haven} on:change={e=>change('Specials.Haven', e.currentTarget.checked)}/>
             </label>
           </fieldset>
         {/if}
@@ -230,11 +230,11 @@
           <legend>Appearance</legend>
           <label>
             <span>Anim</span>
-            <input value={cloned.Anim??''} placeholder={arch.Compiled.Anim} on:change={e=>change('Anim', e.target.value)}/>
+            <input value={cloned.Anim??''} placeholder={arch.Compiled.Anim} on:change={e=>change('Anim', e.currentTarget.value)}/>
           </label>
           <label>
             <span>Face</span>
-            <input value={cloned.Face??''} placeholder={arch.Compiled.Face} on:change={e=>change('Face', e.target.value)}/>
+            <input value={cloned.Face??''} placeholder={arch.Compiled.Face} on:change={e=>change('Face', e.currentTarget.value)}/>
           </label>
         </fieldset>
 
@@ -242,24 +242,24 @@
           <legend>Dimensionality</legend>
           <label>
             <span>Height</span>
-            <input type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', e.target.value)}/>
+            <input type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', e.currentTarget.value)}/>
           </label>
           <label>
             <span>Width</span>
-            <input type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', e.target.value)}/>
+            <input type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', e.currentTarget.value)}/>
           </label>
           <label>
             <span>Depth</span>
-            <input type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.target.value)}/>
+            <input type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.currentTarget.value)}/>
           </label>
 
           <label>
             <span>Matter</span>
-            <input value={cloned.Matter??''} placeholder={arch.Compiled.Matter} on:change={e=>change('Matter', e.target.value)}/>
+            <input value={cloned.Matter??''} placeholder={arch.Compiled.Matter} on:change={e=>change('Matter', e.currentTarget.value)}/>
           </label>
           <label>
             <span>Blocking</span>
-            <input value={cloned.Blocking??''} placeholder={arch.Compiled.Blocking} on:change={e=>change('Blocking', e.target.value)}/>
+            <input value={cloned.Blocking??''} placeholder={arch.Compiled.Blocking} on:change={e=>change('Blocking', e.currentTarget.value)}/>
           </label>
         </fieldset>
 
@@ -270,7 +270,7 @@
               <summary>Exit</summary>
               <label>
                 <span>Trigger</span>
-                <input value={cloned.Events?.Exit?.Trigger?.Event??''} placeholder={arch.Compiled.Events?.Exit?.Trigger?.Event} on:change={e=>change('Events.Exit.Trigger.Event', e.target.value)}/>
+                <input value={cloned.Events?.Exit?.Trigger?.Event??''} placeholder={arch.Compiled.Events?.Exit?.Trigger?.Event} on:change={e=>change('Events.Exit.Trigger.Event', e.currentTarget.value)}/>
               </label>
               <!-- TODO: Spawn -->
               <!-- TODO: Replace -->

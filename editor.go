@@ -46,42 +46,6 @@ func (e *Editor) startup(ctx context.Context) {
 
 // Initialize initializes our editor, including creating user directories, loading configuration, and loading assets.
 func (e *Editor) Initialize() (err error) {
-	// Ensure our system directories are available.
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return err
-	}
-	e.ConfigDir = filepath.Join(configDir, "chimera", "editor")
-
-	err = os.MkdirAll(configDir, 0755)
-	if err != nil {
-		return err
-	}
-
-	configPath := filepath.Join(e.ConfigDir, "cfg.yml")
-
-	// Load our configuration.
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		// Create a default config file.
-		b, _ := yaml.Marshal(&e.Config)
-		if err := os.WriteFile(configPath, b, 0755); err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
-	} else {
-		b, err := os.ReadFile(configPath)
-		if err != nil {
-			return err
-		}
-		if err := yaml.Unmarshal(b, &e.Config); err != nil {
-			return err
-		}
-	}
-	e.Config.MergeDefaults()
-
-	fmt.Println(e.Config.String())
-
 	// Load our animation config.
 	if err := e.LoadAnimationsConfig(); err != nil {
 		return err

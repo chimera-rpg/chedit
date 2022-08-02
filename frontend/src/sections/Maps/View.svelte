@@ -3,7 +3,7 @@
   import { styles } from '../../stores/styles'
   import { fly, slide, scale, blur, fade } from 'svelte/transition'
 
-  import { main, data } from '../../../wailsjs/go/models'
+  import type { main, data } from '../../../wailsjs/go/models'
   import Canvas from './Canvas.svelte'
   import SplitPane from '../../components/SplitPane.svelte'
   import TilesList from './TilesList.svelte'

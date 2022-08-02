@@ -50,7 +50,7 @@
 </script>
 
 <div>
-  <textarea value={script} on:change={e=>script=e.target.value}/>
+  <textarea value={script} on:change={e=>script=e.currentTarget.value}/>
   <div class='toolbar'>
     <Menus>
       <MenuBar>

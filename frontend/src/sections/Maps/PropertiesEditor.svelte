@@ -83,15 +83,15 @@
       <section>
         <label>
           <span>Name</span>
-          <input value={changes['Name']} on:change={e=>change('Name', e.target.value)}/>
+          <input value={changes['Name']} on:change={e=>change('Name', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Description</span>
-          <textarea value={changes['Description']} on:change={e=>change('Description', e.target.value)}/>
+          <textarea value={changes['Description']} on:change={e=>change('Description', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Lore</span>
-          <textarea value={changes['Lore']} on:change={e=>change('Lore', e.target.value)}/>
+          <textarea value={changes['Lore']} on:change={e=>change('Lore', e.currentTarget.value)}/>
         </label>
       </section>
     </div>
@@ -101,15 +101,15 @@
         <section>
           <label class='small-number'>
             <span>Height</span>
-            <input type='number' disabled value={changes['Height']} on:change={e=>change('Height', e.target.value)}/>
+            <input type='number' disabled value={changes['Height']} on:change={e=>change('Height', e.currentTarget.value)}/>
           </label>
           <label class='small-number'>
             <span>Width</span>
-            <input type='number' disabled value={changes['Width']} on:change={e=>change('Width', e.target.value)}/>
+            <input type='number' disabled value={changes['Width']} on:change={e=>change('Width', e.currentTarget.value)}/>
           </label>
           <label class='small-number'>
             <span>Depth</span>
-            <input type='number' disabled value={changes['Depth']} on:change={e=>change('Depth', e.target.value)}/>
+            <input type='number' disabled value={changes['Depth']} on:change={e=>change('Depth', e.currentTarget.value)}/>
           </label>
         </section>
         <section>
@@ -153,28 +153,28 @@
           <span>Default Start</span>
           <label class='small-number'>
             <span>Y</span>
-            <input type='number' value={changes['Y']} on:change={e=>change('Y', e.target.value)}/>
+            <input type='number' value={changes['Y']} on:change={e=>change('Y', e.currentTarget.value)}/>
           </label>
           <label class='small-number'>
             <span>X</span>
-            <input type='number' value={changes['X']} on:change={e=>change('X', e.target.value)}/>
+            <input type='number' value={changes['X']} on:change={e=>change('X', e.currentTarget.value)}/>
           </label>
           <label class='small-number'>
             <span>Z</span>
-            <input type='number' value={changes['Z']} on:change={e=>change('Z', e.target.value)}/>
+            <input type='number' value={changes['Z']} on:change={e=>change('Z', e.currentTarget.value)}/>
           </label>
         </article>
         <label>
           <span>Reset Time</span>
-          <input type='number' value={changes['ResetTime']} on:change={e=>change('ResetTime', e.target.value)}/>
+          <input type='number' value={changes['ResetTime']} on:change={e=>change('ResetTime', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Haven</span>
-          <input type='checkbox' checked={changes['Haven']} on:change={e=>change('Haven', e.target.checked)}/>
+          <input type='checkbox' checked={changes['Haven']} on:change={e=>change('Haven', e.currentTarget.checked)}/>
         </label>
         <label>
           <span>Default Darkness</span>
-          <input type='number' value={changes['Darkness']} on:change={e=>change('Darkness', e.target.value)}/>
+          <input type='number' value={changes['Darkness']} on:change={e=>change('Darkness', e.currentTarget.value)}/>
         </label>
       </section>
     </div>

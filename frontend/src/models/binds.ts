@@ -1,5 +1,6 @@
 import type { Unsubscriber } from 'svelte/store'
-import { keysStore, KeysStore } from '../stores/keys'
+import { keysStore } from '../stores/keys'
+import type { KeysStore } from '../stores/keys'
 
 // This is a little cheaty, but whatever.
 let currentBind: Binds = null

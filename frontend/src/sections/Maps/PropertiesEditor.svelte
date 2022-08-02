@@ -6,7 +6,8 @@
   import MenuBar from '../../components/Menus/MenuBar.svelte'
   import MenuItem from '../../components/Menus/MenuItem.svelte'
   import { MapChangeFieldAction, MapFields, MapResizeAction } from '../../models/maps'
-  import { maps as mapsStore, MapsStoreData } from '../../stores/maps'
+  import { maps as mapsStore } from '../../stores/maps'
+  import type { MapsStoreData } from '../../stores/maps'
   import { onMount } from 'svelte'
 
   export let map: ContainerMap

@@ -2,7 +2,8 @@ import { parse } from 'yaml'
 import type { BaseMaps, Maps, ContainerMaps, Map, ContainerMap } from '../interfaces/Map'
 import type { Archetype, ArchetypeContainer } from '../interfaces/Archetype'
 import { cloneObject, compileInJS } from './archs'
-import { QueueStep, Undoable, UndoStep } from './undo'
+import { QueueStep } from './undo'
+import type { Undoable, UndoStep } from './undo'
 
 export function loadMapsFromYAML(source: string): ContainerMaps {
   let maps: ContainerMaps = {}

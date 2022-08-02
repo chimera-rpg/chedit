@@ -4,7 +4,8 @@
 
 <script lang='ts'>
   import { setContext, onDestroy } from 'svelte'
-  import { Writable, writable } from 'svelte/store'
+  import type { Writable } from 'svelte/store'
+  import { writable } from 'svelte/store'
 
   interface Popup {
     name: string;

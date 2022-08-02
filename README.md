@@ -8,10 +8,8 @@ This, of course, will not be an unfamiliar concept to any of the chimera codebas
 ## Running
 At the moment you will need go 1.18+, as there are no releases yet.
 
-Install wails v2.0.0-beta.38, as there are some problems with their Svelte/vite support with higher versions as of 2022-07-22:
-
 ```
-go install github.com/wailsapp/wails/v2/cmd/wails@v2.0.0-beta.38
+go install github.com/wailsapp/wails/v2/cmd/wails@v2.0.0-beta.42
 ```
 
 Now it can be run with:

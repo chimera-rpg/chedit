@@ -10,8 +10,10 @@
   import type { data } from "../../../wailsjs/go/models"
   import type { ContainerMap } from '../../interfaces/Map'
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
-  import { get, Writable } from "svelte/store"
-  import { maps, MapsStoreData } from "../../stores/maps"
+  import { get } from "svelte/store"
+  import type { Writable } from "svelte/store"
+  import { maps } from "../../stores/maps"
+  import type { MapsStoreData } from "../../stores/maps"
   import { keysStore } from "../../stores/keys"
   import { settingsStore } from "../../stores/settings"
 

@@ -1,4 +1,5 @@
-import { writable, get, Subscriber, Writable } from 'svelte/store'
+import { writable, get } from "svelte/store"
+import type { Subscriber, Writable } from 'svelte/store'
 
 type Colors = {[key: string]: string}
 

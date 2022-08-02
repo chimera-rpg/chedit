@@ -1,4 +1,5 @@
-import { get, writable, Writable } from "svelte/store"
+import { writable, get } from "svelte/store"
+import type { Subscriber, Writable } from 'svelte/store'
 import { LoadSettings, SaveSettings } from '../../wailsjs/go/main/Editor'
 
 export interface SettingsStore {

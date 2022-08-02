@@ -73,4 +73,7 @@
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
   }
+  textarea {
+    font-family: monospace;
+  }
 </style>

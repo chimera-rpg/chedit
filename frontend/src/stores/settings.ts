@@ -10,6 +10,9 @@ export interface SettingsStore {
   //
   showBoundingBoxes: boolean
   hideSpecials: boolean
+  //
+  width?: number
+  height?: number
 }
 
 const DefaultSettings: SettingsStore = {

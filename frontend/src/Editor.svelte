@@ -16,6 +16,8 @@
 
   import { setAnimationsConfig } from './models/config'
 
+  import { WindowGetSize } from '../wailsjs/runtime/runtime'
+
   onMount(async () =>{
     await GoEditor.Initialize()
     settingsStore.load()
@@ -37,6 +39,13 @@
     } catch(err: any) {
       console.error('animations', err)
     }
+
+    // Set up a hook for window resize storing to disk.
+    window.addEventListener('resize', async (e: Event) => {
+      let size = await WindowGetSize()
+      $settingsStore.width = size.w
+      $settingsStore.height = size.h
+    })
   })
 </script>
 

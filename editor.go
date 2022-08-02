@@ -272,3 +272,8 @@ func (e *Editor) LoadSettings() (string, error) {
 	}
 	return string(b), nil
 }
+
+type Settings struct {
+	Width  int `yaml:"width"`
+	Height int `yaml:"height"`
+}

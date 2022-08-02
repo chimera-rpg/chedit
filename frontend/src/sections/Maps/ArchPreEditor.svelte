@@ -274,7 +274,7 @@
               </label>
               <!-- TODO: Spawn -->
               <!-- TODO: Replace -->
-              <textarea value={cloned.Events?.Exit?.Script??''} placeholder={arch.Compiled.Events?.Exit?.Script}></textarea>
+              <textarea class='script' value={cloned.Events?.Exit?.Script??''} placeholder={arch.Compiled.Events?.Exit?.Script}></textarea>
             </details>
           {/if}
         </fieldset>
@@ -323,5 +323,8 @@
   }
   .archview {
     float: left;
+  }
+  textarea.script {
+    font-family: monospace;
   }
 </style>

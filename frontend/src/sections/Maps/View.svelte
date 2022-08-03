@@ -271,7 +271,12 @@
               let tile = getTile(c.y + $cursor.hover.y, c.x + $cursor.hover.x, c.z + $cursor.hover.z)
               let matches = true
               for (let tileArch of tile) {
+                // FIXME: This is broken
                 // FIXME: Do a deep comparison of the arch vs the placing one instead of just comparing archs. Also should probably have a merge or not option, so as to allow replacing the underlying arch, but keeping any uniquely changed properties.
+                if (tileArch.Original.Archs.length === 0) {
+                  matches = false
+                  break
+                }
                 if (tileArch.Original.Archs.length !== c.arch.Archs.length) {
                   matches = false
                   break

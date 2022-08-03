@@ -1,6 +1,7 @@
 import { writable, get } from "svelte/store"
 import type { Subscriber, Writable } from 'svelte/store'
 import { LoadSettings, SaveSettings } from '../../wailsjs/go/main/Editor'
+import type { WandRules } from '../interfaces/editor'
 
 export interface SettingsStore {
   showHeightNumbers: boolean
@@ -14,6 +15,8 @@ export interface SettingsStore {
   //
   width?: number
   height?: number
+  //
+  wandRules: WandRules
 }
 
 const DefaultSettings: SettingsStore = {
@@ -24,6 +27,18 @@ const DefaultSettings: SettingsStore = {
   showPlacementLines: true,
   showBoundingBoxes: true,
   hideSpecials: false,
+  wandRules: {
+    shouldMatchArchetypes: true,
+    shouldMatchName: false,
+    shouldMatchType: false,
+    matchArchetypes: '',
+    matchName: '',
+    matchType: '',
+    matchY: false,
+    matchX: true,
+    matchZ: true,
+    diagonal: false,
+  }
 }
 
 interface SettingsStoreI {

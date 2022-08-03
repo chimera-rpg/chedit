@@ -1,7 +1,7 @@
 <script lang='ts'>
   import type { WandRules, ToolType } from '../../interfaces/editor'
+  import { settingsStore } from '../../stores/settings'
 
-  export let wandRules: WandRules
   export let tool: ToolType
 </script>
 
@@ -11,34 +11,34 @@
       <legend>Match Rules</legend>
         <label>
           <span>Archetypes</span>
-          <input type='checkbox' bind:checked={wandRules.shouldMatchArchetypes}>
-          <input disabled={!wandRules.shouldMatchArchetypes} bind:value={wandRules.matchArchetypes}>
+          <input type='checkbox' bind:checked={$settingsStore.wandRules.shouldMatchArchetypes}>
+          <input disabled={!$settingsStore.wandRules.shouldMatchArchetypes} bind:value={$settingsStore.wandRules.matchArchetypes}>
         </label>
         <label>
           <span>Name</span>
-          <input type='checkbox' bind:checked={wandRules.shouldMatchName}>
-          <input disabled={!wandRules.shouldMatchName} bind:value={wandRules.matchName}>
+          <input type='checkbox' bind:checked={$settingsStore.wandRules.shouldMatchName}>
+          <input disabled={!$settingsStore.wandRules.shouldMatchName} bind:value={$settingsStore.wandRules.matchName}>
         </label>
         <label>
           <span>Type</span>
-          <input type='checkbox' bind:checked={wandRules.shouldMatchType}>
-          <input disabled={!wandRules.shouldMatchType} bind:value={wandRules.matchType}>
+          <input type='checkbox' bind:checked={$settingsStore.wandRules.shouldMatchType}>
+          <input disabled={!$settingsStore.wandRules.shouldMatchType} bind:value={$settingsStore.wandRules.matchType}>
         </label>
         <label>
           <span>Y</span>
-          <input type='checkbox' bind:checked={wandRules.matchY}>
+          <input type='checkbox' bind:checked={$settingsStore.wandRules.matchY}>
         </label>
         <label>
           <span>X</span>
-          <input type='checkbox' bind:checked={wandRules.matchX}>
+          <input type='checkbox' bind:checked={$settingsStore.wandRules.matchX}>
         </label>
         <label>
           <span>Z</span>
-          <input type='checkbox' bind:checked={wandRules.matchZ}>
+          <input type='checkbox' bind:checked={$settingsStore.wandRules.matchZ}>
         </label>
         <label>
           <span>Diagonal</span>
-          <input type='checkbox' bind:checked={wandRules.diagonal}>
+          <input type='checkbox' bind:checked={$settingsStore.wandRules.diagonal}>
         </label>
     </fieldset>
   {/if}

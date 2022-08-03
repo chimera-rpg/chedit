@@ -16,6 +16,8 @@
   import { MapInsertAction, MapRemoveAction } from '../../models/maps'
   import type { Binds } from '../../models/binds'
 
+  import { settingsStore } from '../../stores/settings'
+
   import eraserIcon from '../../assets/icons/eraser.png'
   import wandIcon from '../../assets/icons/wand.png'
   import insertIcon from '../../assets/icons/insert.png'
@@ -76,19 +78,6 @@
     selecting: [],
     placing: [],
   })
-
- let wandRules: WandRules = {
-    shouldMatchArchetypes: true,
-    shouldMatchName: false,
-    shouldMatchType: false,
-    matchArchetypes: '',
-    matchName: '',
-    matchType: '',
-    matchY: false,
-    matchX: true,
-    matchZ: true,
-    diagonal: false,
-  }
 
   let lastWheelTimestamp = 0
   function handleMapMousewheel(e: WheelEvent) {
@@ -282,25 +271,25 @@
           $cursor.selected = adjustShape($cursor.selected, getMatchingTiles(t[t.length-1], tile.map(v=>{
             let m: ArchMatcher = {}
             // TODO: if MatchArchs
-            if (wandRules.shouldMatchArchetypes) {
-              if (wandRules.matchArchetypes) {
-                m.archs = wandRules.matchArchetypes.split(',')
+            if ($settingsStore.wandRules.shouldMatchArchetypes) {
+              if ($settingsStore.wandRules.matchArchetypes) {
+                m.archs = $settingsStore.wandRules.matchArchetypes.split(',')
               } else if (v.Original.Archs.length) {
                 m.archs = v.Original.Archs
               }
             }
 
-            if (wandRules.shouldMatchName) {
-              if (wandRules.matchName) {
-                m.name = wandRules.matchName
+            if ($settingsStore.wandRules.shouldMatchName) {
+              if ($settingsStore.wandRules.matchName) {
+                m.name = $settingsStore.wandRules.matchName
               } else if (v.Compiled.Name !== undefined) {
                 m.name = v.Compiled.Name
               }
             }
 
-            if (wandRules.shouldMatchType) {
-              if (wandRules.matchType) {
-                m.type = wandRules.matchType
+            if ($settingsStore.wandRules.shouldMatchType) {
+              if ($settingsStore.wandRules.matchType) {
+                m.type = $settingsStore.wandRules.matchType
               } else if (v.Compiled.Type !== undefined) {
                 m.type = v.Compiled.Type
               }
@@ -399,35 +388,35 @@
 
       // Get neighbors.
       // Up, Down
-      if (wandRules.matchY) {
+      if ($settingsStore.wandRules.matchY) {
         getCoord(y-1, x, z)
         getCoord(y+1, x, z)
       }
       // Left, right
-      if (wandRules.matchX) {
+      if ($settingsStore.wandRules.matchX) {
         getCoord(y, x-1, z)
         getCoord(y, x+1, z)
       }
       // Top, bottom
-      if (wandRules.matchZ) {
+      if ($settingsStore.wandRules.matchZ) {
         getCoord(y, x, z-1)
         getCoord(y, x, z+1)
       }
 
-      if (wandRules.diagonal) {
-        if (wandRules.matchX && wandRules.matchY) {
+      if ($settingsStore.wandRules.diagonal) {
+        if ($settingsStore.wandRules.matchX && $settingsStore.wandRules.matchY) {
           getCoord(y-1, x-1, z)
           getCoord(y+1, x-1, z)
           getCoord(y+1, x+1, z)
           getCoord(y-1, x+1, z)
         }
-        if (wandRules.matchX && wandRules.matchZ) {
+        if ($settingsStore.wandRules.matchX && $settingsStore.wandRules.matchZ) {
           getCoord(y, x-1, z-1)
           getCoord(y, x-1, z+1)
           getCoord(y, x+1, z+1)
           getCoord(y, x+1, z-1)
         }
-        if (wandRules.matchY && wandRules.matchZ) {
+        if ($settingsStore.wandRules.matchY && $settingsStore.wandRules.matchZ) {
           getCoord(y-1, x, z-1)
           getCoord(y-1, x, z+1)
           getCoord(y+1, x, z+1)
@@ -713,7 +702,7 @@
           <img src={wandIcon} alt='wand'>
         </button>
       </article>
-      <ToolSettingsSection tool={tool} bind:wandRules={wandRules}/>
+      <ToolSettingsSection tool={tool}/>
       <ShapesSection on:copy={copyShape} on:paste={pasteShape}/>
       <ReplaceSection/>
     </section>

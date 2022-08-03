@@ -78,7 +78,25 @@ export class Binds {
     }
   }
 
+  // asCommand returns a Command object.
+  asCommand(cmd: string, keys: string[], cb: BindHandler): Command {
+    this.addBind(cmd, keys, cb)
+    return {
+      cmd,
+      keys: () => {
+        return this.getShortcuts(cmd)
+      },
+      cb,
+    }
+  }
+
   getShortcuts(cmd: string): string[] {
     return Object.entries(this.shortcuts).filter(v=>v[1]===cmd).map(v=>v[0])
   }
+}
+
+interface Command {
+  cmd: string
+  keys: () => string[]
+  cb: BindHandler
 }

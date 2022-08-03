@@ -49,27 +49,18 @@
   let viewMode: ViewMode = 'map'
 
   // Binds
-  const commands = {
-    undo: 'Undo',
-    redo: 'Redo',
-    save: 'Save',
-    swapToInsert: 'Swap to Insert',
-    swapToFill: 'Swap to Fill',
-    swapToErase: 'Swap to Erase',
-    swapToWand: 'Swap to Wand',
-    eraseSelection: 'Erase Selection',
-  }
   export let binds: Binds
-  binds.addBind(commands.save, ['Control', 'S'], () => { save() })
-  binds.addBind(commands.undo, ['Control', 'Z'], () => { undo() })
-  binds.addBind(commands.redo, ['Control', 'Y'], () => { redo() })
-  binds.addShortcut(commands.redo, ['Control', 'Shift', 'Z'])
-  binds.addBind(commands.swapToInsert, ['1'], () => { swapTool('insert') })
-  binds.addBind(commands.swapToFill, ['2'], () => { swapTool('fill') })
-  binds.addBind(commands.swapToErase, ['3'], () => { swapTool('erase') })
-  binds.addBind(commands.swapToWand, ['4'], () => { swapTool('wand') })
-  binds.addBind(commands.eraseSelection, ['Delete'], () => { erase($cursor.selected) })
-  binds.addShortcut(commands.eraseSelection, ['Backspace'])
+  const commands = {
+    undo: binds.asCommand('Undo', ['Control', 'Z'], () => { undo() }),
+    redo: binds.asCommand('Redo', ['Control', 'Shift', 'Z'], () => { redo() }),
+    save: binds.asCommand('Save', ['Control', 'S'], () => { save() }),
+    swapToInsert: binds.asCommand('Swap to Insert', ['1'], () => { swapTool('insert') }),
+    swapToFill: binds.asCommand('Swap to Fill', ['2'], () => { swapTool('fill') }),
+    swapToErase: binds.asCommand('Swap to Erase', ['3'], () => { swapTool('erase') }),
+    swapToWand: binds.asCommand('Swap to Wand', ['4'], () => { swapTool('wand') }),
+    eraseSelection: binds.asCommand('Erase Selection', ['Delete'], () => { erase($cursor.selected) }),
+  }
+  binds.addShortcut(commands.eraseSelection.cmd, ['Backspace'])
 
   //
   export let mapsContainer: MapsContainer
@@ -708,17 +699,17 @@
   <SplitPane type='horizontal' pos={20}>
     <section slot=a class='toolbar'>
       <article class='toolbar__items'>
-        <button class:-active={tool==='insert'} on:click={_=>tool='insert'} title={binds.getShortcuts(commands.swapToInsert).join(',')}>
+        <button class:-active={tool==='insert'} on:click={commands.swapToInsert.cb} title={commands.swapToInsert.keys().join(',')}>
           <img src={insertIcon} alt='insert'>
         </button>
-        <button class:-active={tool==='fill'} on:click={_=>tool='fill'} title={binds.getShortcuts(commands.swapToFill).join(',')}>
+        <button class:-active={tool==='fill'} on:click={commands.swapToFill.cb} title={commands.swapToFill.keys().join(',')}>
           <img src={fillIcon} alt='fill'>
         </button>
-        <button class:-active={tool==='erase'} on:click={_=>tool='erase'} title={binds.getShortcuts(commands.swapToErase).join(',')}>
+        <button class:-active={tool==='erase'} on:click={commands.swapToErase.cb} title={commands.swapToErase.keys().join(',')}>
           <img src={eraserIcon} alt='erase'>
         </button>
         <hr>
-        <button class:-active={tool==='wand'} on:click={_=>tool='wand'} title={binds.getShortcuts(commands.swapToWand).join(',')}>
+        <button class:-active={tool==='wand'} on:click={commands.swapToWand.cb} title={commands.swapToWand.keys().join(',')}>
           <img src={wandIcon} alt='wand'>
         </button>
       </article>
@@ -730,13 +721,13 @@
       {#if map}
         <Menus>
           <MenuBar>
-            <MenuItem on:click={_=>save()} title={binds.getShortcuts(commands.save).join(',')}>
+            <MenuItem on:click={commands.save.cb} title={commands.save.keys().join(',')}>
               <img src={saveIcon} alt='save'>
             </MenuItem>
-            <MenuItem disabled={!map.undoable} on:click={undo} title={binds.getShortcuts(commands.undo).join(',')}>
+            <MenuItem disabled={!map.undoable} on:click={commands.undo.cb} title={commands.undo.keys().join(',')}>
               <img src={undoIcon} alt='undo'>
             </MenuItem>
-            <MenuItem disabled={!map.redoable} on:click={redo} title={binds.getShortcuts(commands.redo).join(',')}>
+            <MenuItem disabled={!map.redoable} on:click={commands.redo.cb} title={commands.redo.keys().join(',')}>
               <img src={redoIcon} alt='redo'>
             </MenuItem>
             <MenuItem on:click={_=>viewMode='map'} highlighted={viewMode==='map'}>

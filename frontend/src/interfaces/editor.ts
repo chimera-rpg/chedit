@@ -53,6 +53,11 @@ export type InsertRules = WandRules & {
   replaceMode: 'replace' | 'merge'
 }
 
+export type PlacingRules = {
+  deduplicate: boolean
+  clear: boolean
+}
+
 export type ToolType = 'insert'|'erase'|'fill'|'placing'|'wand'
 
 export let ArchetypeTypes = {

@@ -295,6 +295,36 @@ export class MapRemoveAction extends MapInsertAction {
   }
 }
 
+export class MapClearAction {
+  y = 0
+  x = 0
+  z = 0
+
+  tiles: ArchetypeContainer[]
+
+  constructor({ y = 0, x = 0, z = 0 }) {
+    this.y = y
+    this.x = x
+    this.z = z
+  }
+
+  apply(c: ContainerMap): ContainerMap {
+    if (this.y < 0 || this.x < 0 || this.z < 0) return c
+    if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
+
+    this.tiles = c.Tiles[this.y][this.x][this.z]
+    c.Tiles[this.y][this.x][this.z] = []
+
+    return c
+  }
+  unapply(c: ContainerMap): ContainerMap {
+    c.Tiles[this.y][this.x][this.z] = this.tiles
+    this.tiles = []
+
+    return c
+  }
+}
+
 export class MapChangeFieldAction implements UndoStep {
   key = ""
   value: any = ""

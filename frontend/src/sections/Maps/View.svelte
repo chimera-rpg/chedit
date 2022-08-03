@@ -13,7 +13,7 @@
   import { cloneObject, compileInJS } from '../../models/archs'
   import { maps as mapsStore } from '../../stores/maps'
   import type { MapsStoreData } from '../../stores/maps'
-  import { MapInsertAction, MapRemoveAction, MapReplaceAction } from '../../models/maps'
+  import { MapClearAction, MapInsertAction, MapRemoveAction, MapReplaceAction } from '../../models/maps'
   import type { Binds } from '../../models/binds'
 
   import { settingsStore } from '../../stores/settings'
@@ -261,6 +261,33 @@
           map.queue()
           for (let c of $cursor.placing) {
             if (c.arch === undefined) continue
+            if ($settingsStore.placeRules.clear) {
+              map.apply(new MapClearAction({
+                y: c.y + $cursor.hover.y,
+                x: c.x + $cursor.hover.x,
+                z: c.z + $cursor.hover.z,
+              }))
+            } else if ($settingsStore.placeRules.deduplicate) {
+              let tile = getTile(c.y + $cursor.hover.y, c.x + $cursor.hover.x, c.z + $cursor.hover.z)
+              let matches = true
+              for (let tileArch of tile) {
+                // FIXME: Do a deep comparison of the arch vs the placing one instead of just comparing archs. Also should probably have a merge or not option, so as to allow replacing the underlying arch, but keeping any uniquely changed properties.
+                if (tileArch.Original.Archs.length !== c.arch.Archs.length) {
+                  matches = false
+                  break
+                }
+                for (let cArch of c.arch.Archs) {
+                  if (!tileArch.Original.Archs.find(v=>v===cArch)) {
+                    matches = false
+                    break
+                  }
+                }
+                if (!matches) break
+              }
+              if (matches) {
+                continue
+              }
+            }
             let compiled: Archetype
             let error: any
             try {

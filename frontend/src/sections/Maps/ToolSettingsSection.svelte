@@ -75,6 +75,15 @@
         <input type='checkbox' bind:checked={$settingsStore.wandRules.diagonal}>
       </label>
     </article>
+  {:else if tool==='placing'}
+    <label>
+      <span>Deduplicate</span>
+        <input type='checkbox' bind:checked={$settingsStore.placeRules.deduplicate}>
+    </label>
+    <label>
+      <span>Clear destinations</span>
+        <input type='checkbox' bind:checked={$settingsStore.placeRules.clear}>
+    </label>
   {/if}
 </div>
 

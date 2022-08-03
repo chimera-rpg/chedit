@@ -62,6 +62,9 @@
     swapToFill: binds.asCommand('Swap to Fill', ['2'], () => { swapTool('fill') }),
     swapToErase: binds.asCommand('Swap to Erase', ['3'], () => { swapTool('erase') }),
     swapToWand: binds.asCommand('Swap to Wand', ['4'], () => { swapTool('wand') }),
+    focusMap: binds.asCommand('Focus Map', ['Control', '1'], () => { setViewMode('map') }),
+    focusProperties: binds.asCommand('Focus Properties', ['Control', '2'], () => { setViewMode('properties') }),
+    focusScripts: binds.asCommand('Focus Scripts', ['Control', '3'], () => { setViewMode('scripts') }),
     eraseSelection: binds.asCommand('Erase Selection', ['Delete'], () => { erase($cursor.selected) }),
   }
   binds.addShortcut(commands.eraseSelection.cmd, ['Backspace'])
@@ -824,8 +827,9 @@
     tool = t
   }
 
-  let showProperties: boolean = false
-  let showScripts: boolean = false
+  function setViewMode(v: ViewMode) {
+    viewMode = v
+  }
 
   let scrolling: boolean = false
   let scrollX = 0
@@ -910,13 +914,13 @@
             <MenuItem disabled={!map.redoable} on:click={commands.redo.cb} title={commands.redo.keys().join(',')}>
               <img src={redoIcon} alt='redo'>
             </MenuItem>
-            <MenuItem on:click={_=>viewMode='map'} highlighted={viewMode==='map'}>
+            <MenuItem on:click={commands.focusMap.cb} highlighted={viewMode==='map'} title={commands.focusMap.keys().join(',')}>
               <img src={mapIcon} alt='map'>
             </MenuItem>
-            <MenuItem on:click={_=>viewMode='properties'} highlighted={viewMode==='properties'}>
+            <MenuItem on:click={commands.focusProperties.cb} highlighted={viewMode==='properties'} title={commands.focusProperties.keys().join(',')}>
               <img src={propertiesIcon} alt='properties'>
             </MenuItem>
-            <MenuItem on:click={_=>viewMode='scripts'} highlighted={viewMode==='scripts'}>
+            <MenuItem on:click={commands.focusScripts.cb} highlighted={viewMode==='scripts'} title={commands.focusScripts.keys().join(',')}>
               <img src={scriptIcon} alt='scripts'>
             </MenuItem>
           </MenuBar>

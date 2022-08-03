@@ -269,28 +269,24 @@
               }))
             } else if ($settingsStore.placeRules.deduplicate) {
               let tile = getTile(c.y + $cursor.hover.y, c.x + $cursor.hover.x, c.z + $cursor.hover.z)
-              let matches = true
-              for (let tileArch of tile) {
-                // FIXME: This is broken
-                // FIXME: Do a deep comparison of the arch vs the placing one instead of just comparing archs. Also should probably have a merge or not option, so as to allow replacing the underlying arch, but keeping any uniquely changed properties.
-                if (tileArch.Original.Archs.length === 0) {
-                  matches = false
-                  break
-                }
-                if (tileArch.Original.Archs.length !== c.arch.Archs.length) {
-                  matches = false
-                  break
-                }
-                for (let cArch of c.arch.Archs) {
-                  if (!tileArch.Original.Archs.find(v=>v===cArch)) {
-                    matches = false
+              if (tile && tile.length > 0) {
+                let matches = false
+                for (let tileArch of tile) {
+                  // FIXME: Do a deep comparison of the arch vs the placing one instead of just comparing archs. Also should probably have a merge or not option, so as to allow replacing the underlying arch, but keeping any uniquely changed properties.
+                  if (tileArch.Original.Archs.length === 0) {
+                    continue
+                  }
+                  if (tileArch.Original.Archs.length !== c.arch.Archs.length) {
+                    continue
+                  }
+                  if (c.arch.Archs.reduce((a, b) => a && tileArch.Original.Archs.includes(b), true)) {
+                    matches = true
                     break
                   }
                 }
-                if (!matches) break
-              }
-              if (matches) {
-                continue
+                if (matches) {
+                  continue
+                }
               }
             }
             let compiled: Archetype

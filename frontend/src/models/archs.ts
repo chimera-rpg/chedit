@@ -1,5 +1,6 @@
 import { get } from "svelte/store"
-import { archetypes, ArchetypesStore } from "../stores/archetypes"
+import { archetypes } from "../stores/archetypes"
+import type { ArchetypesStore } from "../stores/archetypes"
 import type { Archetype, ArchetypeContainer } from '../interfaces/Archetype'
 import merge from 'ts-deepmerge'
 import { CollectArchetypes, GetArchetypes } from "../../wailsjs/go/main/Editor"

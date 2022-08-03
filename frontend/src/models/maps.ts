@@ -224,7 +224,7 @@ export class MapReplaceAction implements UndoStep {
   z = 0
   i = 0
   replace = false
-  arch: Archetype
+  arch: ArchetypeContainer
   archName = ''
 
   constructor({ y = 0, x = 0, z = 0, i = 0, replace = true, archName }: MapActionPosition & MapActionArchetypeReplace) {
@@ -241,7 +241,7 @@ export class MapReplaceAction implements UndoStep {
     if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
     if (this.i < 0 || this.i >= c.Tiles[this.y][this.x][this.z].length) return c
 
-    this.arch = c.Tiles[this.y][this.x][this.z][this.y].Original
+    this.arch = cloneObject(c.Tiles[this.y][this.x][this.z][this.i])
     if (this.replace) {
       c.Tiles[this.y][this.x][this.z][this.i].Original = {
         Archs: [this.archName]
@@ -250,6 +250,18 @@ export class MapReplaceAction implements UndoStep {
       c.Tiles[this.y][this.x][this.z][this.i].Original.Archs = [this.archName]
     }
 
+    let compiled: Archetype
+    let error: any
+    try {
+      compiled = compileInJS(cloneObject(c.Tiles[this.y][this.x][this.z][this.i].Original), true)
+    } catch(err) {
+      compiled = cloneObject(c.Tiles[this.y][this.x][this.z][this.i].Original)
+      c.Tiles[this.y][this.x][this.z][this.i].Error = err
+    }
+    c.Tiles[this.y][this.x][this.z][this.i].Compiled = compiled
+
+    console.log("now", c.Tiles[this.y][this.x][this.z][this.i])
+
     return c
   }
   unapply(c: ContainerMap): ContainerMap {
@@ -257,7 +269,9 @@ export class MapReplaceAction implements UndoStep {
     if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
     if (this.i < 0 || this.i >= c.Tiles[this.y][this.x][this.z].length) return c
 
-    c.Tiles[this.y][this.x][this.z][this.i].Original = this.arch
+    let arch = c.Tiles[this.y][this.x][this.z][this.i]
+    c.Tiles[this.y][this.x][this.z][this.i] = this.arch
+    this.arch = arch
 
     return c
   }

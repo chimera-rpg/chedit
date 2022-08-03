@@ -13,7 +13,7 @@
   import { compileInJS } from '../../models/archs'
   import { maps as mapsStore } from '../../stores/maps'
   import type { MapsStoreData } from '../../stores/maps'
-  import { MapInsertAction, MapRemoveAction } from '../../models/maps'
+  import { MapInsertAction, MapRemoveAction, MapReplaceAction } from '../../models/maps'
   import type { Binds } from '../../models/binds'
 
   import { settingsStore } from '../../stores/settings'
@@ -30,7 +30,7 @@
   import scriptIcon from '../../assets/icons/script.png'
   import type { Writable } from 'svelte/store'
   import { writable } from 'svelte/store'
-  import type { ArchMatcher, Coordinate, CoordinateMatch, Cursor, WandRules, ToolType } from '../../interfaces/editor'
+  import type { ArchMatcher, Coordinate, CoordinateMatch, Cursor, WandRules, ToolType, ReplaceRules } from '../../interfaces/editor'
   import { blueprints } from '../../stores/blueprints'
   import Menus from '../../components/Menus/Menus.svelte'
   import MenuBar from '../../components/Menus/MenuBar.svelte'
@@ -596,6 +596,89 @@
     }))
   }
 
+  function getTile(y: number, x: number, z: number): ArchetypeContainer[]|null {
+    if (y < 0 || x < 0 || z < 0) return null
+    if (y >= map.Height || x >= map.Width || z >= map.Depth) return null
+    return map.Tiles[y][x][z]
+  }
+
+  function replaceSelection(ev: CustomEvent) {
+    let rules: ReplaceRules = ev.detail as ReplaceRules
+
+    // First collect all our coordinates.
+    let coords = $cursor.selected
+    if (rules.matchMode === 'entire') {
+      let coords2: Coordinate[] = []
+      for (let c of coords) {
+        let tile = getTile(c.y, c.x, c.z)
+        if (tile !== null) {
+          for (let i = 0; i < tile.length; i++) {
+            coords2.push({y: c.y, x: c.x, z: c.z, i})
+          }
+        }
+      }
+      coords = coords2
+    } else if (rules.matchMode === 'top') {
+      let coords2: Coordinate[] = []
+      for (let c of coords) {
+        let tile = getTile(c.y, c.x, c.z)
+        if (tile !== null || tile.length !== 0) {
+          coords2.push({y: c.y, x: c.x, z: c.z, i: tile.length-1})
+        }
+      }
+      coords = coords2
+    } else if (rules.matchMode === 'range') {
+      let coords2: Coordinate[] = []
+      for (let c of coords) {
+        let tile = getTile(c.y, c.x, c.z)
+        if (tile !== null || tile.length !== 0) {
+          for (let i = rules.range[0]; i < rules.range[1]; i++) {
+            if (i < 0 || i >= tile.length) continue
+            coords2.push({y: c.y, x: c.x, z: c.z, i})
+          }
+        }
+      }
+      coords = coords2
+    }
+
+    // Now apply our filters.
+    coords = coords.filter(c => {
+      let tile = getTile(c.y, c.x, c.z)
+      if (rules.shouldMatchArchetypes) {
+        if (!tile[c.i].Compiled.Archs?.find(v=>rules.matchArchetypes.split(',').includes(v))) {
+          return false
+        }
+      }
+      if (rules.shouldMatchName) {
+        let r = new RegExp(rules.matchName)
+        if (!r.test(tile[c.i].Compiled.Name)) {
+          return false
+        }
+      }
+      if (rules.shouldMatchType) {
+        let r = new RegExp(rules.matchType)
+        if (!r.test(tile[c.i].Compiled.Type)) {
+          return false
+        }
+      }
+      return true
+    })
+
+    map.queue()
+    for (let c of coords) {
+      map.apply(new MapReplaceAction({
+        y: c.y,
+        x: c.x,
+        z: c.z,
+        i: c.i,
+        replace: rules.replaceMode==='replace',
+        archName: $palette.focused,
+      }))
+    }
+    map.unqueue()
+    mapsStore.set($mapsStore)
+  }
+
   function trimShape(c: Coordinate[]): Coordinate[] {
     let sortX = c.sort((a, b) => {
       if (a.x < b.x) return -1
@@ -704,7 +787,7 @@
       </article>
       <ToolSettingsSection tool={tool}/>
       <ShapesSection on:copy={copyShape} on:paste={pasteShape}/>
-      <ReplaceSection/>
+      <ReplaceSection on:replace={replaceSelection} />
     </section>
     <section slot=b class='view'>
       {#if map}

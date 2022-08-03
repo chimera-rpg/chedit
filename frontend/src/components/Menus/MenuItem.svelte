@@ -11,6 +11,7 @@
   export let disabled = false
   export let noclose = false
   export let highlighted = false
+  export let title = ''
   let self: Element
 
   function click(e: MouseEvent) {
@@ -29,7 +30,7 @@
   }
 </script>
 
-<button class:disabled={disabled} class:highlighted bind:this={self} on:click={click}>
+<button class:disabled={disabled} class:highlighted bind:this={self} on:click={click} title={title}>
   <slot></slot>
 </button>
 

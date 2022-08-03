@@ -77,4 +77,8 @@ export class Binds {
       }
     }
   }
+
+  getShortcuts(cmd: string): string[] {
+    return Object.entries(this.shortcuts).filter(v=>v[1]===cmd).map(v=>v[0])
+  }
 }

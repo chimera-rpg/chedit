@@ -434,7 +434,8 @@
 
   function applyTool(t: TraversedTile) {
     if (tool === 'insert') {
-      insertArchetype($palette.focused, t.y, t.x, t.z, t.i)
+      insert($palette.focused, t.y, t.x, t.z, t.i)
+      mapsStore.set($mapsStore)
     } else if (tool === 'fill') {
       map.queue()
       if ($cursor.selected.length <= 1) {
@@ -552,6 +553,51 @@
   function insert(arch: string, y: number, x: number, z: number, p: number) {
     if (y < 0 || x < 0 || z < 0) return
     if (y >= map.Height || x >= map.Width || z >= map.Depth) return
+
+    if ($settingsStore.insertRules.checkForReplace) {
+      let rules = $settingsStore.insertRules
+      let tile = getTile(y, x, z)
+      if (tile.length > 0) {
+        let checks = 0
+        let fails = 0
+        if (rules.shouldMatchArchetypes) {
+          checks++
+          if (!tile[tile.length-1].Compiled.Archs?.find(v=>rules.matchArchetypes.split(',').includes(v))) {
+            fails++
+          }
+        }
+        if (rules.shouldMatchName) {
+          checks++
+          let r = new RegExp(rules.matchName)
+          if (!r.test(tile[tile.length-1].Compiled.Name)) {
+            fails++
+          }
+        }
+        if (rules.shouldMatchType) {
+          checks++
+          let r = new RegExp(rules.matchType)
+          if (!r.test(tile[tile.length-1].Compiled.Type)) {
+            fails++
+          }
+        }
+        
+        if (checks !== 0 && fails === 0) {
+          map.apply(new MapReplaceAction({
+            y: y,
+            x: x,
+            z: z,
+            i: tile.length-1,
+            replace: rules.replaceMode==='replace',
+            archName: $palette.focused,
+          }))
+          return
+        } else if (!rules.insertOnNoMatch && checks > 0 && fails > 0) {
+          return
+        }
+      } else if (!rules.insertOnNoMatch) {
+        return
+      }
+    }
     map.apply(new MapInsertAction({
       arch: {
         Original: { Archs: [arch] },
@@ -780,14 +826,19 @@
         <button class:-active={tool==='erase'} on:click={commands.swapToErase.cb} title={commands.swapToErase.keys().join(',')}>
           <img src={eraserIcon} alt='erase'>
         </button>
-        <hr>
         <button class:-active={tool==='wand'} on:click={commands.swapToWand.cb} title={commands.swapToWand.keys().join(',')}>
           <img src={wandIcon} alt='wand'>
         </button>
       </article>
-      <ToolSettingsSection tool={tool}/>
-      <ShapesSection on:copy={copyShape} on:paste={pasteShape}/>
-      <ReplaceSection on:replace={replaceSelection} />
+      <fieldset>
+        <legend>Tool</legend>
+        <ToolSettingsSection tool={tool}/>
+      </fieldset>
+      <fieldset>
+        <legend>Selection</legend>
+        <ShapesSection on:copy={copyShape} on:paste={pasteShape}/>
+        <ReplaceSection on:replace={replaceSelection} />
+      </fieldset>
     </section>
     <section slot=b class='view'>
       {#if map}
@@ -877,8 +928,8 @@
     overflow: auto;
   }
   .toolbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
   }
   .toolbar button {
     min-width: 2em;

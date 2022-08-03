@@ -44,4 +44,42 @@ export type ReplaceRules = WandRules & {
   replaceMode: 'replace' | 'merge'
 }
 
+export type InsertRules = WandRules & {
+  checkForReplace: boolean
+  insertOnNoMatch: boolean
+  replaceMode: 'replace' | 'merge'
+}
+
 export type ToolType = 'insert'|'erase'|'fill'|'placing'|'wand'
+
+export let ArchetypeTypes = {
+  "Building": [
+    "Tile",
+    "Block",
+    "Flora",
+    "Exit",
+    "Audio",
+  ],
+  "Items": [
+    "Item",
+    "Armor",
+    "Shield",
+    "Weapon",
+    "Food",
+  ],
+  "Characters": [
+    "PC",
+    "NPC",
+  ],
+  "System": [
+    "Special",
+    "Skill",
+    "Bullet",
+    "Genus",
+    "Species",
+    "Faction",
+  ],
+  "Other": [
+    "Generic",
+  ],
+}

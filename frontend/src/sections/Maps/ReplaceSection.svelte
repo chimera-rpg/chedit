@@ -15,7 +15,7 @@
 
 <div>
   <fieldset class='match_rules'>
-    <legend>Matching</legend>
+    <legend>Match Rules</legend>
     <label>
       <span>Entire Selection</span>
       <input type='radio' name='match_select' bind:group={$settingsStore.replaceRules.matchMode} value='entire'>
@@ -28,7 +28,7 @@
       <span>Within Range</span>
       <input type='radio' name='match_select' bind:group={$settingsStore.replaceRules.matchMode} value='range'>
     </label>
-    <label>
+    <label class='range'>
       <span>Range</span>
       <input type='number' bind:value={$settingsStore.replaceRules.range[0]} disabled={$settingsStore.replaceRules.matchMode!=='range'}/>
       <input type='number' bind:value={$settingsStore.replaceRules.range[1]} disabled={$settingsStore.replaceRules.matchMode!=='range'}/>
@@ -50,7 +50,7 @@
     </label>
   </fieldset>
   <fieldset class='match_rules'>
-    <legend>Replacing</legend>
+    <legend>Replace Mode</legend>
     <label>
       <span>Replace</span>
       <input type='radio' name='replace_select' bind:group={$settingsStore.replaceRules.replaceMode} value='replace'>
@@ -66,8 +66,28 @@
 </div>
 
 <style>
+  div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    font-size: 75%;
+    background: var(--section);
+    color: var(--section-color);
+  }
   .match_rules {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+  }
+  fieldset {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: auto;
+  }
+  label {
+    display: grid;
+    grid-template-columns: 8em auto minmax(0, 1fr);
+  }
+  label.range {
+    grid-template-columns: 8em 4em 4em;
   }
 </style>

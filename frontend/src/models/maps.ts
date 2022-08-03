@@ -121,6 +121,10 @@ export function makeMap(): ContainerMap {
       if (!m.queued) {
         throw 'not queued!'
       }
+      if (m.queueStack.steps.length === 0) {
+        m.queueStack = null
+        return m.queued = false
+      }
       m.stack = [...m.stack.slice(0, m.stackPos), m.queueStack]
       m.stackPos++
       m.undoable = m.stackPos >= 1 && m.stack.length > 0

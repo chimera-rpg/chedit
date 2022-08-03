@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { ContainerMap } from '../../interfaces/Map'
-  import type { Cursor } from '../../interfaces/editor'
+  import { ArchetypeTypes, type Cursor } from '../../interfaces/editor'
   import type { Writable } from 'svelte/store'
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import ArchView from '../ArchView.svelte'
@@ -69,38 +69,6 @@
     'Events',
   ]
 
-  let archetypeTypes = {
-    "Building": [
-      "Tile",
-      "Block",
-      "Flora",
-      "Exit",
-      "Audio",
-    ],
-    "Items": [
-      "Item",
-      "Armor",
-      "Shield",
-      "Weapon",
-      "Food",
-    ],
-    "Characters": [
-      "PC",
-      "NPC",
-    ],
-    "System": [
-      "Special",
-      "Skill",
-      "Bullet",
-      "Genus",
-      "Species",
-      "Faction",
-    ],
-    "Other": [
-      "Generic",
-    ],
-  }
-
   export let arch: ArchetypeContainer
 
   $: cloned = cloneObject(arch?.Original??{})
@@ -147,7 +115,7 @@
           <span>Type</span>
           <select name="Type" value={cloned.Type??arch.Compiled.Type} on:change={e=>change('Type', e.currentTarget.value)}>
             <option value="">Unknown</option>
-            {#each Object.entries(archetypeTypes) as [k, g]}
+            {#each Object.entries(ArchetypeTypes) as [k, g]}
               <optgroup label={k}>
               {#each g as t}
                 <option value={t}>{t}</option>

@@ -1,7 +1,7 @@
 import { writable, get } from "svelte/store"
 import type { Subscriber, Writable } from 'svelte/store'
 import { LoadSettings, SaveSettings } from '../../wailsjs/go/main/Editor'
-import type { WandRules, ReplaceRules } from '../interfaces/editor'
+import type { WandRules, ReplaceRules, InsertRules } from '../interfaces/editor'
 
 export interface SettingsStore {
   showHeightNumbers: boolean
@@ -18,6 +18,7 @@ export interface SettingsStore {
   //
   wandRules: WandRules
   replaceRules: ReplaceRules
+  insertRules: InsertRules
 }
 
 const DefaultSettings: SettingsStore = {
@@ -50,6 +51,17 @@ const DefaultSettings: SettingsStore = {
     matchMode: 'entire',
     replaceMode: 'replace',
     range: [0,0],
+  },
+  insertRules: {
+    checkForReplace: true,
+    insertOnNoMatch: true,
+    replaceMode: 'replace',
+    shouldMatchArchetypes: false,
+    shouldMatchName: false,
+    shouldMatchType: true,
+    matchArchetypes: '',
+    matchName: '',
+    matchType: '',
   }
 }
 

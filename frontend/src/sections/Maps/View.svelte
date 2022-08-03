@@ -893,7 +893,7 @@
       </fieldset>
       <fieldset>
         <legend>Selection</legend>
-        <ShapesSection on:copy={copyShape} on:paste={pasteShape}/>
+        <ShapesSection on:copyShape={copyShape} on:pasteShape={pasteShape} on:copySelection={copySelection} on:pasteSelection={pasteSelection}/>
         <ReplaceSection on:replace={replaceSelection} />
       </fieldset>
     </section>

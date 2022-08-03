@@ -5,10 +5,29 @@
 </script>
 
 <div>
-  <button on:click={_=>dispatch('copy')}>
-    copy shape
-  </button>
-  <button on:click={_=>dispatch('paste')}>
-    paste shape
-  </button>
+  <section>
+    <span>Shape</span>
+    <button on:click={_=>dispatch('copyShape')}>
+      copy
+    </button>
+    <button on:click={_=>dispatch('pasteShape')}>
+      paste
+    </button>
+  </section>
+  <section>
+    <span>Selection</span>
+    <button on:click={_=>dispatch('copySelection')}>
+      copy
+    </button>
+    <button on:click={_=>dispatch('pasteSelection')}>
+      paste
+    </button>
+  </section>
 </div>
+
+<style>
+  section {
+    display: grid;
+    grid-template-columns: 6em auto auto;
+  }
+</style>

@@ -10,21 +10,23 @@ export const keysStore: Writable<KeysStore> = writable({
 })
 
 window.addEventListener('keydown', (e: KeyboardEvent) => {
-  if (e.key === 'Alt') {
+  let key = e.key.toLowerCase()
+  if (key === 'alt') {
     e.preventDefault()
   }
   keysStore.update(v => {
-    v.held[e.key] = true
+    v.held[key] = true
     return v
   })
 })
 
 window.addEventListener('keyup', (e: KeyboardEvent) => {
-  if (e.key === 'Alt') {
+  let key = e.key.toLowerCase()
+  if (key === 'alt') {
     e.preventDefault()
   }
   keysStore.update(v => {
-    delete v.held[e.key]
+    delete v.held[key]
     return v
   })
 })

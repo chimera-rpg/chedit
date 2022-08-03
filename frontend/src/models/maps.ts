@@ -260,8 +260,6 @@ export class MapReplaceAction implements UndoStep {
     }
     c.Tiles[this.y][this.x][this.z][this.i].Compiled = compiled
 
-    console.log("now", c.Tiles[this.y][this.x][this.z][this.i])
-
     return c
   }
   unapply(c: ContainerMap): ContainerMap {

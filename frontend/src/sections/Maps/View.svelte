@@ -50,26 +50,14 @@
 
   // Binds
   export let binds: Binds
-  binds.addHandler('Undo', () => {
-    undo()
-  })
-  binds.addHandler('Redo', () => {
-    redo()
-  })
-  binds.addHandler('Swap to Insert', () => { swapTool('insert')})
-  binds.addHandler('Swap to Erase', () => { swapTool('erase')})
-  binds.addHandler('Swap to Fill', () => { swapTool('fill')})
-  binds.addHandler('Swap to Wand', () => { swapTool('wand')})
-  binds.addHandler('Erase Selection', () => { erase($cursor.selected) })
-
-  binds.addShortcut('Undo', ['Control', 'Z'])
+  binds.addBind('Undo', ['Control', 'Z'], () => { undo() })
+  binds.addBind('Redo', ['Control', 'Y'], () => { redo() })
   binds.addShortcut('Redo', ['Control', 'Shift', 'Z'])
-  binds.addShortcut('Redo', ['Control', 'Y'])
-  binds.addShortcut('Swap to Insert', ['1'])
-  binds.addShortcut('Swap to Fill', ['2'])
-  binds.addShortcut('Swap to Erase', ['3'])
-  binds.addShortcut('Swap to Wand', ['4'])
-  binds.addShortcut('Erase Selection', ['Delete'])
+  binds.addBind('Swap to Insert', ['1'], () => { swapTool('insert') })
+  binds.addBind('Swap to Fill', ['2'], () => { swapTool('fill') })
+  binds.addBind('Swap to Erase', ['3'], () => { swapTool('erase') })
+  binds.addBind('Swap to Wand', ['4'], () => { swapTool('wand') })
+  binds.addBind('Erase Selection', ['Delete'], () => { erase($cursor.selected) })
   binds.addShortcut('Erase Selection', ['Backspace'])
 
   //

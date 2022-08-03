@@ -63,4 +63,18 @@ export class Binds {
     keys = keys.map(v=>v.toLowerCase()).sort()
     delete this.shortcuts[keys.join('+')]
   }
+
+  addBind(cmd: string, keys: string[], cb: BindHandler) {
+    this.addHandler(cmd, cb)
+    this.addShortcut(cmd, keys)
+  }
+
+  trigger(cmd: string) {
+    let command = this.commands[cmd]
+    if (command) {
+      for (let cb of command) {
+        cb()
+      }
+    }
+  }
 }

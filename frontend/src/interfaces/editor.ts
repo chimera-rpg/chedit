@@ -1,8 +1,11 @@
+import type { Archetype } from "./Archetype"
+
 export type Coordinate = {
   x: number
   y: number
   z: number
   i: number
+  arch?: Archetype
 }
 
 export type CoordinateMatch = Coordinate & {

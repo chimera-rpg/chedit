@@ -1,11 +1,11 @@
-import type { Coordinate } from "src/interfaces/editor"
+import type { Coordinate, CoordinateArch } from "src/interfaces/editor"
 import { writable } from "svelte/store"
 import type { Writable } from 'svelte/store'
 
 
 export interface BlueprintsStore {
-  shapes: Coordinate[][]
-  shape: Coordinate[]
+  shapes: (Coordinate|CoordinateArch)[][]
+  shape: (Coordinate|CoordinateArch)[]
 }
 
 export const blueprints: Writable<BlueprintsStore> = writable({

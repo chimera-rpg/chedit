@@ -9,8 +9,8 @@
   import TilesList from './TilesList.svelte'
   import type { MapsContainer, ContainerMap, ContainerMaps } from '../../interfaces/Map'
   import { palette } from '../../stores/palette'
-  import type { ArchetypeContainer } from '../../interfaces/Archetype'
-  import { compileInJS } from '../../models/archs'
+  import type { Archetype, ArchetypeContainer } from '../../interfaces/Archetype'
+  import { cloneObject, compileInJS } from '../../models/archs'
   import { maps as mapsStore } from '../../stores/maps'
   import type { MapsStoreData } from '../../stores/maps'
   import { MapInsertAction, MapRemoveAction, MapReplaceAction } from '../../models/maps'
@@ -56,6 +56,8 @@
     undo: binds.asCommand('Undo', ['Control', 'Z'], () => { undo() }),
     redo: binds.asCommand('Redo', ['Control', 'Shift', 'Z'], () => { redo() }),
     save: binds.asCommand('Save', ['Control', 'S'], () => { save() }),
+    copy: binds.asCommand('Copy', ['Control', 'C'], () => { copySelection() }),
+    paste: binds.asCommand('Paste', ['Control', 'V'], () => { pasteSelection() }),
     swapToInsert: binds.asCommand('Swap to Insert', ['1'], () => { swapTool('insert') }),
     swapToFill: binds.asCommand('Swap to Fill', ['2'], () => { swapTool('fill') }),
     swapToErase: binds.asCommand('Swap to Erase', ['3'], () => { swapTool('erase') }),
@@ -252,12 +254,41 @@
         $cursor.start.x = $cursor.hover.x
         $cursor.start.z = $cursor.hover.z
 
-        $cursor.selected = adjustShape($cursor.selected, $cursor.placing.map(v=>({
-          y: v.y + $cursor.hover.y,
-          x: v.x + $cursor.hover.x,
-          z: v.z + $cursor.hover.z,
-          i: v.i + $cursor.hover.i,
-        })), { alt: e.altKey, shift: e.shiftKey, ctrl: e.ctrlKey, meta: e.metaKey })
+        if ($cursor.placing.length > 0 && $cursor.placing[0].arch !== undefined) {
+          map.queue()
+          for (let c of $cursor.placing) {
+            if (c.arch === undefined) continue
+            let compiled: Archetype
+            let error: any
+            try {
+              compiled = compileInJS(cloneObject(c.arch), true)
+            } catch(err) {
+              compiled = cloneObject(c.arch)
+              error = err
+            }
+
+            map.apply(new MapInsertAction({
+              arch: {
+                Original: cloneObject(c.arch),
+                Compiled: compiled,
+                Error: error,
+              },
+              y: c.y + $cursor.hover.y,
+              x: c.x + $cursor.hover.x,
+              z: c.z + $cursor.hover.z,
+              i: c.i,
+            }))
+          }
+          map.unqueue()
+          mapsStore.set($mapsStore)
+        } else {
+          $cursor.selected = adjustShape($cursor.selected, $cursor.placing.map(v=>({
+            y: v.y + $cursor.hover.y,
+            x: v.x + $cursor.hover.x,
+            z: v.z + $cursor.hover.z,
+            i: v.i + $cursor.hover.i,
+          })), { alt: e.altKey, shift: e.shiftKey, ctrl: e.ctrlKey, meta: e.metaKey })
+        }
         $cursor.placing = []
         swapTool(lastTool)
       } else if (tool === 'wand') {
@@ -745,10 +776,10 @@
     let minY = sortY[0]?.y || 0
     let minZ = sortZ[0]?.z || 0
     return c.map(v=>({
+      ...v,
       y: v.y - minY,
       x: v.x - minX,
       z: v.z - minZ,
-      i: v.i,
     }))
   }
 
@@ -760,6 +791,32 @@
       $cursor.placing = $blueprints.shape
       swapTool('placing')
     }
+  }
+
+  function copySelection() {
+    $blueprints.shape = trimShape(getShapeArchs($cursor.selected))
+  }
+  function pasteSelection() {
+    if ($blueprints.shape.length > 0) {
+      $cursor.placing = $blueprints.shape
+      swapTool('placing')
+    }
+  }
+
+  function getShapeArchs(shape: Coordinate[]): Coordinate[] {
+    let coords: Coordinate[] = []
+    for (let c of shape) {
+      let tile = getTile(c.y, c.x, c.z)
+      for (let i = 0; i < tile.length; i++) {
+        if (coords.find(v=>v.x===c.x&&v.y===c.y&&v.z===c.z&&v.i===c.i)) continue
+        coords.push({
+          ...c,
+          i,
+          arch: cloneObject(tile[i].Original),
+        })
+      }
+    }
+    return coords
   }
 
   function swapTool(t: ToolType) {

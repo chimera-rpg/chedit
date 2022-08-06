@@ -66,6 +66,9 @@
     focusProperties: binds.asCommand('Focus Properties', ['Control', '2'], () => { setViewMode('properties') }),
     focusScripts: binds.asCommand('Focus Scripts', ['Control', '3'], () => { setViewMode('scripts') }),
     eraseSelection: binds.asCommand('Erase Selection', ['Delete'], () => { erase($cursor.selected) }),
+    openGoModeY: binds.asCommand('Go Mode Y', ['y'], () => { openGoMode('Y') }),
+    openGoModeX: binds.asCommand('Go Mode X', ['x'], () => { openGoMode('X') }),
+    openGoModeZ: binds.asCommand('Go Mode Z', ['z'], () => { openGoMode('Z') }),
   }
   binds.addShortcut(commands.eraseSelection.cmd, ['Backspace'])
 
@@ -859,6 +862,41 @@
     viewMode = v
   }
 
+  let goModeOpen: boolean = false
+  let goModeWhich: 'Y' | 'X' | 'Z' = 'Y'
+  let goModeValue: number
+  function openGoMode(which: 'Y'|'X'|'Z') {
+    binds.deactivate()
+    goModeOpen = true
+    goModeValue = undefined
+    goModeWhich = which
+  }
+  function closeGoMode(apply=false) {
+    if (apply === true) {
+      if (goModeWhich === 'Y') {
+        $cursor.hover.y = Math.max(0, Math.min(goModeValue, map.Height-1))
+      }
+      if (goModeWhich === 'X') {
+        $cursor.hover.x = Math.max(0, Math.min(goModeValue, map.Width-1))
+      }
+      if (goModeWhich === 'Z') {
+        $cursor.hover.z = Math.max(0, Math.min(goModeValue, map.Depth-1))
+      }
+    }
+    goModeOpen = false
+    binds.activate()
+  }
+  function onGoModeChange(e: InputEvent) {
+    closeGoMode(true)
+  }
+  function onGoModeKeyup(e: KeyboardEvent) {
+    if (e.key == 'Enter' || e.key === ' ') {
+      closeGoMode(true)
+    } else if (e.key == 'Escape') {
+      closeGoMode()
+    }
+  }
+
   let scrolling: boolean = false
   let scrollX = 0
   let scrollY = 0
@@ -957,6 +995,14 @@
           <SplitPane type='horizontal' pos={80}>
             <article slot=a bind:this={mapEl} class='map__container' on:mousemove={handleMapMousemove} on:wheel={handleMapMousewheel} on:mousedown={handleMapMousedown} on:contextmenu|stopPropagation|preventDefault={_=>{}} use:dragScroll={updateScroll}>
               <Canvas cursor={cursor} map={map} zoom={zoom}></Canvas>
+              {#if goModeOpen}
+                <div class='go-mode'>
+                  <label>
+                    <span>{goModeWhich}</span>
+                    <input type='number' autofocus={true} placeholder={goModeWhich==='Y'?($cursor.start.y):goModeWhich==='X'?($cursor.start.x):($cursor.start.z)} bind:value={goModeValue} on:change={onGoModeChange} on:keyup={onGoModeKeyup} on:blur={closeGoMode}>
+                  </label>
+                </div>
+              {/if}
             </article>
             <aside slot=b class='archlist'>
               <SplitPane type='vertical' pos={50}>
@@ -1085,5 +1131,10 @@
   }
   .hover__text {
     color: var(--hoverBorder);
+  }
+  .go-mode {
+    display: absolute;
+    position: 0;
+    top: 0;
   }
 </style>

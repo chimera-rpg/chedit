@@ -325,7 +325,12 @@
                 {#if cloned.Blocking}
                   {#each cloned.Blocking as b, index}
                     <ItemListItem id={index}>
-                      <input placeholder={b} on:change={e=>change('Blocking.'+index, e.currentTarget.value)}>
+                      <select name="Blocking" value={b} on:change={e=>change('Blocking.'+index, e.currentTarget.value)}>
+                        <option value="">Undefined</option>
+                        {#each MatterTypes as t}
+                          <option value={t}>{t}</option>
+                        {/each}
+                      </select>
                       <button on:click={_=>removeBlocking(index)}>x</button>
                     </ItemListItem>
                   {/each}

@@ -594,6 +594,7 @@
         if (m) {
           m.undo()
         }
+        focusedArchetypeContainer = m.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
       }
       return v
     }))
@@ -607,6 +608,7 @@
         if (m) {
           m.redo()
         }
+        focusedArchetypeContainer = m.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
       }
       return v
     }))

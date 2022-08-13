@@ -226,7 +226,7 @@
   }
 
   function handleMapMousedown(e: MouseEvent) {
-    if (e.button === 0) {
+    if (e.buttons === 1) {
       $cursor.start.y = $cursor.hover.y
       $cursor.start.x = $cursor.hover.x
       $cursor.start.z = $cursor.hover.z
@@ -253,7 +253,7 @@
         $cursor.end.x = x
         $cursor.end.z = z
       })
-    } else if (e.button === 2) {
+    } else if (e.buttons === 2) {
       e.preventDefault()
       e.stopPropagation()
 

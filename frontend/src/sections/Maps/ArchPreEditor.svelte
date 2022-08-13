@@ -1,6 +1,6 @@
 <script lang='ts'>
   import type { ContainerMap } from '../../interfaces/Map'
-  import { ArchetypeTypes, type Cursor } from '../../interfaces/editor'
+  import { ArchetypeTypes, MatterTypes, type Cursor } from '../../interfaces/editor'
   import type { Writable } from 'svelte/store'
   import type { ArchetypeContainer } from '../../interfaces/Archetype'
   import ArchView from '../ArchView.svelte'
@@ -11,6 +11,8 @@
   import Menus from '../../components/Menus/Menus.svelte'
   import MenuBar from '../../components/Menus/MenuBar.svelte'
   import MenuItem from '../../components/Menus/MenuItem.svelte'
+  import ItemList from '../../components/ItemList/ItemList.svelte'
+  import ItemListItem from '../../components/ItemList/ItemListItem.svelte'
 
   let fields = [
     'Archs',
@@ -84,6 +86,35 @@
   }
   function apply() {
   }
+
+  function addArch() {
+    cloned.Archs = [...cloned.Archs, '']
+    cloned = {...cloned}
+  }
+  function removeArch(index: number) {
+    cloned.Archs.splice(index, 1)
+    cloned = {...cloned}
+  }
+  function addMatter() {
+    if (!cloned.Matter) cloned.Matter = []
+    cloned.Matter = [...cloned.Matter, '']
+    cloned = {...cloned}
+  }
+  function removeMatter(index: number) {
+    cloned.Matter.splice(index, 1)
+    if (cloned.Matter.length === 0) delete cloned.Matter
+    cloned = {...cloned}
+  }
+  function addBlocking() {
+    if (!cloned.Blocking) cloned.Blocking = []
+    cloned.Blocking = [...cloned.Blocking, '']
+    cloned = {...cloned}
+  }
+  function removeBlocking(index: number) {
+    cloned.Blocking.splice(index, 1)
+    if (cloned.Blocking.length === 0) delete cloned.Blocking
+    cloned = {...cloned}
+  }
 </script>
 
 <div>
@@ -98,11 +129,22 @@
   <section>
     {#if arch}
       <article>
-        <label>
+        <div class='entry__archs'>
           <span>Archs</span>
-          <input value={cloned.Archs??''} placeholder={arch.Compiled.Archs} on:change={e=>change('Type', e.currentTarget.value)}/>
-        </label>
-
+          <ItemList>
+            <svelte:fragment slot='header'>
+              <button on:click={addArch}> + </button>
+            </svelte:fragment>
+            <svelte:fragment slot='items'>
+              {#each cloned.Archs as a, index}
+                <ItemListItem id={index}>
+                  <input placeholder={a} on:change={e=>change('Archs.'+index, e.currentTarget.value)}>
+                  <button on:click={_=>removeArch(index)}>x</button>
+                </ItemListItem>
+              {/each}
+            </svelte:fragment>
+          </ItemList>
+        </div>
         <label>
           <span>Name</span>
           <input value={cloned.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.currentTarget.value)}/>
@@ -221,14 +263,49 @@
             <input type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.currentTarget.value)}/>
           </label>
 
-          <label>
+          <div class='entry__matter'>
             <span>Matter</span>
-            <input value={cloned.Matter??''} placeholder={arch.Compiled.Matter} on:change={e=>change('Matter', e.currentTarget.value)}/>
-          </label>
-          <label>
+            <ItemList>
+              <svelte:fragment slot='header'>
+                <button on:click={addMatter}> + </button>
+              </svelte:fragment>
+              <svelte:fragment slot='items'>
+                {#if cloned.Matter}
+                  {#each cloned.Matter as m, index}
+                    <ItemListItem id={index}>
+                      <select name="Matter" value={m} on:change={e=>change('Matter.'+index, e.currentTarget.value)}>
+                        <option value="">Undefined</option>
+                        {#each MatterTypes as t}
+                          <option value={t}>{t}</option>
+                        {/each}
+                      </select>
+                      <button on:click={_=>removeMatter(index)}>x</button>
+                    </ItemListItem>
+                  {/each}
+                {/if}
+              </svelte:fragment>
+            </ItemList>
+          </div>
+
+          <div class='entry__blocking'>
             <span>Blocking</span>
-            <input value={cloned.Blocking??''} placeholder={arch.Compiled.Blocking} on:change={e=>change('Blocking', e.currentTarget.value)}/>
-          </label>
+            <ItemList>
+              <svelte:fragment slot='header'>
+                <button on:click={addBlocking}> + </button>
+              </svelte:fragment>
+              <svelte:fragment slot='items'>
+                {#if cloned.Blocking}
+                  {#each cloned.Blocking as b, index}
+                    <ItemListItem id={index}>
+                      <input placeholder={b} on:change={e=>change('Blocking.'+index, e.currentTarget.value)}>
+                      <button on:click={_=>removeBlocking(index)}>x</button>
+                    </ItemListItem>
+                  {/each}
+                {/if}
+              </svelte:fragment>
+            </ItemList>
+          </div>
+
         </fieldset>
 
         <fieldset>
@@ -294,5 +371,9 @@
   }
   textarea.script {
     font-family: monospace;
+  }
+  .entry__archs, .entry__matter, .entry__blocking {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 </style>

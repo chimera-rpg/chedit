@@ -381,17 +381,33 @@
       ctx.globalAlpha = 1
     }
 
-    // Draw hover.
+    // Draw hover cursor.
     {
-      let [x, y, zIndex] = getCoordinatePosition($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
-      ctx.strokeStyle = $styles.colors.hoverBorder
+      let hY = $settingsStore.cursorRules.height / 2
+      let hX = $settingsStore.cursorRules.width / 2
+      let hZ = $settingsStore.cursorRules.depth / 2
 
-      drawVerticalBoxLines($cursor.hover.y, $cursor.hover.x, $cursor.hover.z, $cursor.hover.y-1)
+      let startY = $cursor.hover.y - Math.floor(hY)
+      let startX = $cursor.hover.x - Math.floor(hX)
+      let startZ = $cursor.hover.z - Math.floor(hZ)
+      let endY = $cursor.hover.y + Math.round(hY)
+      let endX = $cursor.hover.x + Math.round(hX)
+      let endZ = $cursor.hover.z + Math.round(hZ)
+      for (let y = startY; y < endY; y++) {
+        for (let x = startX; x < endX; x++) {
+          for (let z = startZ; z < endZ; z++) {
+            let [px, py, zIndex] = getCoordinatePosition(y, x, z)
+            ctx.strokeStyle = $styles.colors.hoverBorder
 
-      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+            drawVerticalBoxLines(y, x, z, y-1)
 
-      ;[x, y] = getCoordinatePosition($cursor.hover.y-1, $cursor.hover.x, $cursor.hover.z)
-      ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+            ctx.strokeRect(px*zoom, py*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+
+            ;[px, py] = getCoordinatePosition(y-1, x, z)
+            ctx.strokeRect(px*zoom, py*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+          }
+        }
+      }
     }
     ctx.globalAlpha = 0.5
     drawLineHelpers(getOpenPositionBelow($cursor.hover.y, $cursor.hover.x, $cursor.hover.z), $cursor.hover.x, $cursor.hover.z)

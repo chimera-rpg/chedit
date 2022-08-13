@@ -27,6 +27,12 @@ export type ArchMatcher = {
   type?: string
 }
 
+export type CursorRules = {
+  height: number
+  width: number
+  depth: number
+}
+
 export type WandRules = {
   shouldMatchArchetypes: boolean
   shouldMatchName: boolean

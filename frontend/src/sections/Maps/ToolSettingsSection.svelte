@@ -6,6 +6,25 @@
 </script>
 
 <div>
+  {#if tool==='insert'||tool==='erase'}
+    <fieldset class='cursor_rules'>
+      <legend>Cursor</legend>
+      <article>
+        <label>
+          <span>H</span>
+          <input type='number' bind:value={$settingsStore.cursorRules.height}>
+        </label>
+        <label>
+          <span>W</span>
+          <input type='number' bind:value={$settingsStore.cursorRules.width}>
+        </label>
+        <label>
+          <span>D</span>
+          <input type='number' bind:value={$settingsStore.cursorRules.depth}>
+        </label>
+      </article>
+    </fieldset>
+  {/if}
   {#if tool==='insert'||tool==='fill'}
     <label>
       <span>Attempt Replace</span>
@@ -107,5 +126,13 @@
   article label {
     display: grid;
     grid-template-columns: auto auto minmax(0, 1fr);
+  }
+  .cursor_rules label {
+    display: grid;
+    grid-template-columns: 1em minmax(0, 1fr);
+  }
+  .cursor_rules article {
+    display: grid;
+    grid-template-columns: auto auto auto;
   }
 </style>

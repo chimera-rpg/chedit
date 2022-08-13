@@ -1,7 +1,7 @@
 import { writable, get } from "svelte/store"
 import type { Subscriber, Writable } from 'svelte/store'
 import { LoadSettings, SaveSettings } from '../../wailsjs/go/main/Editor'
-import type { WandRules, ReplaceRules, InsertRules, PlacingRules } from '../interfaces/editor'
+import type { WandRules, ReplaceRules, InsertRules, PlacingRules, CursorRules } from '../interfaces/editor'
 
 export interface SettingsStore {
   showHeightNumbers: boolean
@@ -16,6 +16,7 @@ export interface SettingsStore {
   width?: number
   height?: number
   //
+  cursorRules: CursorRules
   wandRules: WandRules
   replaceRules: ReplaceRules
   insertRules: InsertRules
@@ -30,6 +31,11 @@ const DefaultSettings: SettingsStore = {
   showPlacementLines: true,
   showBoundingBoxes: true,
   hideSpecials: false,
+  cursorRules: {
+    height: 1,
+    width: 1,
+    depth: 1,
+  },
   wandRules: {
     shouldMatchArchetypes: true,
     shouldMatchName: false,

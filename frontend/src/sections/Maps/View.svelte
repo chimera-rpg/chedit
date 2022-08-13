@@ -184,15 +184,32 @@
 
   function getCoordinateBox(start: Coordinate, end: Coordinate): Coordinate[] {
     let coords: Coordinate[] = []
+
     let minY = Math.min(start.y, end.y)
     let maxY = Math.max(start.y, end.y)
     let minX = Math.min(start.x, end.x)
     let maxX = Math.max(start.x, end.x)
     let minZ = Math.min(start.z, end.z)
     let maxZ = Math.max(start.z, end.z)
-    for (let y = minY; y <= maxY; y++) {
-      for (let x = minX; x <= maxX; x++) {
-        for (let z = minZ; z <= maxZ; z++) {
+
+    // Modify by cursor size.
+    let hY = $settingsStore.cursorRules.height / 2
+    let hX = $settingsStore.cursorRules.width / 2
+    let hZ = $settingsStore.cursorRules.depth / 2
+
+    let startY = minY - Math.floor(hY)
+    let startX = minX - Math.floor(hX)
+    let startZ = minZ - Math.floor(hZ)
+    let endY = maxY + Math.round(hY)
+    let endX = maxX + Math.round(hX)
+    let endZ = maxZ + Math.round(hZ)
+
+    for (let y = startY; y < endY; y++) {
+      if (y < 0 || y >= map.Height) continue
+      for (let x = startX; x < endX; x++) {
+        if (x < 0 || x >= map.Width) continue
+        for (let z = startZ; z < endZ; z++) {
+          if (z < 0 || z >= map.Depth) continue
           coords.push({y, x, z, i: 0})
         }
       }

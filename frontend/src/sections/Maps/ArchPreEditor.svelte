@@ -79,6 +79,7 @@
   $: changed = JSON.stringify(cloned) !== JSON.stringify(arch?.Original)
 
   let clonedCopy: Archetype = cloned
+  let disabled: boolean = false
 
   function change(which: string, value: any) {
     if (showCompiled) return
@@ -129,6 +130,7 @@
   }
   function toggleCompiled() {
     showCompiled = !showCompiled
+    disabled = showCompiled
     if (showCompiled) {
       clonedCopy = cloned
       cloned = cloneObject(arch?.Compiled??{})
@@ -166,8 +168,8 @@
             <svelte:fragment slot='items'>
               {#each cloned.Archs as a, index}
                 <ItemListItem id={index}>
-                  <input placeholder={a} on:change={e=>change('Archs.'+index, e.currentTarget.value)}>
-                  <button on:click={_=>removeArch(index)}>x</button>
+                  <input disabled={disabled} placeholder={a} on:change={e=>change('Archs.'+index, e.currentTarget.value)}>
+                  <button disabled={disabled} on:click={_=>removeArch(index)}>x</button>
                 </ItemListItem>
               {/each}
             </svelte:fragment>
@@ -175,15 +177,15 @@
         </div>
         <label>
           <span>Name</span>
-          <input value={cloned.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.currentTarget.value)}/>
+          <input disabled={disabled} value={cloned.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Description</span>
-          <textarea value={cloned.Description??''} placeholder={arch.Compiled.Description} on:change={e=>change('Description', e.currentTarget.value)}/>
+          <textarea disabled={disabled} value={cloned.Description??''} placeholder={arch.Compiled.Description} on:change={e=>change('Description', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Type</span>
-          <select name="Type" value={cloned.Type??arch.Compiled.Type} on:change={e=>change('Type', e.currentTarget.value)}>
+          <select disabled={disabled} name="Type" value={cloned.Type??arch.Compiled.Type} on:change={e=>change('Type', e.currentTarget.value)}>
             <option value="">Unknown</option>
             {#each Object.entries(ArchetypeTypes) as [k, g]}
               <optgroup label={k}>
@@ -200,39 +202,39 @@
             <legend>Exit</legend>
             <label>
               <span>Name</span>
-              <input value={cloned.Exit?.Name??''} placeholder={arch.Compiled.Exit?.Name} on:change={e=>change('Exit.Name', e.currentTarget.value)}/>
+              <input disabled={disabled} value={cloned.Exit?.Name??''} placeholder={arch.Compiled.Exit?.Name} on:change={e=>change('Exit.Name', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Y</span>
-              <input type='number' value={cloned.Exit?.Y??''} placeholder={arch.Compiled.Exit?.Y} on:change={e=>change('Exit.Y', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.Y??''} placeholder={arch.Compiled.Exit?.Y} on:change={e=>change('Exit.Y', e.currentTarget.value)}/>
             </label>
             <label>
               <span>X</span>
-              <input type='number' value={cloned.Exit?.X??''} placeholder={arch.Compiled.Exit?.X} on:change={e=>change('Exit.X', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.X??''} placeholder={arch.Compiled.Exit?.X} on:change={e=>change('Exit.X', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Z</span>
-              <input type='number' value={cloned.Exit?.Z??''} placeholder={arch.Compiled.Exit?.Z} on:change={e=>change('Exit.Z', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.Z??''} placeholder={arch.Compiled.Exit?.Z} on:change={e=>change('Exit.Z', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Touch</span>
-              <input type='checkbox' checked={cloned.Exit?.Touch??''} placeholder={arch.Compiled.Exit?.Touch} on:change={e=>change('Exit.Touch', e.currentTarget.checked)}/>
+              <input disabled={disabled} type='checkbox' checked={cloned.Exit?.Touch??''} placeholder={arch.Compiled.Exit?.Touch} on:change={e=>change('Exit.Touch', e.currentTarget.checked)}/>
             </label>
             <label>
               <span>Cooldown</span>
-              <input value={cloned.Exit?.Cooldown??''} placeholder={arch.Compiled.Exit?.Cooldown} on:change={e=>change('Exit.Cooldown', e.currentTarget.value)}/>
+              <input disabled={disabled} value={cloned.Exit?.Cooldown??''} placeholder={arch.Compiled.Exit?.Cooldown} on:change={e=>change('Exit.Cooldown', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Size Ratio</span>
-              <input type='number' value={cloned.Exit?.SizeRatio??''} placeholder={arch.Compiled.Exit?.SizeRatio} on:change={e=>change('Exit.SizeRatio', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.SizeRatio??''} placeholder={arch.Compiled.Exit?.SizeRatio} on:change={e=>change('Exit.SizeRatio', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Uses</span>
-              <input type='number' value={cloned.Exit?.Uses??''} placeholder={arch.Compiled.Exit?.Uses} on:change={e=>change('Exit.Uses', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.Uses??''} placeholder={arch.Compiled.Exit?.Uses} on:change={e=>change('Exit.Uses', e.currentTarget.value)}/>
             </label>
             <label>
               <span>Unique Uses</span>
-              <input type='number' value={cloned.Exit?.UniqueUses??''} placeholder={arch.Compiled.Exit?.UniqueUses} on:change={e=>change('Exit.UniqueUses', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.UniqueUses??''} placeholder={arch.Compiled.Exit?.UniqueUses} on:change={e=>change('Exit.UniqueUses', e.currentTarget.value)}/>
             </label>
           </fieldset>
         {/if}
@@ -242,15 +244,15 @@
             <legend>Audio</legend>
             <label>
               <span>Audio</span>
-              <input value={cloned.Audio??''} placeholder={arch.Compiled.Audio} on:change={e=>change('Audio', e.currentTarget.value)}/>
+              <input disabled={disabled} value={cloned.Audio??''} placeholder={arch.Compiled.Audio} on:change={e=>change('Audio', e.currentTarget.value)}/>
             </label>
             <label>
               <span>SoundSet</span>
-              <input value={cloned.SoundSet??''} placeholder={arch.Compiled.SoundSet} on:change={e=>change('SoundSet', e.currentTarget.value)}/>
+              <input disabled={disabled} value={cloned.SoundSet??''} placeholder={arch.Compiled.SoundSet} on:change={e=>change('SoundSet', e.currentTarget.value)}/>
             </label>
             <label>
               <span>SoundIndex</span>
-              <input type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', e.currentTarget.value)}/>
             </label>
           </fieldset>
         {/if}
@@ -260,7 +262,7 @@
             <legend>Specials</legend>
             <label>
               <span>Haven</span>
-              <input type='checkbox' checked={cloned.Haven??arch.Compiled.Specials?.Haven} on:change={e=>change('Specials.Haven', e.currentTarget.checked)}/>
+              <input disabled={disabled} type='checkbox' checked={cloned.Haven??arch.Compiled.Specials?.Haven} on:change={e=>change('Specials.Haven', e.currentTarget.checked)}/>
             </label>
           </fieldset>
         {/if}
@@ -268,11 +270,11 @@
           <legend>Appearance</legend>
           <label>
             <span>Anim</span>
-            <input value={cloned.Anim??''} placeholder={arch.Compiled.Anim} on:change={e=>change('Anim', e.currentTarget.value)}/>
+            <input disabled={disabled} value={cloned.Anim??''} placeholder={arch.Compiled.Anim} on:change={e=>change('Anim', e.currentTarget.value)}/>
           </label>
           <label>
             <span>Face</span>
-            <input value={cloned.Face??''} placeholder={arch.Compiled.Face} on:change={e=>change('Face', e.currentTarget.value)}/>
+            <input disabled={disabled} value={cloned.Face??''} placeholder={arch.Compiled.Face} on:change={e=>change('Face', e.currentTarget.value)}/>
           </label>
         </fieldset>
 
@@ -280,34 +282,34 @@
           <legend>Dimensionality</legend>
           <label>
             <span>Height</span>
-            <input type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', e.currentTarget.value)}/>
+            <input disabled={disabled} type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', e.currentTarget.value)}/>
           </label>
           <label>
             <span>Width</span>
-            <input type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', e.currentTarget.value)}/>
+            <input disabled={disabled} type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', e.currentTarget.value)}/>
           </label>
           <label>
             <span>Depth</span>
-            <input type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.currentTarget.value)}/>
+            <input disabled={disabled} type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.currentTarget.value)}/>
           </label>
 
           <div class='entry__matter'>
             <span>Matter</span>
             <ItemList>
               <svelte:fragment slot='header'>
-                <button on:click={addMatter}> + </button>
+                <button disabled={disabled} on:click={addMatter}> + </button>
               </svelte:fragment>
               <svelte:fragment slot='items'>
                 {#if cloned.Matter}
                   {#each cloned.Matter as m, index}
                     <ItemListItem id={index}>
-                      <select name="Matter" value={m} on:change={e=>change('Matter.'+index, e.currentTarget.value)}>
+                      <select disabled={disabled} name="Matter" value={m} on:change={e=>change('Matter.'+index, e.currentTarget.value)}>
                         <option value="">Undefined</option>
                         {#each MatterTypes as t}
                           <option value={t}>{t}</option>
                         {/each}
                       </select>
-                      <button on:click={_=>removeMatter(index)}>x</button>
+                      <button disabled={disabled} on:click={_=>removeMatter(index)}>x</button>
                     </ItemListItem>
                   {/each}
                 {/if}
@@ -319,13 +321,13 @@
             <span>Blocking</span>
             <ItemList>
               <svelte:fragment slot='header'>
-                <button on:click={addBlocking}> + </button>
+                <button disabled={disabled} on:click={addBlocking}> + </button>
               </svelte:fragment>
               <svelte:fragment slot='items'>
                 {#if cloned.Blocking}
                   {#each cloned.Blocking as b, index}
                     <ItemListItem id={index}>
-                      <select name="Blocking" value={b} on:change={e=>change('Blocking.'+index, e.currentTarget.value)}>
+                      <select disabled={disabled} name="Blocking" value={b} on:change={e=>change('Blocking.'+index, e.currentTarget.value)}>
                         <option value="">Undefined</option>
                         {#each MatterTypes as t}
                           <option value={t}>{t}</option>
@@ -348,11 +350,11 @@
               <summary>Exit</summary>
               <label>
                 <span>Trigger</span>
-                <input value={cloned.Events?.Exit?.Trigger?.Event??''} placeholder={arch.Compiled.Events?.Exit?.Trigger?.Event} on:change={e=>change('Events.Exit.Trigger.Event', e.currentTarget.value)}/>
+                <input disabled={disabled} value={cloned.Events?.Exit?.Trigger?.Event??''} placeholder={arch.Compiled.Events?.Exit?.Trigger?.Event} on:change={e=>change('Events.Exit.Trigger.Event', e.currentTarget.value)}/>
               </label>
               <!-- TODO: Spawn -->
               <!-- TODO: Replace -->
-              <textarea class='script' value={cloned.Events?.Exit?.Script??''} placeholder={arch.Compiled.Events?.Exit?.Script}></textarea>
+              <textarea disabled={disabled} class='script' value={cloned.Events?.Exit?.Script??''} placeholder={arch.Compiled.Events?.Exit?.Script}></textarea>
             </details>
           {/if}
         </fieldset>

@@ -91,3 +91,15 @@ export let ArchetypeTypes = {
     "Generic",
   ],
 }
+
+export let MatterTypes = [
+  "None",
+  "Solid",
+  "Liquid",
+  "Gas",
+  "Plasma",
+  "Physical",
+  "Spirit",
+  "Arcane",
+  "Opaque",
+]

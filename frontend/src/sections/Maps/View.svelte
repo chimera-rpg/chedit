@@ -633,6 +633,9 @@
       y, x, z, i, arch
     }))
     mapsStore.set($mapsStore)
+    if (y === focusedY && x === focusedX && z === focusedZ && i === focusedI) {
+      focusedArchetypeContainer = map.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
+    }
   }
 
   function insert(arch: string, y: number, x: number, z: number, p: number) {

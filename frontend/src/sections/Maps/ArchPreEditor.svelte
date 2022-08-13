@@ -2,7 +2,7 @@
   import type { ContainerMap } from '../../interfaces/Map'
   import { ArchetypeTypes, MatterTypes, type Cursor } from '../../interfaces/editor'
   import type { Writable } from 'svelte/store'
-  import type { ArchetypeContainer } from '../../interfaces/Archetype'
+  import type { Archetype, ArchetypeContainer } from '../../interfaces/Archetype'
   import ArchView from '../ArchView.svelte'
   import { cloneObject } from '../../models/archs'
 
@@ -73,10 +73,15 @@
 
   export let arch: ArchetypeContainer
 
+  let showCompiled: boolean = false
+
   $: cloned = cloneObject(arch?.Original??{})
   $: changed = JSON.stringify(cloned) !== JSON.stringify(arch?.Original)
 
+  let clonedCopy: Archetype = cloned
+
   function change(which: string, value: any) {
+    if (showCompiled) return
     cloned[which] = value
     cloned = {...cloned}
   }
@@ -85,35 +90,51 @@
     cloned = cloneObject(arch.Original??{})
   }
   function apply() {
+    if (showCompiled) return
   }
 
   function addArch() {
+    if (showCompiled) return
     cloned.Archs = [...cloned.Archs, '']
     cloned = {...cloned}
   }
   function removeArch(index: number) {
+    if (showCompiled) return
     cloned.Archs.splice(index, 1)
     cloned = {...cloned}
   }
   function addMatter() {
+    if (showCompiled) return
     if (!cloned.Matter) cloned.Matter = []
     cloned.Matter = [...cloned.Matter, '']
     cloned = {...cloned}
   }
   function removeMatter(index: number) {
+    if (showCompiled) return
     cloned.Matter.splice(index, 1)
     if (cloned.Matter.length === 0) delete cloned.Matter
     cloned = {...cloned}
   }
   function addBlocking() {
+    if (showCompiled) return
     if (!cloned.Blocking) cloned.Blocking = []
     cloned.Blocking = [...cloned.Blocking, '']
     cloned = {...cloned}
   }
   function removeBlocking(index: number) {
+    if (showCompiled) return
     cloned.Blocking.splice(index, 1)
     if (cloned.Blocking.length === 0) delete cloned.Blocking
     cloned = {...cloned}
+  }
+  function toggleCompiled() {
+    showCompiled = !showCompiled
+    if (showCompiled) {
+      clonedCopy = cloned
+      cloned = cloneObject(arch?.Compiled??{})
+    } else {
+      cloned = clonedCopy
+    }
   }
 </script>
 
@@ -125,6 +146,13 @@
       </span>
       {arch.Compiled.Name||arch.Compiled.Self}
     {/if}
+    <button on:click={toggleCompiled}>
+      {#if !showCompiled}
+        compiled
+      {:else}
+        source
+      {/if}
+    </button>
   </header>
   <section>
     {#if arch}

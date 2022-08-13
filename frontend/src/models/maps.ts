@@ -171,6 +171,10 @@ type MapActionPosition = {
 }
 
 type MapActionArchetype = {
+  arch: Archetype
+}
+
+type MapActionArchetypeContainer = {
   arch?: ArchetypeContainer
 }
 
@@ -186,7 +190,7 @@ export class MapInsertAction implements UndoStep {
   i = 0
   arch: ArchetypeContainer
 
-  constructor({ y = 0, x = 0, z = 0, i = 0, arch }: MapActionPosition & MapActionArchetype) {
+  constructor({ y = 0, x = 0, z = 0, i = 0, arch }: MapActionPosition & MapActionArchetypeContainer) {
     this.arch = arch
     this.y = y
     this.x = x
@@ -454,3 +458,52 @@ export class MapResizeAction implements UndoStep {
     return c
   }
 }
+
+export class MapSetArchetypeAction implements UndoStep {
+  y = 0
+  x = 0
+  z = 0
+  i = 0
+  arch: Archetype
+  prevArchContainer: ArchetypeContainer
+
+  constructor({ y = 0, x = 0, z = 0, i = 0, arch }: MapActionPosition & MapActionArchetype) {
+    this.arch = arch
+    this.y = y
+    this.x = x
+    this.z = z
+    this.i = i
+  }
+
+  apply(c: ContainerMap): ContainerMap {
+    if (this.y < 0 || this.x < 0 || this.z < 0) return c
+    if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
+    if (this.i < 0 || this.i >= c.Tiles[this.y][this.x][this.z].length) return c
+
+    let archContainer: ArchetypeContainer = cloneObject(c.Tiles[this.y][this.x][this.z][this.i])
+    c.Tiles[this.y][this.x][this.z][this.i].Original = this.arch
+    this.prevArchContainer = archContainer
+
+    let compiled: Archetype
+    let error: any
+    try {
+      compiled = compileInJS(cloneObject(c.Tiles[this.y][this.x][this.z][this.i].Original), true)
+    } catch(err) {
+      compiled = cloneObject(c.Tiles[this.y][this.x][this.z][this.i].Original)
+      c.Tiles[this.y][this.x][this.z][this.i].Error = err
+    }
+    c.Tiles[this.y][this.x][this.z][this.i].Compiled = compiled
+
+    return c
+  }
+  unapply(c: ContainerMap): ContainerMap {
+    if (this.y < 0 || this.x < 0 || this.z < 0) return c
+    if (this.y >= c.Height || this.x >= c.Width || this.z >= c.Depth) return c
+    if (this.i < 0 || this.i >= c.Tiles[this.y][this.x][this.z].length) return c
+
+    c.Tiles[this.y][this.x][this.z][this.i] = this.prevArchContainer
+
+    return c
+  }
+}
+

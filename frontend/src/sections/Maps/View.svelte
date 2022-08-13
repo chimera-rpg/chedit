@@ -87,6 +87,19 @@
     placing: [],
   })
 
+  let focusedArchetypeContainer: ArchetypeContainer
+  let focusedY: number
+  let focusedX: number
+  let focusedZ: number
+  let focusedI: number
+  $: if (focusedY !== $cursor.start.y || focusedX !== $cursor.start.x || focusedZ !== $cursor.start.z || focusedI !== $cursor.start.i) {
+    focusedY = $cursor.start.y
+    focusedX = $cursor.start.x
+    focusedZ = $cursor.start.z
+    focusedI = $cursor.start.i
+    focusedArchetypeContainer = map.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
+  }
+
   let lastWheelTimestamp = 0
   function handleMapMousewheel(e: WheelEvent) {
     // Limit the frequency of scrolling allowed to once per ms.
@@ -1014,7 +1027,7 @@
             <aside slot=b class='archlist'>
               <SplitPane type='vertical' pos={50}>
                 <TilesList slot=a cursor={cursor} map={map}></TilesList>
-                <ArchPreEditor slot=b on:apply={e=>setArchFromEditor(e.detail, $cursor.start.y, $cursor.start.x, $cursor.start.z, $cursor.start.i)} arch={map.Tiles[$cursor.start.y]?.[$cursor.start.x]?.[$cursor.start.z]?.[$cursor.start.i]}></ArchPreEditor>
+                <ArchPreEditor slot=b on:apply={e=>setArchFromEditor(e.detail, $cursor.start.y, $cursor.start.x, $cursor.start.z, $cursor.start.i)} arch={focusedArchetypeContainer}></ArchPreEditor>
               </SplitPane>
             </aside>
           </SplitPane>

@@ -6,6 +6,8 @@
   import type { Archetype, ArchetypeContainer } from '../../interfaces/Archetype'
   import ArchView from '../ArchView.svelte'
   import { cloneObject } from '../../models/archs'
+  import DotDotty from 'dot-dotty'
+  import Field from './ArchEditor/Field.svelte'
 
   import applyIcon from '../../assets/icons/apply.png'
   import resetIcon from '../../assets/icons/reset.png'
@@ -81,6 +83,8 @@
   let cloned: Archetype
   $: cloned = cloneObject(arch?.Original??{})
   $: changed = JSON.stringify(cloned) !== JSON.stringify(arch?.Original)
+  $: clonedDD = DotDotty(cloned, {throwErrors: false, throwTraps: false})
+  $: compiledDD = DotDotty(arch?.Compiled??{}, {throwErrors: false, throwTraps: false})
 
   let clonedCopy: Archetype = cloned
   let disabled: boolean = false
@@ -188,144 +192,51 @@
             </svelte:fragment>
           </ItemList>
         </div>
-        <label>
-          <span>Name</span>
-          <input disabled={disabled} value={cloned.Name??''} placeholder={arch.Compiled.Name} on:change={e=>change('Name', e.currentTarget.value)}/>
-          <button disabled={disabled} on:click={e=>clear('Name')}>c</button>
-        </label>
-        <label>
-          <span>Description</span>
-          <textarea disabled={disabled} value={cloned.Description??''} placeholder={arch.Compiled.Description} on:change={e=>change('Description', e.currentTarget.value)}/>
-          <button disabled={disabled} on:click={e=>clear('Description')}>c</button>
-        </label>
-        <label>
-          <span>Type</span>
-          <select disabled={disabled} name="Type" value={cloned.Type??arch.Compiled.Type} on:change={e=>change('Type', e.currentTarget.value)}>
-            <option value="">Unknown</option>
-            {#each Object.entries(ArchetypeTypes) as [k, g]}
-              <optgroup label={k}>
-              {#each g as t}
-                <option value={t}>{t}</option>
-              {/each}
-              </optgroup>
-            {/each}
-          </select>
-          <button disabled={disabled} on:click={e=>clear('Type')}>c</button>
-        </label>
+        <Field key='Name' {disabled} {clonedDD} {compiledDD}></Field>
+        <Field key='Description' type='textarea' {disabled} {clonedDD} {compiledDD}></Field>
+        <Field key='Type' type='list' list={ArchetypeTypes} {disabled} {clonedDD} {compiledDD}></Field>
 
         {#if (cloned.Type??arch.Compiled.Type) == 'Exit'}
           <fieldset>
             <legend>Exit</legend>
-            <label>
-              <span>Name</span>
-              <input disabled={disabled} value={cloned.Exit?.Name??''} placeholder={arch.Compiled.Exit?.Name} on:change={e=>change('Exit.Name', e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.Name')}>c</button>
-            </label>
-            <label>
-              <span>Y</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.Y??''} placeholder={arch.Compiled.Exit?.Y} on:change={e=>change('Exit.Y', +e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.Y')}>c</button>
-            </label>
-            <label>
-              <span>X</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.X??''} placeholder={arch.Compiled.Exit?.X} on:change={e=>change('Exit.X', +e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.X')}>c</button>
-            </label>
-            <label>
-              <span>Z</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.Z??''} placeholder={arch.Compiled.Exit?.Z} on:change={e=>change('Exit.Z', +e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.Z')}>c</button>
-            </label>
-            <label>
-              <span>Touch</span>
-              <input disabled={disabled} type='checkbox' checked={cloned.Exit?.Touch??''} placeholder={arch.Compiled.Exit?.Touch} on:change={e=>change('Exit.Touch', e.currentTarget.checked)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.Touch')}>c</button>
-            </label>
-            <label>
-              <span>Cooldown</span>
-              <input disabled={disabled} value={cloned.Exit?.Cooldown??''} placeholder={arch.Compiled.Exit?.Cooldown} on:change={e=>change('Exit.Cooldown', e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.Cooldown')}>c</button>
-            </label>
-            <label>
-              <span>Size Ratio</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.SizeRatio??''} placeholder={arch.Compiled.Exit?.SizeRatio} on:change={e=>change('Exit.SizeRatio', +e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.SizeRatio')}>c</button>
-            </label>
-            <label>
-              <span>Uses</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.Uses??''} placeholder={arch.Compiled.Exit?.Uses} on:change={e=>change('Exit.Uses', +e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.Uses')}>c</button>
-            </label>
-            <label>
-              <span>Unique Uses</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.UniqueUses??''} placeholder={arch.Compiled.Exit?.UniqueUses} on:change={e=>change('Exit.UniqueUses', +e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Exit.UniqueUses')}>c</button>
-            </label>
+            <Field key='Exit.Name' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.Y' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.X' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.Z' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.Touch' type='checkbox' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.Cooldown' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.SizeRatio' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.Uses' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.UniqueUses' type='number' {disabled} {clonedDD} {compiledDD}></Field>
           </fieldset>
         {/if}
 
         {#if (cloned.Type??arch.Compiled.Type) == 'Audio'}
           <fieldset>
             <legend>Audio</legend>
-            <label>
-              <span>Audio</span>
-              <input disabled={disabled} value={cloned.Audio??''} placeholder={arch.Compiled.Audio} on:change={e=>change('Audio', e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('Audio')}>c</button>
-            </label>
-            <label>
-              <span>SoundSet</span>
-              <input disabled={disabled} value={cloned.SoundSet??''} placeholder={arch.Compiled.SoundSet} on:change={e=>change('SoundSet', e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('SoundSet')}>c</button>
-            </label>
-            <label>
-              <span>SoundIndex</span>
-              <input disabled={disabled} type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', +e.currentTarget.value)}/>
-              <button disabled={disabled} on:click={e=>clear('SoundIndex')}>c</button>
-            </label>
+            <Field key='Audio' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='SoundSet' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='SoundIndex' type='number' {disabled} {clonedDD} {compiledDD}></Field>
           </fieldset>
         {/if}
 
         {#if (cloned.Type??arch.Compiled.Type) == 'Special'}
           <fieldset>
             <legend>Specials</legend>
-            <label>
-              <span>Haven</span>
-              <input disabled={disabled} type='checkbox' checked={cloned.Haven??arch.Compiled.Specials?.Haven} on:change={e=>change('Specials.Haven', e.currentTarget.checked)}/>
-              <button disabled={disabled} on:click={e=>clear('Specials.Haven')}>c</button>
-            </label>
+            <Field key='Specials.Haven' type='checkbox' {disabled} {clonedDD} {compiledDD}></Field>
           </fieldset>
         {/if}
         <fieldset>
           <legend>Appearance</legend>
-          <label>
-            <span>Anim</span>
-            <input disabled={disabled} value={cloned.Anim??''} placeholder={arch.Compiled.Anim} on:change={e=>change('Anim', e.currentTarget.value)}/>
-            <button disabled={disabled} on:click={e=>clear('Anim')}>c</button>
-          </label>
-          <label>
-            <span>Face</span>
-            <input disabled={disabled} value={cloned.Face??''} placeholder={arch.Compiled.Face} on:change={e=>change('Face', e.currentTarget.value)}/>
-            <button disabled={disabled} on:click={e=>clear('Face')}>c</button>
-          </label>
+          <Field key='Anim' {disabled} {clonedDD} {compiledDD}></Field>
+          <Field key='Face' {disabled} {clonedDD} {compiledDD}></Field>
         </fieldset>
 
         <fieldset>
           <legend>Dimensionality</legend>
-          <label>
-            <span>Height</span>
-            <input disabled={disabled} type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', +e.currentTarget.value)}/>
-            <button disabled={disabled} on:click={e=>clear('Height')}>c</button>
-          </label>
-          <label>
-            <span>Width</span>
-            <input disabled={disabled} type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', +e.currentTarget.value)}/>
-            <button disabled={disabled} on:click={e=>clear('Width')}>c</button>
-          </label>
-          <label>
-            <span>Depth</span>
-            <input disabled={disabled} type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', +e.currentTarget.value)}/>
-            <button disabled={disabled} on:click={e=>clear('Depth')}>c</button>
-          </label>
+          <Field key='Height' {disabled} {clonedDD} {compiledDD}></Field>
+          <Field key='Width' {disabled} {clonedDD} {compiledDD}></Field>
+          <Field key='Depth' {disabled} {clonedDD} {compiledDD}></Field>
 
           <div class='entry__matter'>
             <span>Matter</span>
@@ -384,15 +295,10 @@
           {#if (cloned.Type??arch.Compiled.Type) == 'Exit'}
             <details>
               <summary>Exit</summary>
-              <label>
-                <span>Trigger</span>
-                <input disabled={disabled} value={cloned.Events?.Exit?.Trigger?.Event??''} placeholder={arch.Compiled.Events?.Exit?.Trigger?.Event} on:change={e=>change('Events.Exit.Trigger.Event', e.currentTarget.value)}/>
-                <button disabled={disabled} on:click={e=>clear('Events.Exit.Trigger.Event')}>c</button>
-              </label>
+              <Field label='Trigger Event' key='Events.Exit.Trigger.Event' {disabled} {clonedDD} {compiledDD}></Field>
               <!-- TODO: Spawn -->
               <!-- TODO: Replace -->
-              <textarea disabled={disabled} class='script' value={cloned.Events?.Exit?.Script??''} placeholder={arch.Compiled.Events?.Exit?.Script}></textarea>
-              <button disabled={disabled} on:click={e=>clear('Events.Exit.Script')}>c</button>
+              <Field key='Events.Exit.Script' type='textarea' {disabled} {clonedDD} {compiledDD}></Field>
             </details>
           {/if}
         </fieldset>

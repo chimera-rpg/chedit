@@ -237,9 +237,9 @@
 
         <fieldset>
           <legend>Dimensionality</legend>
-          <Field key='Height' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
-          <Field key='Width' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
-          <Field key='Depth' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Height' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Width' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Depth' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
 
           <div class='entry__matter'>
             <span>Matter</span>

@@ -147,7 +147,7 @@
       {arch.Compiled.Name||arch.Compiled.Self}
     {/if}
     <button on:click={toggleCompiled}>
-      {#if !showCompiled}
+      {#if showCompiled}
         compiled
       {:else}
         source

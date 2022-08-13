@@ -1,6 +1,7 @@
 <script lang='ts'>
   import type { ContainerMap } from '../../interfaces/Map'
   import { ArchetypeTypes, MatterTypes, type Cursor } from '../../interfaces/editor'
+  import { createEventDispatcher } from 'svelte'
   import type { Writable } from 'svelte/store'
   import type { Archetype, ArchetypeContainer } from '../../interfaces/Archetype'
   import ArchView from '../ArchView.svelte'
@@ -13,6 +14,8 @@
   import MenuItem from '../../components/Menus/MenuItem.svelte'
   import ItemList from '../../components/ItemList/ItemList.svelte'
   import ItemListItem from '../../components/ItemList/ItemListItem.svelte'
+
+  const dispatch = createEventDispatcher()
 
   let fields = [
     'Archs',
@@ -75,6 +78,7 @@
 
   let showCompiled: boolean = false
 
+  let cloned: Archetype
   $: cloned = cloneObject(arch?.Original??{})
   $: changed = JSON.stringify(cloned) !== JSON.stringify(arch?.Original)
 
@@ -91,7 +95,7 @@
     cloned = cloneObject(arch.Original??{})
   }
   function apply() {
-    if (showCompiled) return
+    dispatch('apply', cloned)
   }
 
   function addArch() {
@@ -206,15 +210,15 @@
             </label>
             <label>
               <span>Y</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.Y??''} placeholder={arch.Compiled.Exit?.Y} on:change={e=>change('Exit.Y', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.Y??''} placeholder={arch.Compiled.Exit?.Y} on:change={e=>change('Exit.Y', +e.currentTarget.value)}/>
             </label>
             <label>
               <span>X</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.X??''} placeholder={arch.Compiled.Exit?.X} on:change={e=>change('Exit.X', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.X??''} placeholder={arch.Compiled.Exit?.X} on:change={e=>change('Exit.X', +e.currentTarget.value)}/>
             </label>
             <label>
               <span>Z</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.Z??''} placeholder={arch.Compiled.Exit?.Z} on:change={e=>change('Exit.Z', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.Z??''} placeholder={arch.Compiled.Exit?.Z} on:change={e=>change('Exit.Z', +e.currentTarget.value)}/>
             </label>
             <label>
               <span>Touch</span>
@@ -226,15 +230,15 @@
             </label>
             <label>
               <span>Size Ratio</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.SizeRatio??''} placeholder={arch.Compiled.Exit?.SizeRatio} on:change={e=>change('Exit.SizeRatio', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.SizeRatio??''} placeholder={arch.Compiled.Exit?.SizeRatio} on:change={e=>change('Exit.SizeRatio', +e.currentTarget.value)}/>
             </label>
             <label>
               <span>Uses</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.Uses??''} placeholder={arch.Compiled.Exit?.Uses} on:change={e=>change('Exit.Uses', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.Uses??''} placeholder={arch.Compiled.Exit?.Uses} on:change={e=>change('Exit.Uses', +e.currentTarget.value)}/>
             </label>
             <label>
               <span>Unique Uses</span>
-              <input disabled={disabled} type='number' value={cloned.Exit?.UniqueUses??''} placeholder={arch.Compiled.Exit?.UniqueUses} on:change={e=>change('Exit.UniqueUses', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.Exit?.UniqueUses??''} placeholder={arch.Compiled.Exit?.UniqueUses} on:change={e=>change('Exit.UniqueUses', +e.currentTarget.value)}/>
             </label>
           </fieldset>
         {/if}
@@ -252,7 +256,7 @@
             </label>
             <label>
               <span>SoundIndex</span>
-              <input disabled={disabled} type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', e.currentTarget.value)}/>
+              <input disabled={disabled} type='number' value={cloned.SoundIndex??''} placeholder={arch.Compiled.SoundIndex} on:change={e=>change('SoundIndex', +e.currentTarget.value)}/>
             </label>
           </fieldset>
         {/if}
@@ -282,15 +286,15 @@
           <legend>Dimensionality</legend>
           <label>
             <span>Height</span>
-            <input disabled={disabled} type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', e.currentTarget.value)}/>
+            <input disabled={disabled} type='number' value={cloned.Height??''} placeholder={arch.Compiled.Height} on:change={e=>change('Height', +e.currentTarget.value)}/>
           </label>
           <label>
             <span>Width</span>
-            <input disabled={disabled} type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', e.currentTarget.value)}/>
+            <input disabled={disabled} type='number' value={cloned.Width??''} placeholder={arch.Compiled.Width} on:change={e=>change('Width', +e.currentTarget.value)}/>
           </label>
           <label>
             <span>Depth</span>
-            <input disabled={disabled} type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', e.currentTarget.value)}/>
+            <input disabled={disabled} type='number' value={cloned.Depth??''} placeholder={arch.Compiled.Depth} on:change={e=>change('Depth', +e.currentTarget.value)}/>
           </label>
 
           <div class='entry__matter'>
@@ -363,10 +367,10 @@
     <div class='toolbar'>
       <Menus>
         <MenuBar>
-          <MenuItem disabled={!changed} on:click={reset}>
+          <MenuItem disabled={disabled||!changed} on:click={reset}>
             <img src={resetIcon} alt='reset'>
           </MenuItem>
-          <MenuItem disabled={!changed} on:click={apply}>
+          <MenuItem disabled={disabled||!changed} on:click={apply}>
             <img src={applyIcon} alt='apply'>
           </MenuItem>
         </MenuBar>

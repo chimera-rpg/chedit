@@ -13,7 +13,7 @@
   import { cloneObject, compileInJS } from '../../models/archs'
   import { maps as mapsStore } from '../../stores/maps'
   import type { MapsStoreData } from '../../stores/maps'
-  import { MapClearAction, MapInsertAction, MapRemoveAction, MapReplaceAction } from '../../models/maps'
+  import { MapClearAction, MapInsertAction, MapRemoveAction, MapReplaceAction, MapSetArchetypeAction } from '../../models/maps'
   import type { Binds } from '../../models/binds'
 
   import { settingsStore } from '../../stores/settings'
@@ -615,6 +615,13 @@
     }
   }
 
+  function setArchFromEditor(arch: Archetype, y: number, x: number, z: number, i: number) {
+    map.apply(new MapSetArchetypeAction({
+      y, x, z, i, arch
+    }))
+    mapsStore.set($mapsStore)
+  }
+
   function insert(arch: string, y: number, x: number, z: number, p: number) {
     if (y < 0 || x < 0 || z < 0) return
     if (y >= map.Height || x >= map.Width || z >= map.Depth) return
@@ -1007,7 +1014,7 @@
             <aside slot=b class='archlist'>
               <SplitPane type='vertical' pos={50}>
                 <TilesList slot=a cursor={cursor} map={map}></TilesList>
-                <ArchPreEditor slot=b arch={map.Tiles[$cursor.start.y]?.[$cursor.start.x]?.[$cursor.start.z]?.[$cursor.start.i]}></ArchPreEditor>
+                <ArchPreEditor slot=b on:apply={e=>setArchFromEditor(e.detail, $cursor.start.y, $cursor.start.x, $cursor.start.z, $cursor.start.i)} arch={map.Tiles[$cursor.start.y]?.[$cursor.start.x]?.[$cursor.start.z]?.[$cursor.start.i]}></ArchPreEditor>
               </SplitPane>
             </aside>
           </SplitPane>

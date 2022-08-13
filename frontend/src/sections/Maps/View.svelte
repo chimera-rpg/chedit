@@ -13,7 +13,7 @@
   import { cloneObject, compileInJS } from '../../models/archs'
   import { maps as mapsStore } from '../../stores/maps'
   import type { MapsStoreData } from '../../stores/maps'
-  import { MapClearAction, MapInsertAction, MapRemoveAction, MapReplaceAction, MapSetArchetypeAction } from '../../models/maps'
+  import { doesActionApplyToTile, hasMapActionPosition, MapClearAction, MapInsertAction, MapRemoveAction, MapReplaceAction, MapSetArchetypeAction } from '../../models/maps'
   import type { Binds } from '../../models/binds'
 
   import { settingsStore } from '../../stores/settings'
@@ -592,9 +592,11 @@
       if (mc) {
         let m = mc.Maps[mapsContainer.SelectedMap]
         if (m) {
-          m.undo()
+          let step = m.undo()
+          if (doesActionApplyToTile(step, focusedY, focusedX, focusedZ)) {
+            focusedArchetypeContainer = m.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
+          }
         }
-        focusedArchetypeContainer = m.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
       }
       return v
     }))
@@ -606,9 +608,11 @@
       if (mc) {
         let m = mc.Maps[mapsContainer.SelectedMap]
         if (m) {
-          m.redo()
+          let step = m.redo()
+          if (doesActionApplyToTile(step, focusedY, focusedX, focusedZ)) {
+            focusedArchetypeContainer = m.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
+          }
         }
-        focusedArchetypeContainer = m.Tiles[focusedY]?.[focusedX]?.[focusedZ]?.[focusedI]
       }
       return v
     }))

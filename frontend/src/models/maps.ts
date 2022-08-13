@@ -95,19 +95,21 @@ export function makeMap(): ContainerMap {
         m.redoable = m.stackPos < m.stack.length
       }
     },
-    undo: () => {
-      if (!m.undoable) return false
-      m.stack[--m.stackPos].unapply(m)
+    undo: (): UndoStep => {
+      if (!m.undoable) return undefined
+      let step = m.stack[--m.stackPos]
+      step.unapply(m)
       m.undoable = m.stackPos >= 1 && m.stack.length > 0
       m.redoable = m.stackPos < m.stack.length
-      return true
+      return step
     },
-    redo: () => {
-      if (!m.redoable) return false
-      m.stack[m.stackPos++].apply(m)
+    redo: (): UndoStep => {
+      if (!m.redoable) return undefined
+      let step = m.stack[m.stackPos++]
+      step.apply(m)
       m.undoable = m.stackPos >= 1 && m.stack.length > 0
       m.redoable = m.stackPos < m.stack.length
-      return true
+      return step
     },
     queue: () => {
       if (m.queued) {
@@ -169,6 +171,24 @@ type MapActionPosition = {
   z: number;
   i: number;
 }
+export function hasMapActionPosition(s: UndoStep): boolean {
+  return (s as any).y !== undefined
+}
+export function doesActionApplyToTile(s: UndoStep, y: number, x: number, z: number): boolean {
+  let c = (s as any)
+  if (c.y === y && c.x === x && c.z === z) {
+    return true
+  }
+  return false
+}
+
+export function doesActionApplyToPosition(s: UndoStep, y: number, x: number, z: number, i: number): boolean {
+  let c = (s as any)
+  if (c.y === y && c.x === x && c.z === z && c.i === i) {
+    return true
+  }
+  return false
+}
 
 type MapActionArchetype = {
   arch: Archetype
@@ -224,6 +244,9 @@ export class MapInsertAction implements UndoStep {
     c.Tiles[this.y][this.x][this.z].splice(p, 1)
     return c
   }
+}
+export function isMapInsertAction(s: UndoStep): s is MapInsertAction {
+  return s instanceof MapInsertAction
 }
 
 export class MapReplaceAction implements UndoStep {
@@ -282,6 +305,9 @@ export class MapReplaceAction implements UndoStep {
     return c
   }
 }
+export function isMapReplaceAction(s: UndoStep): s is MapReplaceAction {
+  return s instanceof MapReplaceAction
+}
 
 export class MapRemoveAction extends MapInsertAction {
   apply(c: ContainerMap): ContainerMap {
@@ -297,6 +323,9 @@ export class MapRemoveAction extends MapInsertAction {
   unapply(c: ContainerMap): ContainerMap {
     return super.apply(c)
   }
+}
+export function isMapRemoveAction(s: UndoStep): s is MapRemoveAction {
+  return s instanceof MapRemoveAction
 }
 
 export class MapClearAction {
@@ -328,6 +357,10 @@ export class MapClearAction {
     return c
   }
 }
+export function IsMapClearAction(s: UndoStep): s is MapClearAction {
+  return s instanceof MapClearAction
+}
+
 
 export class MapChangeFieldAction implements UndoStep {
   key = ""
@@ -506,4 +539,6 @@ export class MapSetArchetypeAction implements UndoStep {
     return c
   }
 }
-
+export function IsMapSetArchetypeAction(s: UndoStep): s is MapSetArchetypeAction {
+  return s instanceof MapSetArchetypeAction
+}

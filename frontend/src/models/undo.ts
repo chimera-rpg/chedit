@@ -5,9 +5,9 @@ export interface Undoable {
   stack: UndoStep[]
   stackPos: number
   apply(u: UndoStep): void
-  undo(): boolean
+  undo(): UndoStep
   undoable: boolean
-  redo(): boolean
+  redo(): UndoStep
   redoable: boolean
   queue(): boolean
   unqueue(): boolean

@@ -99,6 +99,9 @@
     delete cloned[which]
     cloned = {...cloned}
   }
+  function update() {
+    cloned = {...cloned}
+  }
 
   function reset() {
     cloned = cloneObject(arch.Original??{})
@@ -192,51 +195,51 @@
             </svelte:fragment>
           </ItemList>
         </div>
-        <Field key='Name' {disabled} {clonedDD} {compiledDD}></Field>
-        <Field key='Description' type='textarea' {disabled} {clonedDD} {compiledDD}></Field>
-        <Field key='Type' type='list' list={ArchetypeTypes} {disabled} {clonedDD} {compiledDD}></Field>
+        <Field key='Name' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+        <Field key='Description' type='textarea' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+        <Field key='Type' type='list' list={ArchetypeTypes} {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
 
         {#if (cloned.Type??arch.Compiled.Type) == 'Exit'}
           <fieldset>
             <legend>Exit</legend>
-            <Field key='Exit.Name' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.Y' type='number' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.X' type='number' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.Z' type='number' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.Touch' type='checkbox' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.Cooldown' type='number' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.SizeRatio' type='number' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.Uses' type='number' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='Exit.UniqueUses' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Exit.Name' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.Y' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.X' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.Z' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.Touch' type='checkbox' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.Cooldown' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.SizeRatio' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.Uses' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Exit.UniqueUses' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
           </fieldset>
         {/if}
 
         {#if (cloned.Type??arch.Compiled.Type) == 'Audio'}
           <fieldset>
             <legend>Audio</legend>
-            <Field key='Audio' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='SoundSet' {disabled} {clonedDD} {compiledDD}></Field>
-            <Field key='SoundIndex' type='number' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Audio' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='SoundSet' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='SoundIndex' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
           </fieldset>
         {/if}
 
         {#if (cloned.Type??arch.Compiled.Type) == 'Special'}
           <fieldset>
             <legend>Specials</legend>
-            <Field key='Specials.Haven' type='checkbox' {disabled} {clonedDD} {compiledDD}></Field>
+            <Field key='Specials.Haven' type='checkbox' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
           </fieldset>
         {/if}
         <fieldset>
           <legend>Appearance</legend>
-          <Field key='Anim' {disabled} {clonedDD} {compiledDD}></Field>
-          <Field key='Face' {disabled} {clonedDD} {compiledDD}></Field>
+          <Field key='Anim' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Face' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
         </fieldset>
 
         <fieldset>
           <legend>Dimensionality</legend>
-          <Field key='Height' {disabled} {clonedDD} {compiledDD}></Field>
-          <Field key='Width' {disabled} {clonedDD} {compiledDD}></Field>
-          <Field key='Depth' {disabled} {clonedDD} {compiledDD}></Field>
+          <Field key='Height' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Width' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Depth' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
 
           <div class='entry__matter'>
             <span>Matter</span>
@@ -295,10 +298,10 @@
           {#if (cloned.Type??arch.Compiled.Type) == 'Exit'}
             <details>
               <summary>Exit</summary>
-              <Field label='Trigger Event' key='Events.Exit.Trigger.Event' {disabled} {clonedDD} {compiledDD}></Field>
+              <Field label='Trigger Event' key='Events.Exit.Trigger.Event' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
               <!-- TODO: Spawn -->
               <!-- TODO: Replace -->
-              <Field key='Events.Exit.Script' type='textarea' {disabled} {clonedDD} {compiledDD}></Field>
+              <Field key='Events.Exit.Script' type='textarea' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
             </details>
           {/if}
         </fieldset>

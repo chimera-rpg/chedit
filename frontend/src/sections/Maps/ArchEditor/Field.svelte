@@ -22,10 +22,12 @@
       value = +value
     }
     clonedDD[key] = value
+    dispatch('update')
   }
 
   function clear() {
     delete clonedDD[key]
+    dispatch('update')
   }
 </script>
 

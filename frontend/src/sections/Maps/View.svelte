@@ -1035,14 +1035,14 @@
           <img src={wandIcon} alt='wand'>
         </button>
       </article>
-      <fieldset>
-        <legend>Cursor</legend>
+      <details>
+        <summary>Cursor</summary>
         <CursorSettingsSection/>
-      </fieldset>
-      <fieldset>
-        <legend>Tool</legend>
+      </details>
+      <details>
+        <summary>Tool</summary>
         <ToolSettingsSection tool={tool}/>
-      </fieldset>
+      </details>
       <fieldset>
         <legend>Selection</legend>
         <ShapesSection on:copyShape={copyShape} on:pasteShape={pasteShape} on:copySelection={copySelection} on:pasteSelection={pasteSelection}/>

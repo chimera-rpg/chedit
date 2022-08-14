@@ -172,10 +172,11 @@ type MapActionPosition = {
   i: number;
 }
 export function hasMapActionPosition(s: UndoStep): boolean {
-  return (s as any).y !== undefined
+  return (s as any)?.y !== undefined
 }
 export function doesActionApplyToTile(s: UndoStep, y: number, x: number, z: number): boolean {
   let c = (s as any)
+  if (!c) return false
   if (c.y === y && c.x === x && c.z === z) {
     return true
   }
@@ -184,6 +185,7 @@ export function doesActionApplyToTile(s: UndoStep, y: number, x: number, z: numb
 
 export function doesActionApplyToPosition(s: UndoStep, y: number, x: number, z: number, i: number): boolean {
   let c = (s as any)
+  if (!c) return false
   if (c.y === y && c.x === x && c.z === z && c.i === i) {
     return true
   }

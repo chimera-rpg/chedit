@@ -41,8 +41,9 @@
   import PropertiesEditor from './PropertiesEditor.svelte'
   import ArchPreEditor from './ArchPreEditor.svelte'
   import ShapesSection from './ShapesSection.svelte'
-  import ToolSettingsSection from './ToolSettingsSection.svelte';
+  import ToolSettingsSection from './ToolSettingsSection.svelte'
   import ReplaceSection from './ReplaceSection.svelte'
+  import CursorSettingsSection from './CursorSettingsSection.svelte'
 
   let tool: ToolType = 'insert'
   let lastTool: ToolType = 'insert'
@@ -193,23 +194,54 @@
     let maxZ = Math.max(start.z, end.z)
 
     // Modify by cursor size.
-    let hY = $settingsStore.cursorRules.height / 2
-    let hX = $settingsStore.cursorRules.width / 2
-    let hZ = $settingsStore.cursorRules.depth / 2
+    let hY = $settingsStore.cursorRules.height
+    let hX = $settingsStore.cursorRules.width
+    let hZ = $settingsStore.cursorRules.depth
 
-    let startY = minY - Math.floor(hY)
-    let startX = minX - Math.floor(hX)
-    let startZ = minZ - Math.floor(hZ)
-    let endY = maxY + Math.round(hY)
-    let endX = maxX + Math.round(hX)
-    let endZ = maxZ + Math.round(hZ)
+    let startY = minY
+    let startX = minX
+    let startZ = minZ
+    let endY = maxY + hY
+    let endX = maxX + hX
+    let endZ = maxZ + hZ
 
     for (let y = startY; y < endY; y++) {
+      let innerY = (y > startY && y < endY-1)
       if (y < 0 || y >= map.Height) continue
       for (let x = startX; x < endX; x++) {
+        let innerX = (x > startX && x < endX-1)
         if (x < 0 || x >= map.Width) continue
         for (let z = startZ; z < endZ; z++) {
+          let innerZ = (z > startZ && z < endZ-1)
           if (z < 0 || z >= map.Depth) continue
+          // Cursor rules checks
+          if ($settingsStore.cursorRules.openTop && y === endY-1 && innerX && innerZ) continue
+          if ($settingsStore.cursorRules.openBottom && y === startY && innerX && innerZ) continue
+          if ($settingsStore.cursorRules.openRight && x === endX-1 && innerY && innerZ) continue
+          if ($settingsStore.cursorRules.openLeft && x === startX && innerY && innerZ) continue
+          if ($settingsStore.cursorRules.openBack && z === startZ && innerY && innerX) continue
+          if ($settingsStore.cursorRules.openFront && z === endZ-1 && innerY && innerX) continue
+          if ($settingsStore.cursorRules.hollowY && innerY) {
+            if ($settingsStore.cursorRules.hollowBorder) {
+              if (innerX && innerZ) {
+                continue
+              }
+            } else continue
+          }
+          if ($settingsStore.cursorRules.hollowX && innerX) {
+            if ($settingsStore.cursorRules.hollowBorder) {
+              if (innerY && innerZ) {
+                continue
+              }
+            } else continue
+          }
+          if ($settingsStore.cursorRules.hollowZ && innerZ) {
+            if ($settingsStore.cursorRules.hollowBorder) {
+              if (innerY && innerX) {
+                continue
+              }
+            } else continue
+          }
           coords.push({y, x, z, i: 0})
         }
       }
@@ -1003,6 +1035,10 @@
           <img src={wandIcon} alt='wand'>
         </button>
       </article>
+      <fieldset>
+        <legend>Cursor</legend>
+        <CursorSettingsSection/>
+      </fieldset>
       <fieldset>
         <legend>Tool</legend>
         <ToolSettingsSection tool={tool}/>

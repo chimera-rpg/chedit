@@ -31,6 +31,16 @@ export type CursorRules = {
   height: number
   width: number
   depth: number
+  hollowY: boolean
+  hollowX: boolean
+  hollowZ: boolean
+  hollowBorder: boolean
+  openTop: boolean
+  openBottom: boolean
+  openLeft: boolean
+  openRight: boolean
+  openBack: boolean
+  openFront: boolean
 }
 
 export type WandRules = {

@@ -383,19 +383,50 @@
 
     // Draw hover cursor.
     {
-      let hY = $settingsStore.cursorRules.height / 2
-      let hX = $settingsStore.cursorRules.width / 2
-      let hZ = $settingsStore.cursorRules.depth / 2
+      let hY = $settingsStore.cursorRules.height
+      let hX = $settingsStore.cursorRules.width
+      let hZ = $settingsStore.cursorRules.depth
 
-      let startY = $cursor.hover.y - Math.floor(hY)
-      let startX = $cursor.hover.x - Math.floor(hX)
-      let startZ = $cursor.hover.z - Math.floor(hZ)
-      let endY = $cursor.hover.y + Math.round(hY)
-      let endX = $cursor.hover.x + Math.round(hX)
-      let endZ = $cursor.hover.z + Math.round(hZ)
+      let startY = $cursor.hover.y
+      let startX = $cursor.hover.x
+      let startZ = $cursor.hover.z
+      let endY = $cursor.hover.y + hY
+      let endX = $cursor.hover.x + hX
+      let endZ = $cursor.hover.z + hZ
       for (let y = startY; y < endY; y++) {
+        let innerY = (y > startY && y < endY-1)
         for (let x = startX; x < endX; x++) {
+          let innerX = (x > startX && x < endX-1)
           for (let z = startZ; z < endZ; z++) {
+            let innerZ = (z > startZ && z < endZ-1)
+            if ($settingsStore.cursorRules.openTop && y === endY-1 && innerX && innerZ) continue
+            if ($settingsStore.cursorRules.openBottom && y === startY && innerX && innerZ) continue
+            if ($settingsStore.cursorRules.openRight && x === endX-1 && innerY && innerZ) continue
+            if ($settingsStore.cursorRules.openLeft && x === startX && innerY && innerZ) continue
+            if ($settingsStore.cursorRules.openBack && z === startZ && innerY && innerX) continue
+            if ($settingsStore.cursorRules.openFront && z === endZ-1 && innerY && innerX) continue
+            if ($settingsStore.cursorRules.hollowY && innerY) {
+              if ($settingsStore.cursorRules.hollowBorder) {
+                if (innerX && innerZ) {
+                  continue
+                }
+              } else continue
+            }
+            if ($settingsStore.cursorRules.hollowX && innerX) {
+              if ($settingsStore.cursorRules.hollowBorder) {
+                if (innerY && innerZ) {
+                  continue
+                }
+              } else continue
+            }
+            if ($settingsStore.cursorRules.hollowZ && innerZ) {
+              if ($settingsStore.cursorRules.hollowBorder) {
+                if (innerY && innerX) {
+                  continue
+                }
+              } else continue
+            }
+
             let [px, py, zIndex] = getCoordinatePosition(y, x, z)
             ctx.strokeStyle = $styles.colors.hoverBorder
 

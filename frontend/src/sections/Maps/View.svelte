@@ -15,6 +15,7 @@
   import type { MapsStoreData } from '../../stores/maps'
   import { doesActionApplyToTile, hasMapActionPosition, MapClearAction, MapInsertAction, MapRemoveAction, MapReplaceAction, MapSetArchetypeAction } from '../../models/maps'
   import type { Binds } from '../../models/binds'
+  import { adjustShape, getMatchingCoordsForTile, replaceShape, trimShape, type KeysState, type TraversedTile } from '../../models/shapes'
 
   import { settingsStore } from '../../stores/settings'
 
@@ -119,7 +120,7 @@
 
       if (hoverY !== $cursor.hover.y) {
         if (e.shiftKey || e.ctrlKey) {
-          $cursor.selected = adjustShape($cursor.selected, $cursor.selected.map(v=>({
+          $cursor.selected = adjustShape(map, $cursor.selected, $cursor.selected.map(v=>({
             y: v.y+deltaY,
             x: v.x,
             z: v.z,
@@ -249,29 +250,8 @@
     return coords
   }
 
-  type KeysState = {[key: string]: boolean}
-
-  function adjustShape(base: Coordinate[], coords: Coordinate[], keys: KeysState) {
-    if (keys.shift) {
-      // add
-      for (let v of coords) {
-        if (!base.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z)) {
-          if (v.y < 0 || v.y >= map.Height || v.x < 0 || v.x >= map.Width || v.z < 0 || v.z >= map.Depth) return
-          base.push(v)
-        }
-      }
-    } else if (keys.ctrl) {
-      // remove
-      base = base.filter(v=>!coords.find(v2=>v.y===v2.y&&v.x===v2.x&&v.z===v2.z))
-    } else {
-      // replace
-      base = coords
-    }
-    return base
-  }
-
   function adjustSelection(coords: Coordinate[], keys: KeysState) {
-    $cursor.selected = adjustShape($cursor.selected, coords, keys)
+    $cursor.selected = adjustShape(map, $cursor.selected, coords, keys)
   }
 
   function handleMapMousedown(e: MouseEvent) {
@@ -378,7 +358,7 @@
           map.unqueue()
           mapsStore.set($mapsStore)
         } else {
-          $cursor.selected = adjustShape($cursor.selected, $cursor.placing.map(v=>({
+          $cursor.selected = adjustShape(map, $cursor.selected, $cursor.placing.map(v=>({
             y: v.y + $cursor.hover.y,
             x: v.x + $cursor.hover.x,
             z: v.z + $cursor.hover.z,
@@ -395,7 +375,7 @@
         }, (t: TraversedTile[], e: MouseEvent) => {
           let targetTile = t[t.length-1]
           let tile = map.Tiles[targetTile.y][targetTile.x][targetTile.z]
-          $cursor.selected = adjustShape($cursor.selected, getMatchingTiles(t[t.length-1], tile.map(v=>{
+          $cursor.selected = adjustShape(map, $cursor.selected, getMatchingCoordsForTile(map, t[t.length-1], $settingsStore.wandRules, tile.map(v=>{
             let m: ArchMatcher = {}
             // TODO: if MatchArchs
             if ($settingsStore.wandRules.shouldMatchArchetypes) {
@@ -441,124 +421,6 @@
     }
   }
 
-  function getMatchingTiles(t: TraversedTile, matchers: ArchMatcher[]): CoordinateMatch[] {
-    let coords: CoordinateMatch[] = []
-
-    let getCoord = (y: number, x: number, z: number) => {
-      if (y < 0 || y >= map.Height) return
-      if (x < 0 || x >= map.Width) return
-      if (z < 0 || z >= map.Depth) return
-      if (coords.find(v=>v.y===y&&v.x===x&&v.z===z)) return
-
-      let open = true
-      let tiles = map.Tiles[y][x][z]
-      if (tiles.length > 0 && matchers.length===0) open = false
-      else {
-        if (matchers.length !== 0 && tiles.length === 0) {
-          open = false
-        } else {
-          for (let m of matchers) {
-            let okay = true
-            for (let a of tiles) {
-              if (m.archs) {
-                for (let mArch of m.archs) {
-                  let has = false
-                  for (let arch of a.Original.Archs) {
-                    if (mArch === arch) {
-                      has = true
-                      break
-                    }
-                  }
-                  if (!has) {
-                    okay = false
-                    break
-                  }
-                }
-              }
-              if (okay && m.name !== undefined) {
-                let r = new RegExp(m.name)
-                if (!r.test(a.Compiled.Name)) {
-                  okay = false
-                  break
-                }
-              }
-              if (okay && m.type !== undefined) {
-                let r = new RegExp(m.type)
-                if (!r.test(a.Compiled.Type)) {
-                  okay = false
-                  break
-                }
-              }
-            }
-            if (!okay) {
-              open = false
-              break
-            }
-          }
-        }
-      }
-
-      if (!open) {
-        coords.push({
-          y, x, z,
-          i: 0,
-          matched: false,
-        })
-        return
-      }
-
-      coords.push({
-        y, x, z,
-        i: 0,
-        matched: true,
-      })
-
-      // Get neighbors.
-      // Up, Down
-      if ($settingsStore.wandRules.matchY) {
-        getCoord(y-1, x, z)
-        getCoord(y+1, x, z)
-      }
-      // Left, right
-      if ($settingsStore.wandRules.matchX) {
-        getCoord(y, x-1, z)
-        getCoord(y, x+1, z)
-      }
-      // Top, bottom
-      if ($settingsStore.wandRules.matchZ) {
-        getCoord(y, x, z-1)
-        getCoord(y, x, z+1)
-      }
-
-      if ($settingsStore.wandRules.diagonal) {
-        if ($settingsStore.wandRules.matchX && $settingsStore.wandRules.matchY) {
-          getCoord(y-1, x-1, z)
-          getCoord(y+1, x-1, z)
-          getCoord(y+1, x+1, z)
-          getCoord(y-1, x+1, z)
-        }
-        if ($settingsStore.wandRules.matchX && $settingsStore.wandRules.matchZ) {
-          getCoord(y, x-1, z-1)
-          getCoord(y, x-1, z+1)
-          getCoord(y, x+1, z+1)
-          getCoord(y, x+1, z-1)
-        }
-        if ($settingsStore.wandRules.matchY && $settingsStore.wandRules.matchZ) {
-          getCoord(y-1, x, z-1)
-          getCoord(y-1, x, z+1)
-          getCoord(y+1, x, z+1)
-          getCoord(y+1, x, z-1)
-        }
-      }
-
-      // TODO: up, down, as well as diagonals
-    }
-
-    getCoord(t.y, t.x, t.z)
-
-    return coords
-  }
-
   function applyTool(t: TraversedTile) {
     if (tool === 'insert') {
       insert($palette.focused, t.y, t.x, t.z, t.i)
@@ -568,7 +430,7 @@
       if ($cursor.selected.length <= 1) {
         // Flood fill if we only have 1 tile selected.
         // FIXME: Use a match based upon the hover tile!
-        let tiles = getMatchingTiles(t, []).filter(v=>v.matched)
+        let tiles = getMatchingCoordsForTile(map, t, $settingsStore.wandRules, []).filter(v=>v.matched)
         for (let t of tiles) {
           insert($palette.focused, t.y, t.x, t.z, -1)
         }
@@ -600,13 +462,6 @@
     mapsStore.set($mapsStore)
   }
 
-  interface TraversedTile {
-    y: number
-    x: number
-    z: number
-    i: number
-    initial: boolean
-  }
   let traversedTiles: TraversedTile[] = []
   function startMouseDrag(e: MouseEvent, cb1: (t: TraversedTile, e?: MouseEvent) => void, cb2: (t: TraversedTile[], e?: MouseEvent) => void) {
     let [y, x, z] = getNearestFromMouse(e)
@@ -795,63 +650,7 @@
     let rules: ReplaceRules = ev.detail as ReplaceRules
 
     // First collect all our coordinates.
-    let coords = $cursor.selected
-    if (rules.matchMode === 'entire') {
-      let coords2: Coordinate[] = []
-      for (let c of coords) {
-        let tile = getTile(c.y, c.x, c.z)
-        if (tile !== null) {
-          for (let i = 0; i < tile.length; i++) {
-            coords2.push({y: c.y, x: c.x, z: c.z, i})
-          }
-        }
-      }
-      coords = coords2
-    } else if (rules.matchMode === 'top') {
-      let coords2: Coordinate[] = []
-      for (let c of coords) {
-        let tile = getTile(c.y, c.x, c.z)
-        if (tile !== null || tile.length !== 0) {
-          coords2.push({y: c.y, x: c.x, z: c.z, i: tile.length-1})
-        }
-      }
-      coords = coords2
-    } else if (rules.matchMode === 'range') {
-      let coords2: Coordinate[] = []
-      for (let c of coords) {
-        let tile = getTile(c.y, c.x, c.z)
-        if (tile !== null || tile.length !== 0) {
-          for (let i = rules.range[0]; i < rules.range[1]; i++) {
-            if (i < 0 || i >= tile.length) continue
-            coords2.push({y: c.y, x: c.x, z: c.z, i})
-          }
-        }
-      }
-      coords = coords2
-    }
-
-    // Now apply our filters.
-    coords = coords.filter(c => {
-      let tile = getTile(c.y, c.x, c.z)
-      if (rules.shouldMatchArchetypes) {
-        if (!tile[c.i].Compiled.Archs?.find(v=>rules.matchArchetypes.split(',').includes(v))) {
-          return false
-        }
-      }
-      if (rules.shouldMatchName) {
-        let r = new RegExp(rules.matchName)
-        if (!r.test(tile[c.i].Compiled.Name)) {
-          return false
-        }
-      }
-      if (rules.shouldMatchType) {
-        let r = new RegExp(rules.matchType)
-        if (!r.test(tile[c.i].Compiled.Type)) {
-          return false
-        }
-      }
-      return true
-    })
+    let coords = replaceShape($cursor.selected, map, rules)
 
     map.queue()
     for (let c of coords) {
@@ -866,33 +665,6 @@
     }
     map.unqueue()
     mapsStore.set($mapsStore)
-  }
-
-  function trimShape(c: Coordinate[]): Coordinate[] {
-    let sortX = c.sort((a, b) => {
-      if (a.x < b.x) return -1
-      if (a.x > b.x) return 1
-      return 0
-    })
-    let sortY = c.sort((a, b) => {
-      if (a.y < b.y) return -1
-      if (a.y > b.y) return 1
-      return 0
-    })
-    let sortZ = c.sort((a, b) => {
-      if (a.z < b.z) return -1
-      if (a.z > b.z) return 1
-      return 0
-    })
-    let minX = sortX[0]?.x || 0
-    let minY = sortY[0]?.y || 0
-    let minZ = sortZ[0]?.z || 0
-    return c.map(v=>({
-      ...v,
-      y: v.y - minY,
-      x: v.x - minX,
-      z: v.z - minZ,
-    }))
   }
 
   function copyShape() {

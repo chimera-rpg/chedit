@@ -427,12 +427,12 @@
             let [px, py, zIndex] = getCoordinatePosition(y, x, z)
             ctx.strokeStyle = $styles.colors.hoverBorder
 
-            drawVerticalBoxLines(y, x, z, y-1)
-
+            ctx.strokeStyle = '#00ff00'
             ctx.strokeRect(px*zoom, py*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+            ctx.strokeStyle = $styles.colors.hoverBorder
 
-            ;[px, py] = getCoordinatePosition(y-1, x, z)
-            ctx.strokeRect(px*zoom, py*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
+            /*;[px, py] = getCoordinatePosition(y, x, z)
+            ctx.strokeRect(px*zoom, py*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)*/
           }
         }
       }
@@ -440,7 +440,9 @@
     ctx.globalAlpha = 0.5
     drawLineHelpers(getOpenPositionBelow($cursor.hover.y+1, $cursor.hover.x, $cursor.hover.z), $cursor.hover.x, $cursor.hover.z)
     ctx.globalAlpha = 0.7
+    ctx.strokeStyle = '#00ff00'
     renderPositionLines($cursor.hover.y+1, $cursor.hover.x, $cursor.hover.z)
+    ctx.strokeStyle = $styles.colors.hoverBorder
     ctx.globalAlpha = 1
     ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
@@ -490,33 +492,37 @@
     let [x1, y1] = getCoordinatePosition(y, x, z)
     let [x2, y2] = [x1+map.Width*animationsConfig.TileWidth, y1+map.Depth*animationsConfig.TileHeight]
 
-    ctx.beginPath()
 
+    let oldStroke = ctx.strokeStyle
     // Left
+    ctx.strokeStyle = '#ff0000'
+    ctx.beginPath()
     ctx.moveTo(x1*zoom, y1*zoom)
     ctx.lineTo(0, y1*zoom)
     ctx.moveTo(x1*zoom, (y1+animationsConfig.TileHeight)*zoom)
     ctx.lineTo(0, (y1+animationsConfig.TileHeight)*zoom)
-
-    // Top
-    ctx.moveTo(x1*zoom, y1*zoom)
-    ctx.lineTo(x1*zoom, 0)
-    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, y1*zoom)
-    ctx.lineTo((x1+animationsConfig.TileWidth)*zoom, 0)
-
     // Right
     ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, y1*zoom)
     ctx.lineTo((x2+animationsConfig.TileWidth)*zoom, y1*zoom)
     ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
     ctx.lineTo((x2+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
+    ctx.stroke()
 
+    // Top
+    ctx.strokeStyle = '#0000ff'
+    ctx.beginPath()
+    ctx.moveTo(x1*zoom, y1*zoom)
+    ctx.lineTo(x1*zoom, 0)
+    ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, y1*zoom)
+    ctx.lineTo((x1+animationsConfig.TileWidth)*zoom, 0)
     // Bottom
     ctx.moveTo((x1)*zoom, (y1+animationsConfig.TileHeight)*zoom)
     ctx.lineTo((x1)*zoom, (y2+animationsConfig.TileHeight)*zoom)
     ctx.moveTo((x1+animationsConfig.TileWidth)*zoom, (y1+animationsConfig.TileHeight)*zoom)
     ctx.lineTo((x1+animationsConfig.TileWidth)*zoom, (y2+animationsConfig.TileHeight)*zoom)
-
     ctx.stroke()
+
+    ctx.strokeStyle = oldStroke
   }
 
   function drawBoundingBox(y: number, x: number, z: number, h: number, w: number, d: number) {

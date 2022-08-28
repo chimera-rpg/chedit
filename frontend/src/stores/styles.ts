@@ -8,10 +8,10 @@ interface Styles {
 }
 
 export const defaultColors: Colors = {
-  cursorBorder: '#f00',
+  cursorBorder: '#f80',
   hoverBorder: '#fff',
-  selectedBorder: '#ff0',
-  selectingBorder: '#ff0',
+  selectedBorder: '#f80',
+  selectingBorder: '#f80',
   placingBorder: '#00f',
 }
 

@@ -254,8 +254,8 @@
         let y = getOpenPositionBelow($cursor.hover.y, x, z)
         if ($settingsStore.showHeightNumbersSameYOnly && y !== $cursor.hover.y-1) continue
         let [left, top] = getCoordinatePosition(y, x, z)
-        ctx.strokeText(`${y+1}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
-        ctx.fillText(`${y+1}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+        ctx.strokeText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
+        ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
       }
     }
     ctx.globalAlpha = 1
@@ -271,20 +271,17 @@
     // Draw hover
     let y = getOpenPositionBelow($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
     let [left, top] = getCoordinatePosition(y, $cursor.hover.x, $cursor.hover.z)
-    y++
     ctx.strokeText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
     ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
 
     // Draw cursor start and end
     y = getOpenPositionBelow($cursor.start.y, $cursor.start.x, $cursor.start.z)
     ;[left, top] = getCoordinatePosition(y, $cursor.start.x, $cursor.start.z)
-    y++
     ctx.strokeText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
     ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
 
     y = getOpenPositionBelow($cursor.end.y, $cursor.end.x, $cursor.end.z)
     ;[left, top] = getCoordinatePosition(y, $cursor.end.x, $cursor.end.z)
-    y++
     ctx.strokeText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
     ctx.fillText(`${y}`, left * zoom + (animationsConfig.TileWidth/2)*zoom, top * zoom + (animationsConfig.TileHeight/2)*zoom)
 
@@ -313,12 +310,12 @@
       let y1 = t.y + $cursor.hover.y
       let x1 = t.x + $cursor.hover.x
       let z1 = t.z + $cursor.hover.z
-      drawVerticalBoxLines(y1, x1, z1, y1-1)
+      drawVerticalBoxLines(y1+1, x1, z1, y1)
 
-      let [x, y] = getCoordinatePosition(y1, x1, z1)
+      let [x, y] = getCoordinatePosition(y1+1, x1, z1)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
-      ;[x, y] = getCoordinatePosition(y1-1, x1, z1)
+      ;[x, y] = getCoordinatePosition(y1, x1, z1)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
 
@@ -326,24 +323,24 @@
     ctx.strokeStyle = $styles.colors.selectedBorder
     ctx.globalAlpha = 0.4
     for (let t of $cursor.selected) {
-      drawVerticalBoxLines(t.y, t.x, t.z, t.y-1)
+      drawVerticalBoxLines(t.y+1, t.x, t.z, t.y)
 
-      let [x, y] = getCoordinatePosition(t.y, t.x, t.z)
+      let [x, y] = getCoordinatePosition(t.y+1, t.x, t.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
-      ;[x, y] = getCoordinatePosition(t.y-1, t.x, t.z)
+      ;[x, y] = getCoordinatePosition(t.y, t.x, t.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     // Draw selecting.
     ctx.strokeStyle = $styles.colors.selectingBorder
     ctx.globalAlpha = 0.6
     for (let t of $cursor.selecting) {
-      drawVerticalBoxLines(t.y, t.x, t.z, t.y-1)
+      drawVerticalBoxLines(t.y+1, t.x, t.z, t.y)
 
-      let [x, y] = getCoordinatePosition(t.y, t.x, t.z)
+      let [x, y] = getCoordinatePosition(t.y+1, t.x, t.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
-      ;[x, y] = getCoordinatePosition(t.y-1, t.x, t.z)
+      ;[x, y] = getCoordinatePosition(t.y, t.x, t.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
     }
     ctx.globalAlpha = 1
@@ -351,16 +348,16 @@
     {
       ctx.strokeStyle = $styles.colors.cursorBorder
       //drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
-      drawVerticalBoxLines($cursor.start.y, $cursor.start.x, $cursor.start.z, $cursor.start.y-1)
+      drawVerticalBoxLines($cursor.start.y+1, $cursor.start.x, $cursor.start.z, $cursor.start.y)
 
-      let [x, y] = getCoordinatePosition($cursor.start.y, $cursor.start.x, $cursor.start.z)
+      let [x, y] = getCoordinatePosition($cursor.start.y+1, $cursor.start.x, $cursor.start.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
-      ;[x, y] = getCoordinatePosition($cursor.start.y-1, $cursor.start.x, $cursor.start.z)
+      ;[x, y] = getCoordinatePosition($cursor.start.y, $cursor.start.x, $cursor.start.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
       ctx.globalAlpha = 0.7
-      renderPositionLines($cursor.start.y, $cursor.start.x, $cursor.start.z)
+      renderPositionLines($cursor.start.y+1, $cursor.start.x, $cursor.start.z)
       ctx.globalAlpha = 1
     }
     // Draw cursor end.
@@ -368,16 +365,16 @@
       ctx.globalAlpha = 0.3
       ctx.strokeStyle = $styles.colors.cursorBorder
       //drawVerticalBoxLines(cursorY, cursorX, cursorZ, cursorY-1)
-      drawVerticalBoxLines($cursor.end.y, $cursor.end.x, $cursor.end.z, $cursor.end.y-1)
+      drawVerticalBoxLines($cursor.end.y+1, $cursor.end.x, $cursor.end.z, $cursor.end.y)
 
-      let [x, y] = getCoordinatePosition($cursor.end.y, $cursor.end.x, $cursor.end.z)
+      let [x, y] = getCoordinatePosition($cursor.end.y+1, $cursor.end.x, $cursor.end.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
-      ;[x, y] = getCoordinatePosition($cursor.end.y-1, $cursor.end.x, $cursor.end.z)
+      ;[x, y] = getCoordinatePosition($cursor.end.y, $cursor.end.x, $cursor.end.z)
       ctx.strokeRect(x*zoom, y*zoom, animationsConfig.TileWidth*zoom, animationsConfig.TileHeight*zoom)
 
       ctx.globalAlpha = 0.7
-      renderPositionLines($cursor.end.y, $cursor.end.x, $cursor.end.z)
+      renderPositionLines($cursor.end.y+1, $cursor.end.x, $cursor.end.z)
       ctx.globalAlpha = 1
     }
 
@@ -387,10 +384,10 @@
       let hX = $settingsStore.cursorRules.width
       let hZ = $settingsStore.cursorRules.depth
 
-      let startY = $cursor.hover.y
+      let startY = $cursor.hover.y+1
       let startX = $cursor.hover.x
       let startZ = $cursor.hover.z
-      let endY = $cursor.hover.y + hY
+      let endY = $cursor.hover.y + hY +1
       let endX = $cursor.hover.x + hX
       let endZ = $cursor.hover.z + hZ
       for (let y = startY; y < endY; y++) {
@@ -441,9 +438,9 @@
       }
     }
     ctx.globalAlpha = 0.5
-    drawLineHelpers(getOpenPositionBelow($cursor.hover.y, $cursor.hover.x, $cursor.hover.z), $cursor.hover.x, $cursor.hover.z)
+    drawLineHelpers(getOpenPositionBelow($cursor.hover.y+1, $cursor.hover.x, $cursor.hover.z), $cursor.hover.x, $cursor.hover.z)
     ctx.globalAlpha = 0.7
-    renderPositionLines($cursor.hover.y, $cursor.hover.x, $cursor.hover.z)
+    renderPositionLines($cursor.hover.y+1, $cursor.hover.x, $cursor.hover.z)
     ctx.globalAlpha = 1
     ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
@@ -466,7 +463,7 @@
         break
       }
     }
-    return i
+    return i+1
   }
 
   function drawVerticalBoxLines(y: number, x: number, z: number, y_: number) {
@@ -531,6 +528,13 @@
 
     let [bx1, by1] = getCoordinatePosition(y+h, x, z)
     let [bx2, by2] = [bx1+animationsConfig.TileWidth*w, by1+animationsConfig.TileHeight*d]
+
+    if (d > 1) {
+      by1 -= animationsConfig.TileHeight*(d-1)
+      by2 -= animationsConfig.TileHeight*(d-1)
+      ay1 -= animationsConfig.TileHeight*(d-1)
+      ay2 -= animationsConfig.TileHeight*(d-1)
+    }
 
     // bottom box
     ctx.moveTo(ax1*zoom, ay1*zoom)

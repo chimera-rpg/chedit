@@ -84,7 +84,7 @@ export function cloneObject(object: any) {
 }
 
 // compileInJS is used _only_ for compiling in-map archetypes.
-export function compileInJS(arch: Archetype, compile?: boolean): Archetype {
+export function compileInJS(arch: Archetype, compile?: boolean, container?: ArchetypeContainer): Archetype {
   if (!compile || arch.Compile) {
     return arch
   }
@@ -106,17 +106,17 @@ export function compileInJS(arch: Archetype, compile?: boolean): Archetype {
       dep = dep.substring(1)
       shouldMerge = false
     }
-    let arch2 = getArchetype(dep)
+    let arch2 = getArchetypeContainer(dep)
     if (!arch2) {
       throw new Error(`missing dep ${dep}`)
     }
 
-    compileInJS(arch2, compile)
+    compileInJS(arch2.Compiled, compile, arch2)
 
     if (shouldMerge) {
-      arch = mergeArch(arch, arch2)
+      arch = mergeArch(arch, arch2.Compiled)
     } else {
-      arch = addArch(arch, arch2)
+      arch = addArch(arch, arch2.Compiled)
     }
   }
 
@@ -128,6 +128,10 @@ export function compileInJS(arch: Archetype, compile?: boolean): Archetype {
   
   arch.Compile = 'compiled'
 
+  if (container) {
+    container.Compiled = arch
+  }
+
   return arch
 }
 
@@ -136,6 +140,11 @@ export let localArchetypes: ArchetypesStore = {archetypes: {}, tree: {}}
 archetypes.subscribe((value: ArchetypesStore) => {
   localArchetypes = value
 })
+
+
+function getArchetypeContainer(name: string): ArchetypeContainer {
+  return localArchetypes.archetypes[name]
+}
 
 function getArchetype(name: string): Archetype {
   let r = localArchetypes.archetypes[name]

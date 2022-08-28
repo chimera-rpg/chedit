@@ -542,6 +542,8 @@
       ay2 -= animationsConfig.TileHeight*(d-1)
     }
 
+    ctx.beginPath()
+
     // bottom box
     ctx.moveTo(ax1*zoom, ay1*zoom)
     ctx.lineTo(ax2*zoom, ay1*zoom)
@@ -568,7 +570,6 @@
     ctx.lineTo(bx2*zoom, by1*zoom)
     ctx.moveTo(ax2*zoom, ay2*zoom)
     ctx.lineTo(bx2*zoom, by2*zoom)
-
 
     ctx.stroke()
   }

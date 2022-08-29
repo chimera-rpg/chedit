@@ -866,11 +866,11 @@
             </aside>
           </SplitPane>
           {#if viewMode === 'properties'}
-            <div transition:fade class='dialog' on:click={_=>showProperties=false}>
+            <div transition:fade class='dialog'>
               <PropertiesEditor bind:map={map}></PropertiesEditor>
             </div>
           {:else if viewMode === 'scripts'}
-            <div transition:fade class='dialog' on:click={_=>showScripts=false}>
+            <div transition:fade class='dialog'>
               <ScriptsEditor bind:map={map}></ScriptsEditor>
             </div>
           {/if}

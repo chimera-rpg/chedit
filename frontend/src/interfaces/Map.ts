@@ -10,6 +10,7 @@ export interface BaseMap {
   Width?: number
   Height?: number
   Darkness?: number
+  Outdoor?: boolean
   ResetTime?: number
   Y?: number
   X?: number

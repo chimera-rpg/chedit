@@ -19,7 +19,7 @@
   $: changed = changeCount.length>0 || growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0
 
   function change(key: string, v: any) {
-    if (['Depth','Width','Height','Darkness','ResetTime','Y','X','Z'].includes(key)) {
+    if (['Depth','Width','Height','AmbientBrightness','AmbientHue', 'OutdoorBrightness','ResetTime','Y','X','Z'].includes(key)) {
       v = Number(v)
     }
     changes[key] = v
@@ -173,8 +173,20 @@
           <input type='checkbox' checked={changes['Haven']} on:change={e=>change('Haven', e.currentTarget.checked)}/>
         </label>
         <label>
-          <span>Default Darkness</span>
-          <input type='number' value={changes['Darkness']} on:change={e=>change('Darkness', e.currentTarget.value)}/>
+          <span>Ambient Brightness</span>
+          <input type='number' value={changes['AmbientBrightness']} on:change={e=>change('AmbientBrightness', e.currentTarget.value)}/>
+        </label>
+        <label>
+          <span>Ambient Hue</span>
+          <input type='number' value={changes['AmbientHue']} on:change={e=>change('AmbientHue', e.currentTarget.value)}/>
+        </label>
+        <label>
+          <span>Outdoor</span>
+          <input type='checkbox' checked={changes['Outdoor']} on:change={e=>change('Outdoor', e.currentTarget.checked)}/>
+        </label>
+        <label>
+          <span>Outdoor Brightness</span>
+          <input type='number' value={changes['OutdoorBrightness']} on:change={e=>change('OutdoorBrightness', e.currentTarget.value)}/>
         </label>
       </section>
     </div>

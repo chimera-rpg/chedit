@@ -224,9 +224,7 @@ export interface ExitInfo {
 
 export interface Light {
   Brightness: number
-  Red: number
-  Green: number
-  Blue: number
+  Hue: number
   Intensity: number
 }
 

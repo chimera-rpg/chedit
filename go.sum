@@ -2,10 +2,10 @@ github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf h1:FPsprx82rdrX2j
 github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf/go.mod h1:peYoMncQljjNS6tZwI9WVyQB3qZS6u79/N3mBOcnd3I=
 github.com/bep/debounce v1.2.1 h1:v67fRdBA9UQu2NhLFXrSg0Brw7CexQekrBwDMM8bzeY=
 github.com/bep/debounce v1.2.1/go.mod h1:H8yggRPQKLUhUoqrJC1bO2xNya7vanpDl7xR3ISbCJ0=
-github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b h1:+Y/F5oMFp09+8qNkewMzMPv8X73/J3Ln4DU7yNmEJAQ=
-github.com/chimera-rpg/go-common v0.0.0-20220601082951-5135e3333f0b/go.mod h1:/FwRKhQznOZpTqwkeKsxXiRD2BJVU5hU5B932mDTQnY=
-github.com/chimera-rpg/go-server v0.0.0-20220603004030-bcd454480575 h1:FqnIceAOYv4m2fNTTfv/8phWzAiDb2xGitkkQ0iYbGQ=
-github.com/chimera-rpg/go-server v0.0.0-20220603004030-bcd454480575/go.mod h1:WgvC+vkS8RRLN0TgZpJQjQ4ymKVOjqLBPUTBIrZrseA=
+github.com/chimera-rpg/go-common v0.0.0-20220829032117-5e5778c2155b h1:7DM4/GmwaBwq6nX7mjPMQAzOpmp0+rkDqNcClEKTVXk=
+github.com/chimera-rpg/go-common v0.0.0-20220829032117-5e5778c2155b/go.mod h1:/FwRKhQznOZpTqwkeKsxXiRD2BJVU5hU5B932mDTQnY=
+github.com/chimera-rpg/go-server v0.0.0-20220829034402-977d35ea883f h1:9qJVFQ+6IbzMftCo/2oc/nHzbo+0hXuGNrlZ7yE8d00=
+github.com/chimera-rpg/go-server v0.0.0-20220829034402-977d35ea883f/go.mod h1:OiAA8imLk5fC4hDVvJ3CBr2plnLvrW+msm1qQNVsTWw=
 github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898 h1:wJEWj0f2mjjweXAOsqw0YxEnfTwzWNpxDRGkN+SaIV0=
 github.com/cosmos72/gomacro v0.0.0-20220110200413-b2701849f898/go.mod h1:60O8/t169OwS8bX0BeWSjxlGGb/I5cGYc6Brt5rWDL0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

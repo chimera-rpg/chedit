@@ -91,7 +91,7 @@
 
   function change(which: string, value: any) {
     if (showCompiled) return
-    cloned[which] = value
+    clonedDD[which] = value
     cloned = {...cloned}
   }
   function clear(which: string) {

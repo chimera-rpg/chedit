@@ -82,7 +82,7 @@
               zIndex: zIndex,
               frame: null,
             }
-            di.frame = anims[di.arch.Compiled.Anim]?.Faces[di.arch.Compiled.Face][0]
+            di.frame = anims[di.arch.Compiled.Anim]?.Faces[di.arch.Compiled.Face]?.[0]
             dl.push(di)
           }
         }

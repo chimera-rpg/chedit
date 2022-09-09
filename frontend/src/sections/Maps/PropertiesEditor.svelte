@@ -17,12 +17,26 @@
   let changes = Object.keys(map).filter(k => MapFields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
   $: changeCount = Object.keys(changes).map(k=>changes[k]===map[k]).filter(v=>v!==true)
   $: changed = changeCount.length>0 || growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0
+  $: outdoorRGB = '#' + [changes['OutdoorRed'], changes['OutdoorGreen'], changes['OutdoorBlue']].map(x => { const hex = x.toString(16); return hex.length === 1 ? '0' + hex : hex }).join('')
+  $: ambientRGB = '#' + [changes['AmbientRed'], changes['AmbientGreen'], changes['AmbientBlue']].map(x => { const hex = x.toString(16); return hex.length === 1 ? '0' + hex : hex }).join('')
 
   function change(key: string, v: any) {
     if (['Depth','Width','Height','AmbientRed','AmbientGreen','AmbientBlue', 'OutdoorRed', 'OutdoorGreen', 'OutdoorBlue','ResetTime','Y','X','Z'].includes(key)) {
       v = Number(v)
     }
-    changes[key] = v
+    if (key === 'OutdoorRGB') {
+      let n = parseInt(v.slice(1), 16)
+      changes['OutdoorRed'] = (n >> 16) & 255
+      changes['OutdoorGreen'] = (n >> 8) & 255
+      changes['OutdoorBlue'] = n & 255
+    } else if (key === 'AmbientRGB') {
+      let n = parseInt(v.slice(1), 16)
+      changes['AmbientRed'] = (n >> 16) & 255
+      changes['AmbientGreen'] = (n >> 8) & 255
+      changes['AmbientBlue'] = n & 255
+    } else {
+      changes[key] = v
+    }
   }
 
   function reset() {
@@ -172,34 +186,46 @@
           <span>Haven</span>
           <input type='checkbox' checked={changes['Haven']} on:change={e=>change('Haven', e.currentTarget.checked)}/>
         </label>
-        <label>
-          <span>Ambient Red</span>
-          <input type='number' value={changes['AmbientRed']} on:change={e=>change('AmbientRed', e.currentTarget.value)}/>
-        </label>
-        <label>
-          <span>Ambient Green</span>
-          <input type='number' value={changes['AmbientGreen']} on:change={e=>change('AmbientGreen', e.currentTarget.value)}/>
-        </label>
-        <label>
-          <span>Ambient Blue</span>
-          <input type='number' value={changes['AmbientBlue']} on:change={e=>change('AmbientBlue', e.currentTarget.value)}/>
-        </label>
+        <article>
+          <span>Ambient Color</span>
+          <label>
+            <input type='color' value={ambientRGB} on:change={e=>change('AmbientRGB', e.currentTarget.value)}/>
+          </label>
+          <label>
+            <span>Red</span>
+            <input type='number' value={changes['AmbientRed']} on:change={e=>change('AmbientRed', e.currentTarget.value)}/>
+          </label>
+          <label>
+            <span>Green</span>
+            <input type='number' value={changes['AmbientGreen']} on:change={e=>change('AmbientGreen', e.currentTarget.value)}/>
+          </label>
+          <label>
+            <span>Blue</span>
+            <input type='number' value={changes['AmbientBlue']} on:change={e=>change('AmbientBlue', e.currentTarget.value)}/>
+          </label>
+        </article>
         <label>
           <span>Outdoor</span>
           <input type='checkbox' checked={changes['Outdoor']} on:change={e=>change('Outdoor', e.currentTarget.checked)}/>
         </label>
-        <label>
-          <span>Outdoor Red</span>
-          <input type='number' value={changes['OutdoorRed']} on:change={e=>change('OutdoorRed', e.currentTarget.value)}/>
-        </label>
-        <label>
-          <span>Outdoor Green</span>
-          <input type='number' value={changes['OutdoorGreen']} on:change={e=>change('OutdoorGreen', e.currentTarget.value)}/>
-        </label>
-        <label>
-          <span>Outdoor Blue</span>
-          <input type='number' value={changes['OutdoorBlue']} on:change={e=>change('OutdoorBlue', e.currentTarget.value)}/>
-        </label>
+        <article>
+          <span>Outdoor Color</span>
+          <label>
+            <input type='color' value={outdoorRGB} on:change={e=>change('OutdoorRGB', e.currentTarget.value)}/>
+          </label>
+          <label>
+            <span>Red</span>
+            <input type='number' value={changes['OutdoorRed']} on:change={e=>change('OutdoorRed', e.currentTarget.value)}/>
+          </label>
+          <label>
+            <span>Green</span>
+            <input type='number' value={changes['OutdoorGreen']} on:change={e=>change('OutdoorGreen', e.currentTarget.value)}/>
+          </label>
+          <label>
+            <span>Blue</span>
+            <input type='number' value={changes['OutdoorBlue']} on:change={e=>change('OutdoorBlue', e.currentTarget.value)}/>
+          </label>
+        </article>
       </section>
     </div>
   </div>

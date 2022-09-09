@@ -159,6 +159,15 @@
     }
     cloned = {...cloned}
   }
+  function toggleEvents(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+    if (!e.currentTarget.checked) {
+      delete cloned.Events
+    } else {
+      cloned.Events = {
+      }
+    }
+    cloned = {...cloned}
+  }
   function toggleCompiled() {
     showCompiled = !showCompiled
     disabled = showCompiled
@@ -323,7 +332,23 @@
         </fieldset>
 
         <fieldset>
-          <legend>Events</legend>
+          <legend>
+            <label>
+              <span>Events</span>
+              <input type='checkbox' on:change={toggleEvents} checked={cloned.Events!==undefined}>
+            </label>
+          </legend>
+          {#if cloned.Events !== undefined}
+            <fieldset>
+              <legend>
+                <span>Birth</span>
+                <input type='checkbox' on:change={toggleEvents} checked={cloned.Events.Birth!==undefined}>
+              </legend>
+              {#if cloned.Events.Birth !== undefined}
+                TODO
+              {/if}
+            </fieldset>
+          {/if}
           {#if (cloned.Type??arch.Compiled.Type) == 'Exit'}
             <details>
               <summary>Exit</summary>

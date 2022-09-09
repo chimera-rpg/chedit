@@ -7,9 +7,9 @@
   export let clonedDD: any
   export let compiledDD: any
 
-  export let min: string|number
-  export let max: string|number
-  export let step: string|number
+  export let min: string|number = ''
+  export let max: string|number = ''
+  export let step: string|number = ''
 
   export let list: any = []
 

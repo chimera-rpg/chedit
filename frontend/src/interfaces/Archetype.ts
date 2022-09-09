@@ -223,9 +223,9 @@ export interface ExitInfo {
 }
 
 export interface Light {
-  R: number
-  G: number
-  B: number
+  Red: number
+  Green: number
+  Blue: number
   Distance: number
   Falloff: number
 }

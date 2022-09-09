@@ -150,9 +150,9 @@
       delete cloned.Light
     } else {
       cloned.Light = {
-        R: 255,
-        G: 255,
-        B: 255,
+        Red: 255,
+        Green: 255,
+        Blue: 255,
         Distance: 8,
         Falloff: 1,
       }
@@ -304,6 +304,7 @@
               </svelte:fragment>
             </ItemList>
           </div>
+        </fieldset>
 
         <fieldset>
           <legend>
@@ -313,7 +314,11 @@
             </label>
           </legend>
           {#if cloned.Light}
-            <div>TODO</div>
+            <Field key='Light.Red' type='number' step=1 min=0 max=255 {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Light.Green' type='number' step=1 min=0 max=255 {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Light.Blue' type='number' step=1 min=0 max=255 {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Light.Distance' type='number' step=1 min=1 max=100  {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+            <Field key='Light.Falloff' type='number' step=0.1 min=0 max=10 {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
           {/if}
         </fieldset>
 

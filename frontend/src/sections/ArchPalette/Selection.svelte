@@ -9,10 +9,11 @@
 <div>
   {#if arch && arch.Compiled}
     <ArchView arch={arch.Compiled} anim={arch.Compiled.Anim} face={arch.Compiled.Face} zoom={2}></ArchView>
-    <span title={arch.Compiled.Anim+':'+arch.Compiled.Face}>{arch.Compiled.Name}</span>
+    <span title={arch.Compiled.Anim+':'+arch.Compiled.Face}>{arch.Compiled.Name} <small>{arch.Compiled.Self}</small></span>
   {:else}
     <span></span>
     <span>{$palette.focused}</span>
+    <span></span>
   {/if}
 </div>
 

@@ -19,7 +19,7 @@
   $: changed = changeCount.length>0 || growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0
 
   function change(key: string, v: any) {
-    if (['Depth','Width','Height','AmbientBrightness','AmbientHue', 'OutdoorBrightness','ResetTime','Y','X','Z'].includes(key)) {
+    if (['Depth','Width','Height','AmbientRed','AmbientGreen','AmbientBlue', 'OutdoorRed', 'OutdoorGreen', 'OutdoorBlue','ResetTime','Y','X','Z'].includes(key)) {
       v = Number(v)
     }
     changes[key] = v

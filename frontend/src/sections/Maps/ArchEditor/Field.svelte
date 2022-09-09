@@ -7,6 +7,10 @@
   export let clonedDD: any
   export let compiledDD: any
 
+  export let min: string|number
+  export let max: string|number
+  export let step: string|number
+
   export let list: any = []
 
   export let label: string = ''
@@ -53,7 +57,7 @@
       {/if}
     </select>
   {:else if type === 'number'}
-    <input disabled={disabled} type='number' value={clonedDD[key]??''} placeholder={compiledDD[key]} on:change={change}/>
+    <input disabled={disabled} type='number' value={clonedDD[key]??''} placeholder={compiledDD[key]} min={min} max={max} step={step} on:change={change}/>
   {:else}
     <input disabled={disabled} type={type} value={clonedDD[key]??''} placeholder={compiledDD[key]} on:change={change}/>
   {/if}

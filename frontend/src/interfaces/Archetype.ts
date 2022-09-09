@@ -223,9 +223,11 @@ export interface ExitInfo {
 }
 
 export interface Light {
-  Brightness: number
-  Hue: number
-  Intensity: number
+  R: number
+  G: number
+  B: number
+  Distance: number
+  Falloff: number
 }
 
 export interface Specials {

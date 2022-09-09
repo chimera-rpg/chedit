@@ -173,20 +173,32 @@
           <input type='checkbox' checked={changes['Haven']} on:change={e=>change('Haven', e.currentTarget.checked)}/>
         </label>
         <label>
-          <span>Ambient Brightness</span>
-          <input type='number' value={changes['AmbientBrightness']} on:change={e=>change('AmbientBrightness', e.currentTarget.value)}/>
+          <span>Ambient Red</span>
+          <input type='number' value={changes['AmbientRed']} on:change={e=>change('AmbientRed', e.currentTarget.value)}/>
         </label>
         <label>
-          <span>Ambient Hue</span>
-          <input type='number' value={changes['AmbientHue']} on:change={e=>change('AmbientHue', e.currentTarget.value)}/>
+          <span>Ambient Green</span>
+          <input type='number' value={changes['AmbientGreen']} on:change={e=>change('AmbientGreen', e.currentTarget.value)}/>
+        </label>
+        <label>
+          <span>Ambient Blue</span>
+          <input type='number' value={changes['AmbientBlue']} on:change={e=>change('AmbientBlue', e.currentTarget.value)}/>
         </label>
         <label>
           <span>Outdoor</span>
           <input type='checkbox' checked={changes['Outdoor']} on:change={e=>change('Outdoor', e.currentTarget.checked)}/>
         </label>
         <label>
-          <span>Outdoor Brightness</span>
-          <input type='number' value={changes['OutdoorBrightness']} on:change={e=>change('OutdoorBrightness', e.currentTarget.value)}/>
+          <span>Outdoor Red</span>
+          <input type='number' value={changes['OutdoorRed']} on:change={e=>change('OutdoorRed', e.currentTarget.value)}/>
+        </label>
+        <label>
+          <span>Outdoor Green</span>
+          <input type='number' value={changes['OutdoorGreen']} on:change={e=>change('OutdoorGreen', e.currentTarget.value)}/>
+        </label>
+        <label>
+          <span>Outdoor Blue</span>
+          <input type='number' value={changes['OutdoorBlue']} on:change={e=>change('OutdoorBlue', e.currentTarget.value)}/>
         </label>
       </section>
     </div>

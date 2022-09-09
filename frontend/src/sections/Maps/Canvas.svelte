@@ -468,6 +468,48 @@
     return i+1
   }
 
+  function getOpenPositionLeft(y: number, x: number, z: number): number {
+    let i = x-1
+    for (; i > 0; i--) {
+      if (!map.Tiles[y]) continue
+      if (!map.Tiles[y][i]) continue
+      if (!map.Tiles[y][i][z]) continue
+      let blocks = false
+      for (let a of map.Tiles[y][i][z]) {
+        if (!a.Compiled.Blocking) continue
+        if (a.Compiled.Blocking.includes('Solid') && a.Compiled.Blocking.includes('Physical')) {
+          blocks = true
+          break
+        }
+      }
+      if (blocks) {
+        break
+      }
+    }
+    return i+1
+  }
+
+  function getOpenPositionRight(y: number, x: number, z: number): number {
+    let i = x+1
+    for (; i < map.Width; i++) {
+      if (!map.Tiles[y]) continue
+      if (!map.Tiles[y][i]) continue
+      if (!map.Tiles[y][i][z]) continue
+      let blocks = false
+      for (let a of map.Tiles[y][i][z]) {
+        if (!a.Compiled.Blocking) continue
+        if (a.Compiled.Blocking.includes('Solid') && a.Compiled.Blocking.includes('Physical')) {
+          blocks = true
+          break
+        }
+      }
+      if (blocks) {
+        break
+      }
+    }
+    return i+1
+  }
+
   function drawVerticalBoxLines(y: number, x: number, z: number, y_: number) {
     let [x1, y1] = getCoordinatePosition(y, x, z)
     let [x2, y2] = getCoordinatePosition(y_, x, z)

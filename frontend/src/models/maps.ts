@@ -163,7 +163,7 @@ export function makeMap(): ContainerMap {
   return m
 }
 
-export const MapFields = ['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'Outdoor', 'OutdoorBrightness', 'AmbientBrightness', 'AmbientHue', 'Haven', 'ResetTime', 'Y', 'X', 'Z', 'Script']
+export const MapFields = ['DataName', 'Name', 'Description', 'Lore', 'Depth', 'Width', 'Height', 'Darkness', 'Outdoor', 'OutdoorRed', 'OutdoorGreen', 'OutdoorBlue', 'AmbientRed', 'AmbientGreen', 'AmbientBlue', 'Haven', 'ResetTime', 'Y', 'X', 'Z', 'Script']
 
 type MapActionPosition = {
   y: number;

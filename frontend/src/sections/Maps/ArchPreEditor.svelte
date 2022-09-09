@@ -145,6 +145,20 @@
     if (cloned.Blocking.length === 0) delete cloned.Blocking
     cloned = {...cloned}
   }
+  function toggleLight(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+    if (!e.currentTarget.checked) {
+      delete cloned.Light
+    } else {
+      cloned.Light = {
+        R: 255,
+        G: 255,
+        B: 255,
+        Distance: 8,
+        Falloff: 1,
+      }
+    }
+    cloned = {...cloned}
+  }
   function toggleCompiled() {
     showCompiled = !showCompiled
     disabled = showCompiled
@@ -291,6 +305,16 @@
             </ItemList>
           </div>
 
+        <fieldset>
+          <legend>
+            <label>
+              <span>Light</span>
+              <input type='checkbox' on:change={toggleLight} checked={cloned.Light!==undefined}>
+            </label>
+          </legend>
+          {#if cloned.Light}
+            <div>TODO</div>
+          {/if}
         </fieldset>
 
         <fieldset>

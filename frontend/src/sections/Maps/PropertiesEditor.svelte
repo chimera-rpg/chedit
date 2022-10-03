@@ -17,8 +17,8 @@
   let changes = Object.keys(map).filter(k => MapFields.includes(k)).reduce((cur, key) => { return Object.assign(cur, { [key]: map[key] })}, {})
   $: changeCount = Object.keys(changes).map(k=>changes[k]===map[k]).filter(v=>v!==true)
   $: changed = changeCount.length>0 || growLeft!=0 || growRight!=0 || growBottom!=0 || growTop!=0 || growUp!=0 || growDown!=0
-  $: outdoorRGB = '#' + [changes['OutdoorRed'], changes['OutdoorGreen'], changes['OutdoorBlue']].map(x => { const hex = x.toString(16); return hex.length === 1 ? '0' + hex : hex }).join('')
-  $: ambientRGB = '#' + [changes['AmbientRed'], changes['AmbientGreen'], changes['AmbientBlue']].map(x => { const hex = x.toString(16); return hex.length === 1 ? '0' + hex : hex }).join('')
+  $: outdoorRGB = '#' + [changes['OutdoorRed'], changes['OutdoorGreen'], changes['OutdoorBlue']].map(x => { const hex = Number(x).toString(16); return hex.length === 1 ? '0' + hex : hex }).join('')
+  $: ambientRGB = '#' + [changes['AmbientRed'], changes['AmbientGreen'], changes['AmbientBlue']].map(x => { const hex = Number(x).toString(16); return hex.length === 1 ? '0' + hex : hex }).join('')
 
   function change(key: string, v: any) {
     if (['Depth','Width','Height','AmbientRed','AmbientGreen','AmbientBlue', 'OutdoorRed', 'OutdoorGreen', 'OutdoorBlue','ResetTime','Y','X','Z'].includes(key)) {

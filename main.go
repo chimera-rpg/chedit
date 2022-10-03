@@ -30,7 +30,7 @@ func main() {
 	}
 	editor.ConfigDir = filepath.Join(configDir, "chimera", "editor")
 
-	err = os.MkdirAll(configDir, 0755)
+	err = os.MkdirAll(editor.ConfigDir, 0755)
 	if err != nil {
 		panic(err)
 	}

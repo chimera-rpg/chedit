@@ -252,12 +252,17 @@
             <Field key='Specials.Haven' type='checkbox' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
           </fieldset>
         {/if}
+        {#if (cloned.Type??arch.Compiled.Type) == 'Equipable'}
+          <fieldset>
+            <legend>Equipable</legend>
+            <Field key='Armor' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          </fieldset>
+        {/if}
         <fieldset>
           <legend>Appearance</legend>
           <Field key='Anim' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
           <Field key='Face' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
         </fieldset>
-
         <fieldset>
           <legend>Dimensionality</legend>
           <Field key='Height' type='number' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>

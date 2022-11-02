@@ -85,10 +85,8 @@ export let ArchetypeTypes = {
     "Audio",
   ],
   "Items": [
+    "Equipable",
     "Item",
-    "Armor",
-    "Shield",
-    "Weapon",
     "Food",
   ],
   "Characters": [

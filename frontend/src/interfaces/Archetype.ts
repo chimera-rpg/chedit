@@ -16,6 +16,7 @@ export interface Archetype {
   Name?: string
   Description?: string
   Type?: string
+  TypeHints?: string[]
 
   Anim?: string
   Face?: string

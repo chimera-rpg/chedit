@@ -119,6 +119,23 @@
   function removeArch(index: number) {
     if (showCompiled) return
     cloned.Archs.splice(index, 1)
+    if (cloned.Archs.length === 0) {
+      delete cloned.Archs
+    }
+    cloned = {...cloned}
+  }
+  function addTypeHint() {
+    if (showCompiled) return
+    if (!cloned.TypeHints) cloned.TypeHints = []
+    cloned.TypeHints = [...cloned.TypeHints, '']
+    cloned = {...cloned}
+  }
+  function removeTypeHint(index: number) {
+    if (showCompiled) return
+    cloned.TypeHints.splice(index, 1)
+    if (cloned.TypeHints.length === 0) {
+      delete cloned.TypeHints
+    }
     cloned = {...cloned}
   }
   function addMatter() {
@@ -199,29 +216,50 @@
   <section>
     {#if arch}
       <article>
-        <div class='entry__archs'>
-          <span>Archs</span>
-          <ItemList>
-            <svelte:fragment slot='header'>
-              <button on:click={addArch}> + </button>
-              <button disabled={disabled} on:click={e=>clear('Archs')}>c</button>
-            </svelte:fragment>
-            <svelte:fragment slot='items'>
-              {#if cloned.Archs}
-                {#each cloned.Archs as a, index}
-                  <ItemListItem id={index}>
-                    <input disabled={disabled} placeholder={a} on:change={e=>change('Archs.'+index, e.currentTarget.value)}>
-                    <button disabled={disabled} on:click={_=>removeArch(index)}>x</button>
-                  </ItemListItem>
-                {/each}
-              {/if}
-            </svelte:fragment>
-          </ItemList>
-        </div>
-        <Field key='Name' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
-        <Field key='Description' type='textarea' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
-        <Field key='Type' type='list' list={ArchetypeTypes} {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
-
+        <fieldset>
+          <legend>Base</legend>
+          <div class='entry__archs'>
+            <span>Archs</span>
+            <ItemList>
+              <svelte:fragment slot='header'>
+                <button disabled={disabled} on:click={addArch}> + </button>
+                <button disabled={disabled} on:click={e=>clear('Archs')}>c</button>
+              </svelte:fragment>
+              <svelte:fragment slot='items'>
+                {#if cloned.Archs}
+                  {#each cloned.Archs as a, index}
+                    <ItemListItem id={index}>
+                      <input disabled={disabled} placeholder={a} on:change={e=>change('Archs.'+index, e.currentTarget.value)}>
+                      <button disabled={disabled} on:click={_=>removeArch(index)}>x</button>
+                    </ItemListItem>
+                  {/each}
+                {/if}
+              </svelte:fragment>
+            </ItemList>
+          </div>
+          <Field key='Name' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Description' type='textarea' {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <Field key='Type' type='list' list={ArchetypeTypes} {disabled} {clonedDD} {compiledDD} on:update={update}></Field>
+          <div class='entry__typehints'>
+            <span>Type Hints</span>
+            <ItemList>
+              <svelte:fragment slot='header'>
+                <button disabled={disabled} on:click={addTypeHint}> + </button>
+                <button disabled={disabled} on:click={e=>clear('TypeHints')}>c</button>
+              </svelte:fragment>
+              <svelte:fragment slot='items'>
+                {#if cloned.TypeHints}
+                  {#each cloned.TypeHints as a, index}
+                    <ItemListItem id={index}>
+                      <input disabled={disabled} placeholder={a} on:change={e=>change('TypeHints.'+index, e.currentTarget.value)}>
+                      <button disabled={disabled} on:click={_=>removeTypeHint(index)}>x</button>
+                    </ItemListItem>
+                  {/each}
+                {/if}
+              </svelte:fragment>
+            </ItemList>
+          </div>
+        </fieldset>
         {#if (cloned.Type??arch.Compiled.Type) == 'Exit'}
           <fieldset>
             <legend>Exit</legend>
@@ -324,7 +362,7 @@
           <legend>
             <label>
               <span>Light</span>
-              <input type='checkbox' on:change={toggleLight} checked={cloned.Light!==undefined}>
+              <input type='checkbox' disabled={disabled} on:change={toggleLight} checked={cloned.Light!==undefined}>
             </label>
           </legend>
           {#if cloned.Light}
@@ -340,7 +378,7 @@
           <legend>
             <label>
               <span>Events</span>
-              <input type='checkbox' on:change={toggleEvents} checked={cloned.Events!==undefined}>
+              <input type='checkbox' disabled={disabled} on:change={toggleEvents} checked={cloned.Events!==undefined}>
             </label>
           </legend>
           {#if cloned.Events !== undefined}
@@ -413,7 +451,7 @@
   textarea.script {
     font-family: monospace;
   }
-  .entry__archs, .entry__matter, .entry__blocking {
+  .entry__archs, .entry__matter, .entry__blocking, .entry__typehints {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
   }

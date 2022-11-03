@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	cdata "github.com/chimera-rpg/go-common/data"
 	sdata "github.com/chimera-rpg/go-server/data"
 	"gopkg.in/yaml.v2"
 )
@@ -24,7 +23,7 @@ type Editor struct {
 	ctx              context.Context
 	Archetypes       map[string]string              `json:"Archetypes"`
 	Animations       map[string]*sdata.AnimationPre `json:"Animations"`
-	AnimationsConfig cdata.AnimationsConfig         `json:"AnimationsConfig"`
+	AnimationsConfig sdata.AnimationsConfig         `json:"AnimationsConfig"`
 	Config           Config                         `json:"Config"`
 	ConfigDir        string
 	compiled         bool

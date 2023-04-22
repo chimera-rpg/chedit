@@ -1,6 +1,6 @@
 module changeme
 
-go 1.17
+go 1.20
 
 require (
 	github.com/chimera-rpg/go-common v0.0.0-20221101092204-e361ba3a7ab6
